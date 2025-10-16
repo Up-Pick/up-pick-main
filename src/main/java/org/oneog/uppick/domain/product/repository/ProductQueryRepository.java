@@ -6,6 +6,7 @@ import org.oneog.uppick.domain.product.dto.response.ProductInfoResponse;
 import org.springframework.stereotype.Repository;
 
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import static org.oneog.uppick.domain.product.entity.QProduct.product;
@@ -35,6 +36,7 @@ public class ProductQueryRepository {
 					product.viewCount,
 					product.registeredAt,
 					product.image,
+					Expressions.stringTemplate("CONCAT({0}, '/', {1}", category.big, category.small),
 					category.big,
 					sellDetail.sellAt,
 					auction.currentPrice,
@@ -46,6 +48,7 @@ public class ProductQueryRepository {
 			.join(auction).on(product.id.eq(auction.productId))
 			.join(member).on(product.registerId.eq(member.id))
 			.leftJoin(sellDetail).on(product.id.eq(sellDetail.productId))
+			.where(product.id.eq(productId))
 			.fetchOne();
 
 		return Optional.ofNullable(qResponse);
