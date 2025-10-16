@@ -41,6 +41,7 @@ public class AuctionInternalService {
 			BiddingDetail biddingDetail = BiddingDetail.builder()
 				.auctionId(auctionId)
 				.memberId(memberId)
+				.bidPrice(request.getBiddingPrice())
 				.build();
 
 			biddingDetailRepository.save(biddingDetail);
