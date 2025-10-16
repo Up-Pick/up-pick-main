@@ -3,6 +3,7 @@ plugins {
     id 'org.springframework.boot' version '3.5.6'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'jacoco'
+    id 'org.asciidoctor.jvm.convert' version '3.3.2' // spring rest docs
 }
 
 group = 'org.1og'
@@ -24,6 +25,7 @@ configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
+    asciidoctorExt  // spring rest docs
 }
 
 repositories {
@@ -52,10 +54,20 @@ dependencies {
     implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
     runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
     runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
+
+    // spring rest docs
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+}
+
+// REST Docs 스니펫 디렉토리 설정
+ext {
+    snippetsDir = file('build/generated-snippets')
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+    outputs.dir snippetsDir // spring rest docs
 }
 
 tasks.jacocoTestReport {
@@ -79,4 +91,20 @@ sourceSets {
 tasks.withType(JavaCompile).configureEach {
     // Gradle의 annotation processor 출력 디렉터리 지정
     options.annotationProcessorGeneratedSourcesDirectory = file("$buildDir/generated/sources/annotationProcessor/java/main")
+}
+
+// spring rest docs
+asciidoctor {
+    inputs.dir snippetsDir
+    configurations 'asciidoctorExt'
+    dependsOn test
+    baseDirFollowsSourceFile()
+}
+
+// spring rest docs
+bootJar {
+    dependsOn asciidoctor
+    from("build/docs/asciidoc") {
+        into 'static/docs'
+    }
 }
