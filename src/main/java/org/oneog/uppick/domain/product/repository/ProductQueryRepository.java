@@ -37,11 +37,10 @@ public class ProductQueryRepository {
 					product.registeredAt,
 					product.image,
 					Expressions.stringTemplate("CONCAT({0}, '/', {1})", category.big, category.small),
-					category.big,
-					sellDetail.sellAt,
+					product.soldAt,
 					auction.currentPrice,
 					auction.endAt,
-					member.name
+					member.nickname
 				)
 			)
 			.from(product)
@@ -49,7 +48,7 @@ public class ProductQueryRepository {
 			.join(auction).on(product.id.eq(auction.productId))
 			.join(member).on(product.registerId.eq(member.id))
 			.leftJoin(sellDetail).on(product.id.eq(sellDetail.productId))
-			.where(product.id.eq(productId))
+			.where(productId != null ? product.id.eq(productId) : null)
 			.fetchOne();
 
 		return Optional.ofNullable(qResponse);
