@@ -33,6 +33,8 @@ public class SellDetail {
 	@Column(name = "sell_at", nullable = false, updatable = false)
 	private LocalDateTime sellAt;
 
+	@Column(name = "auction_id", nullable = false)
+	private Long auctionId;
 	@Column(name = "product_id", nullable = false)
 	private Long productId;
 	@Column(name = "seller_id", nullable = false)
