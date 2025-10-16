@@ -34,6 +34,7 @@ jobs:
         SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3307/uppick_db
         SPRING_DATASOURCE_USERNAME: user
         SPRING_DATASOURCE_PASSWORD: password
+        SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
 
     - name: Add Coverage Report to PR and Check Threshold
       id: jacoco_check
