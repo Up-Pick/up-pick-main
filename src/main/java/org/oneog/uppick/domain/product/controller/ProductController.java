@@ -21,7 +21,7 @@ public class ProductController {
 	private final ProductInternalService productInternalService;
 
 	@PostMapping
-	public GlobalApiResponse<Object> registerProduct(
+	public GlobalApiResponse<Void> registerProduct(
 		@Valid @RequestBody ProductRegisterRequest request,
 		@AuthenticationPrincipal AuthMember authMember) {
 

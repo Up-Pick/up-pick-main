@@ -33,6 +33,7 @@ public class ProductRegisterRequest {
 	@Positive(message = "값을 입력해야 합니다.")
 	private Long startBid;
 
+	@NotNull(message = "마감 날짜는 비울 수 없습니다.")
 	@Future(message = "마감 날짜는 현재 날짜 이후여야 합니다.")
 	private LocalDateTime endAt;
 }
