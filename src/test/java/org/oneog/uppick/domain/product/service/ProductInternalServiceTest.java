@@ -19,7 +19,6 @@ import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
 
 import java.time.LocalDateTime;
@@ -75,5 +74,24 @@ public class ProductInternalServiceTest {
 		assertThat(saved.getName()).isEqualTo(request.getName());
 		assertThat(saved.getDescription()).isEqualTo(request.getDescription());
 		assertThat(saved.getCategoryId()).isEqualTo(request.getCategoryId());
+	}
+
+	@Test
+	void 상품을_상세_조회하면_조회수가_올라감() {
+
+		// given
+		Product product = Product.builder()
+			.name("상품 이름")
+			.description("상품 설명")
+			.categoryId(1L)
+			.registerId(1L)
+			.build();
+		Long prevViewCount = product.getViewCount();
+
+		// when
+		product.increaseViewCount();
+
+		// then
+		assertThat(product.getViewCount()).isEqualTo(prevViewCount + 1);
 	}
 }
