@@ -8,8 +8,8 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class AuctionErrorCode implements ErrorCode {
-
+public enum AuctionErrorCode implements ErrorCode {
+	;
 	private final HttpStatus status;
 	private final String message;
 }
