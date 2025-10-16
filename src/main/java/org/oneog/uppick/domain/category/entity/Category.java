@@ -28,7 +28,7 @@ public class Category {
 	private String small;
 
 	@Column(nullable = false, updatable = false)
-	private LocalDateTime created_at = LocalDateTime.now();
+	private LocalDateTime createdAt = LocalDateTime.now();
 
 	@Builder
 	private Category(String big, String small) {
