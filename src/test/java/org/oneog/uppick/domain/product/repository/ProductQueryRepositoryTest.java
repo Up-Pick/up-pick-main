@@ -1,6 +1,7 @@
 package org.oneog.uppick.domain.product.repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,6 +13,7 @@ import org.oneog.uppick.domain.category.repository.CategoryRepository;
 import org.oneog.uppick.domain.member.entity.Member;
 import org.oneog.uppick.domain.member.repository.MemberRepository;
 import org.oneog.uppick.domain.product.dto.response.ProductInfoResponse;
+import org.oneog.uppick.domain.product.dto.response.ProductSoldInfoResponse;
 import org.oneog.uppick.domain.product.entity.Product;
 import org.oneog.uppick.domain.product.entity.SellDetail;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,5 +105,20 @@ public class ProductQueryRepositoryTest {
 		assertThat(result.getCurrentBid()).isEqualTo(auction.getCurrentPrice());
 		assertThat(result.getEndAt().toLocalDate()).isEqualTo(auction.getEndAt().toLocalDate());
 		assertThat(result.getSellerName()).isEqualTo(member.getNickname());
+	}
+
+	@Test
+	void 판매_완료된_상품의_정보_조회_가능() {
+		List<ProductSoldInfoResponse> results = productQueryRepository.getProductSoldInfoByMemberId(member.getId());
+
+		assertThat(results).isNotNull();
+		ProductSoldInfoResponse result = results.getFirst();
+
+		assertThat(result.getId()).isEqualTo(product.getId());
+		assertThat(result.getName()).isEqualTo(product.getName());
+		assertThat(result.getDescription()).isEqualTo(product.getDescription());
+		assertThat(result.getImage()).isEqualTo(product.getImage());
+		assertThat(result.getFinalPrice()).isEqualTo(sellDetail.getFinalPrice());
+		assertThat(result.getSoldAt().toLocalDate()).isEqualTo(sellDetail.getSellAt().toLocalDate());
 	}
 }
