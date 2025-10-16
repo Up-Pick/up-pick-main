@@ -16,14 +16,12 @@ import org.oneog.uppick.domain.product.entity.Product;
 import org.oneog.uppick.domain.product.entity.SellDetail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-@ActiveProfiles("dev")
 public class ProductQueryRepositoryTest {
 
 	@Autowired
