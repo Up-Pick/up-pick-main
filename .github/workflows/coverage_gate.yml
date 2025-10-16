@@ -43,6 +43,11 @@ jobs:
         paths: ${{ github.workspace }}/build/reports/jacoco/test/jacocoTestReport.xml
         token: ${{ secrets.GITHUB_TOKEN }}
         min-coverage-overall: 10
-        min-coverage-changed-files: 0
         title: "JaCoCo Code Coverage Report"
         update-comment: true
+
+    - name: Fail CI if overall coverage is below threshold
+      if: ${{ steps.jacoco_check.outputs.coverage-overall < 10 }}
+      run: |
+        echo "Overall coverage is below the 10% threshold."
+        exit 1
