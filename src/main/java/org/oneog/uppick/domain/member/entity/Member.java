@@ -52,7 +52,7 @@ public class Member {
 	private LocalDateTime registeredAt;
 
 	@Builder
-	public Member(String email, String nickname, String password, String name, String address, String phone,
+	private Member(String email, String nickname, String password, String name, String address, String phone,
 		Long credit) {
 
 		this.email = email;
