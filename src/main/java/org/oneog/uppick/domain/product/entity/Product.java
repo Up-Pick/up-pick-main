@@ -3,9 +3,11 @@ package org.oneog.uppick.domain.product.entity;
 import java.time.LocalDateTime;
 
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -17,6 +19,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 public class Product {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -51,5 +54,10 @@ public class Product {
 		this.image = image;
 		this.categoryId = categoryId;
 		this.registerId = registerId;
+	}
+
+	// ***** Method ***** //
+	public void increaseViewCount() {
+		this.viewCount++;
 	}
 }
