@@ -6,5 +6,5 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class CategoryExternalService {
+public class CategoryExternalService implements CategoryExternalServiceApi {
 }
