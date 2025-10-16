@@ -12,12 +12,15 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @EntityListeners(AuditingEntityListener.class)
 public class SellDetail {
 
@@ -39,4 +42,12 @@ public class SellDetail {
 	private Long productId;
 	@Column(name = "seller_id", nullable = false)
 	private Long sellerId;
+
+	@Builder
+	private SellDetail(Long finalPrice, Long auctionId, Long productId, Long sellerId) {
+		this.finalPrice = finalPrice;
+		this.auctionId = auctionId;
+		this.productId = productId;
+		this.sellerId = sellerId;
+	}
 }
