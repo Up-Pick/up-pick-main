@@ -1,7 +1,5 @@
 package org.oneog.uppick.domain.ranking.entity;
 
-import java.time.LocalDateTime;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,19 +12,17 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class SearchHistory {
+public class HotKeyword {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
 	private Long id;
 
-	@Column(nullable = false)
+	@Column(name = "keyword", nullable = false)
 	private String keyword;
 
-	@Column(nullable = false, updatable = false)
-	private LocalDateTime searchedAt = LocalDateTime.now();
+	@Column(name = "rank", nullable = false)
+	private Integer rank;
 
-	public SearchHistory(String keyword) {
-		this.keyword = keyword;
-	}
 }
