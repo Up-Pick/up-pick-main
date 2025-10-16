@@ -34,7 +34,7 @@ public class BiddingDetail {
 	private Long memberId;
 
 	@CreatedDate
-	@Column(name = "bid_at", nullable = false)
+	@Column(name = "bid_at", nullable = false, updatable = false)
 	private LocalDateTime bidAt; //입찰시각
 
 	@Builder
