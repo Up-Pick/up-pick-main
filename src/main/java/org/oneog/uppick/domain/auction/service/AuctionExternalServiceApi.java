@@ -10,6 +10,5 @@ public interface AuctionExternalServiceApi {
 	 * @param minPrice 최소 입찰가
 	 * @param endAt 마감 시간
 	 */
-	default void registerAuction(Long productID, Long minPrice, LocalDateTime endAt) {
-	}
+	void registerAuction(Long productID, Long minPrice, LocalDateTime endAt);
 }
