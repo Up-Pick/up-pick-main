@@ -1,7 +1,6 @@
 package org.oneog.uppick.domain.product.repository;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,6 +17,9 @@ import org.oneog.uppick.domain.product.entity.Product;
 import org.oneog.uppick.domain.product.entity.SellDetail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -91,7 +93,7 @@ public class ProductQueryRepositoryTest {
 
 	@Test
 	void 상품의_상세_정보_조회_가능() {
-		ProductInfoResponse result = productQueryRepository.getProductInfoById(testProductId).get();
+		ProductInfoResponse result = productQueryRepository.getProductInfoById(testProductId).orElseThrow();
 
 		assertThat(result).isNotNull();
 		assertThat(result.getId()).isEqualTo(testProductId);
@@ -109,10 +111,11 @@ public class ProductQueryRepositoryTest {
 
 	@Test
 	void 판매_완료된_상품의_정보_조회_가능() {
-		List<ProductSoldInfoResponse> results = productQueryRepository.getProductSoldInfoByMemberId(member.getId());
+		Pageable pageable = PageRequest.of(0, 10);
+		Page<ProductSoldInfoResponse> results = productQueryRepository.getProductSoldInfoByMemberId(member.getId(), pageable);
 
 		assertThat(results).isNotNull();
-		ProductSoldInfoResponse result = results.getFirst();
+		ProductSoldInfoResponse result = results.getContent().getFirst();
 
 		assertThat(result.getId()).isEqualTo(product.getId());
 		assertThat(result.getName()).isEqualTo(product.getName());

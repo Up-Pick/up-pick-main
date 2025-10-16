@@ -1,7 +1,5 @@
 package org.oneog.uppick.domain.product.service;
 
-import java.util.List;
-
 import org.oneog.uppick.common.exception.BusinessException;
 import org.oneog.uppick.domain.auction.service.AuctionExternalServiceApi;
 import org.oneog.uppick.domain.product.dto.request.ProductRegisterRequest;
@@ -13,8 +11,6 @@ import org.oneog.uppick.domain.product.mapper.ProductMapper;
 import org.oneog.uppick.domain.product.repository.ProductQueryRepository;
 import org.oneog.uppick.domain.product.repository.ProductRepository;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,13 +51,9 @@ public class ProductInternalService {
 		return productQueryRepository.getProductInfoById(productId).orElseThrow(() -> new BusinessException(ProductErrorCode.CANNOT_READ_PRODUCT_INFO));
 	}
 
-	public Page<ProductSoldInfoResponse> getProductSoldInfoByMemberId(Long memberId) {
+	public Page<ProductSoldInfoResponse> getProductSoldInfoByMemberId(Long memberId, Pageable pageable) {
 
-		List<ProductSoldInfoResponse> responseList = productQueryRepository.getProductSoldInfoByMemberId(memberId);
-		Pageable pageable = PageRequest.of(0, 10);
-		long totalCount = responseList.size();
-
-		return new PageImpl<>(responseList, pageable, totalCount);
+		return productQueryRepository.getProductSoldInfoByMemberId(memberId, pageable);
 	}
 
 	// ***** Internal Method ***** //

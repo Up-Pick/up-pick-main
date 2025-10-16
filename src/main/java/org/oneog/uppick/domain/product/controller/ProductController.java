@@ -8,6 +8,8 @@ import org.oneog.uppick.domain.product.dto.response.ProductInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductSoldInfoResponse;
 import org.oneog.uppick.domain.product.service.ProductInternalService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -47,10 +49,10 @@ public class ProductController {
 	// 판매 완료된 상품 내역 조회
 	@GetMapping("/sold/me")
 	public GlobalPageResponse<ProductSoldInfoResponse> getSoldProducts(
-		@AuthenticationPrincipal AuthMember authMember) {
+		@AuthenticationPrincipal AuthMember authMember,
+		@PageableDefault Pageable pageable) {
 
-		Page<ProductSoldInfoResponse> responses = productInternalService.getProductSoldInfoByMemberId(
-			authMember.getMemberId());
+		Page<ProductSoldInfoResponse> responses = productInternalService.getProductSoldInfoByMemberId(authMember.getMemberId(), pageable);
 		return GlobalPageResponse.of(responses);
 	}
 }
