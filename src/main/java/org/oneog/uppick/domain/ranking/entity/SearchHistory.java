@@ -24,7 +24,7 @@ public class SearchHistory {
 	@Column(nullable = false)
 	private String keyword;
 
-	@Column(nullable = false)
+	@Column(nullable = false, updatable = false)
 	private LocalDateTime searchedAt = LocalDateTime.now();
 
 	@Builder

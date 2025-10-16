@@ -30,7 +30,7 @@ public class HotDeal {
 	@Column(nullable = false)
 	private String productImage;
 
-	@Column(nullable = false)
+	@Column(nullable = false, updatable = false)
 	private LocalDateTime createdAt = LocalDateTime.now();
 
 	@Builder
