@@ -29,8 +29,8 @@ public class Product {
 
 	@Column(name = "registered_at", nullable = false)
 	private LocalDateTime registeredAt = LocalDateTime.now();
-	@Column(name = "sold_out_at")
-	private LocalDateTime soldOutAt;
+	@Column(name = "sold_at")
+	private LocalDateTime soldAt;
 
 	@Column(name = "image")
 	private String image;
