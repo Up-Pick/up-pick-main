@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.5.6'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'jacoco'
 }
 
 group = 'org.1og'
@@ -40,6 +41,7 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testImplementation 'com.h2database:h2'
 
 	// QueryDSL: JPA 및 APT (jakarta 플러그인 사용)
 	implementation "com.querydsl:querydsl-jpa:${querydslVersion}:jakarta"
@@ -54,6 +56,14 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+tasks.jacocoTestReport {
+    dependsOn test 
+    reports {
+        xml.required = true 
+        html.required = false 
+    }
 }
 
 // QueryDSL이 생성하는 소스 디렉터리를 main 소스셋에 추가하고
