@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
-public class HotDealQueryRepository {
+public class RankingQueryRepository {
 
 	private final JPAQueryFactory jpaQueryFactory;
 
