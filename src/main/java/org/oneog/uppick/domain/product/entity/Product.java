@@ -2,6 +2,8 @@ package org.oneog.uppick.domain.product.entity;
 
 import java.time.LocalDateTime;
 
+import org.springframework.data.annotation.CreatedDate;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -18,6 +20,7 @@ import lombok.NoArgsConstructor;
 public class Product {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
 	private Long id;
 
 	@Column(name = "name", nullable = false)
@@ -27,8 +30,9 @@ public class Product {
 
 	private Long viewCount = 0L;
 
-	@Column(name = "registered_at", nullable = false)
-	private LocalDateTime registeredAt = LocalDateTime.now();
+	@CreatedDate
+	@Column(name = "registered_at", nullable = false, updatable = false)
+	private LocalDateTime registeredAt;
 	@Column(name = "sold_at")
 	private LocalDateTime soldAt;
 
