@@ -1,4 +1,4 @@
-package org.oneog.uppick.domain.bid.enums;
+package org.oneog.uppick.domain.auction.enums;
 
 import lombok.Getter;
 

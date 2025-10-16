@@ -1,4 +1,4 @@
-package org.oneog.uppick.domain.bid.service;
+package org.oneog.uppick.domain.auction.service;
 
 import org.springframework.stereotype.Service;
 
@@ -6,5 +6,5 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class BidExternalService implements BidExternalServiceApi {
+public class AuctionExternalService implements AuctionExternalServiceApi {
 }
