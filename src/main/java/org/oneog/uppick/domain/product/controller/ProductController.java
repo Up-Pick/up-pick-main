@@ -2,9 +2,12 @@ package org.oneog.uppick.domain.product.controller;
 
 import org.oneog.uppick.common.dto.AuthMember;
 import org.oneog.uppick.common.dto.GlobalApiResponse;
+import org.oneog.uppick.common.dto.GlobalPageResponse;
 import org.oneog.uppick.domain.product.dto.request.ProductRegisterRequest;
 import org.oneog.uppick.domain.product.dto.response.ProductInfoResponse;
+import org.oneog.uppick.domain.product.dto.response.ProductSoldInfoResponse;
 import org.oneog.uppick.domain.product.service.ProductInternalService;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,5 +42,15 @@ public class ProductController {
 
 		ProductInfoResponse response = productInternalService.getProductInfoById(productId);
 		return GlobalApiResponse.ok(response);
+	}
+
+	// 판매 완료된 상품 내역 조회
+	@GetMapping("/sold/me")
+	public GlobalPageResponse<ProductSoldInfoResponse> getSoldProducts(
+		@AuthenticationPrincipal AuthMember authMember) {
+
+		Page<ProductSoldInfoResponse> responses = productInternalService.getProductSoldInfoByMemberId(
+			authMember.getMemberId());
+		return GlobalPageResponse.of(responses);
 	}
 }

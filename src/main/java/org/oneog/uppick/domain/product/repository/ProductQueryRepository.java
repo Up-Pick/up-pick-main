@@ -1,8 +1,10 @@
 package org.oneog.uppick.domain.product.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.oneog.uppick.domain.product.dto.response.ProductInfoResponse;
+import org.oneog.uppick.domain.product.dto.response.ProductSoldInfoResponse;
 import org.springframework.stereotype.Repository;
 
 import com.querydsl.core.types.Projections;
@@ -54,4 +56,23 @@ public class ProductQueryRepository {
 		return Optional.ofNullable(qResponse);
 	}
 
+	public List<ProductSoldInfoResponse> getProductSoldInfoByMemberId(Long memberId) {
+
+		return queryFactory
+			.select(
+				Projections.constructor(
+					ProductSoldInfoResponse.class,
+					product.id,
+					product.name,
+					product.description,
+					product.image,
+					sellDetail.finalPrice,
+					sellDetail.sellAt
+				)
+			)
+			.from(product)
+			.join(sellDetail).on(product.id.eq(sellDetail.productId))
+			.where(memberId != null ? product.registerId.eq(memberId) : null)
+			.fetch();
+	}
 }
