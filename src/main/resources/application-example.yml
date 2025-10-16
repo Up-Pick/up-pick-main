@@ -1,0 +1,20 @@
+spring:
+  datasource:
+    url: 디비 URL
+    username: 디비 USERNAME
+    password: 디비 PASS
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+server:
+  port: 8080
