@@ -27,8 +27,8 @@ public class HotDeal {
 	@Column(name = "id")
 	private Long id;
 
-	@Column(name = "rank", nullable = false)
-	private Integer rank;
+	@Column(name = "rank_no", nullable = false)
+	private Integer rankNo;
 
 	@Column(name = "product_name", nullable = false)
 	private String productName;
@@ -41,8 +41,8 @@ public class HotDeal {
 	private LocalDateTime createdAt;
 
 	@Builder
-	private HotDeal(Integer rank, String productName, String productImage) {
-		this.rank = rank;
+	private HotDeal(Integer rankNo, String productName, String productImage) {
+		this.rankNo = rankNo;
 		this.productName = productName;
 		this.productImage = productImage;
 	}

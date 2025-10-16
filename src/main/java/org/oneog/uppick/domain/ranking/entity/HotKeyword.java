@@ -22,12 +22,12 @@ public class HotKeyword {
 	@Column(name = "keyword", nullable = false)
 	private String keyword;
 
-	@Column(name = "rank", nullable = false)
-	private Integer rank;
+	@Column(name = "rank_no", nullable = false)
+	private Integer rankNo;
 
-	public HotKeyword(String keyword, Integer rank) {
+	public HotKeyword(String keyword, Integer rankNo) {
 		this.keyword = keyword;
-		this.rank = rank;
+		this.rankNo = rankNo;
 	}
 
 }
