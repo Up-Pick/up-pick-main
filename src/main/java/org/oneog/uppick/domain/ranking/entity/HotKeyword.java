@@ -25,4 +25,9 @@ public class HotKeyword {
 	@Column(name = "rank", nullable = false)
 	private Integer rank;
 
+	public HotKeyword(String keyword, Integer rank) {
+		this.keyword = keyword;
+		this.rank = rank;
+	}
+
 }
