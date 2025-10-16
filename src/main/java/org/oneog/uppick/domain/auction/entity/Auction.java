@@ -2,7 +2,9 @@ package org.oneog.uppick.domain.auction.entity;
 
 import java.time.LocalDateTime;
 
+import org.oneog.uppick.common.exception.BusinessException;
 import org.oneog.uppick.domain.auction.enums.Status;
+import org.oneog.uppick.domain.auction.exception.AuctionErrorCode;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -57,5 +59,14 @@ public class Auction {
 		this.minPrice = minPrice;
 		this.status = status;
 		this.endAt = endAt;
+	}
+
+	// --- 도메인 메서드 ---
+	//입찰 성공시 현재 입찰가를 갱신하기 위함
+	public void updateCurrentPrice(Long biddingPrice) {
+		if (biddingPrice == null || biddingPrice <= 0) {
+			throw new BusinessException(AuctionErrorCode.WRONG_BIDDING_PRICE);
+		}
+		this.currentPrice = biddingPrice;
 	}
 }

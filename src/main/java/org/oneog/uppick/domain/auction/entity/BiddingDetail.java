@@ -38,9 +38,8 @@ public class BiddingDetail {
 	private LocalDateTime bidAt; //입찰시각
 
 	@Builder
-	private BiddingDetail(Long auctionId, Long memberId, LocalDateTime bidAt) {
+	private BiddingDetail(Long auctionId, Long memberId) {
 		this.auctionId = auctionId;
 		this.memberId = memberId;
-		this.bidAt = bidAt;
 	}
 }
