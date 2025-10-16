@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: 디비 URL
-    username: 디비 USERNAME
-    password: 디비 PASS
+    url: jdbc:mysql://localhost:3307/uppick_db
+    username: user
+    password: password
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
