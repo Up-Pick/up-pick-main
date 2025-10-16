@@ -8,7 +8,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -27,8 +26,7 @@ public class SearchHistory {
 	@Column(nullable = false, updatable = false)
 	private LocalDateTime searchedAt = LocalDateTime.now();
 
-	@Builder
-	private SearchHistory(String keyword) {
+	public SearchHistory(String keyword) {
 		this.keyword = keyword;
 	}
 }
