@@ -1,8 +1,8 @@
-package org.oneog.uppick.domain.bid.entity;
+package org.oneog.uppick.domain.auction.entity;
 
 import java.time.LocalDateTime;
 
-import org.oneog.uppick.domain.bid.enums.Status;
+import org.oneog.uppick.domain.auction.enums.Status;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Bid {
+public class Auction {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -51,7 +51,7 @@ public class Bid {
 	private LocalDateTime endAt;
 
 	@Builder
-	private Bid(Long productId, Long currentPrice, Long minPrice, Status status, LocalDateTime endAt) {
+	private Auction(Long productId, Long currentPrice, Long minPrice, Status status, LocalDateTime endAt) {
 		this.productId = productId;
 		this.currentPrice = currentPrice;
 		this.minPrice = minPrice;

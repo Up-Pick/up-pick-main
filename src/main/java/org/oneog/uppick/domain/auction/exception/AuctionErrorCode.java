@@ -1,4 +1,4 @@
-package org.oneog.uppick.domain.bid.exception;
+package org.oneog.uppick.domain.auction.exception;
 
 import org.oneog.uppick.common.exception.ErrorCode;
 import org.springframework.http.HttpStatus;
@@ -8,7 +8,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class BidErrorCode implements ErrorCode {
+public class AuctionErrorCode implements ErrorCode {
 
 	private final HttpStatus status;
 	private final String message;

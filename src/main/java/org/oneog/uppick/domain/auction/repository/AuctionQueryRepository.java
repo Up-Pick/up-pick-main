@@ -1,4 +1,4 @@
-package org.oneog.uppick.domain.bid.repository;
+package org.oneog.uppick.domain.auction.repository;
 
 import org.springframework.stereotype.Repository;
 
@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
-public class BidQueryRepository {
+public class AuctionQueryRepository {
 
 	private final JPAQueryFactory jpaQueryFactory;
 }
