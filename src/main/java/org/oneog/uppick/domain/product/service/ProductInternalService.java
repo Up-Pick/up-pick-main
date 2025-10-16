@@ -38,6 +38,7 @@ public class ProductInternalService {
 		auctionExternalServiceApi.registerAuction(product.getId(), request.getStartBid(), request.getEndAt());
 	}
 
+	@Transactional
 	public ProductInfoResponse getProductInfoById(Long productId) {
 
 		// 조회수 +1
