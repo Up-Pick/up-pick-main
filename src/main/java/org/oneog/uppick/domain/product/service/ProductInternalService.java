@@ -27,6 +27,7 @@ public class ProductInternalService {
 	// ****** External Domain API ***** //
 	private final AuctionExternalServiceApi auctionExternalServiceApi;
 
+	// ***** Service Method ***** //
 	@Transactional
 	public void registerProduct(ProductRegisterRequest request, Long registerId) {
 
@@ -38,10 +39,15 @@ public class ProductInternalService {
 	}
 
 	public ProductInfoResponse getProductInfoById(Long productId) {
+
+		// 조회수 +1
+		Product product = findProductByIdOrElseThrow(productId);
+		product.increaseViewCount();
+
 		return productQueryRepository.getProductInfoById(productId).orElseThrow(() -> new BusinessException(ProductErrorCode.CANNOT_READ_PRODUCT_INFO));
 	}
 
-	// ***** Internal Service Method ***** //
+	// ***** Internal Method ***** //
 	private Product findProductByIdOrElseThrow(Long productId) {
 		return productRepository.findById(productId).orElseThrow(() -> new BusinessException(ProductErrorCode.PRODUCT_NOT_FOUND));
 	}

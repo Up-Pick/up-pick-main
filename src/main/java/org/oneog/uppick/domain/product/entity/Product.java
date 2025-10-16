@@ -55,4 +55,9 @@ public class Product {
 		this.categoryId = categoryId;
 		this.registerId = registerId;
 	}
+
+	// ***** Method ***** //
+	public void increaseViewCount() {
+		this.viewCount++;
+	}
 }
