@@ -2,8 +2,12 @@ package org.oneog.uppick.domain.auction.entity;
 
 import java.time.LocalDateTime;
 
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -15,6 +19,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 public class BiddingDetail {
 
 	@Id
@@ -28,6 +33,7 @@ public class BiddingDetail {
 	@Column(name = "bidder_id", nullable = false)
 	private Long memberId;
 
+	@CreatedDate
 	@Column(name = "bid_at", nullable = false)
 	private LocalDateTime bidAt; //입찰시각
 
