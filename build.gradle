@@ -1,8 +1,9 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.5.6'
-	id 'io.spring.dependency-management' version '1.1.7'
-	id 'jacoco'
+    id 'java'
+    id 'org.springframework.boot' version '3.5.6'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'jacoco'
+    id 'org.asciidoctor.jvm.convert' version '3.3.2' // spring rest docs
 }
 
 group = 'org.1og'
@@ -15,68 +16,95 @@ def querydslVersion = '5.1.0'
 def jjwtVersion = '0.13.0'
 
 java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
-	}
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+    asciidoctorExt  // spring rest docs
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	compileOnly 'org.projectlombok:lombok'
-	runtimeOnly 'com.mysql:mysql-connector-j'
-	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.security:spring-security-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-	testImplementation 'com.h2database:h2'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    compileOnly 'org.projectlombok:lombok'
+    runtimeOnly 'com.mysql:mysql-connector-j'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'com.h2database:h2'
 
-	// QueryDSL: JPA 및 APT (jakarta 플러그인 사용)
-	implementation "com.querydsl:querydsl-jpa:${querydslVersion}:jakarta"
-	annotationProcessor "com.querydsl:querydsl-apt:${querydslVersion}:jakarta"
-	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+    // QueryDSL: JPA 및 APT (jakarta 플러그인 사용)
+    implementation "com.querydsl:querydsl-jpa:${querydslVersion}:jakarta"
+    annotationProcessor "com.querydsl:querydsl-apt:${querydslVersion}:jakarta"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
-	// JJWT for JSON Web Tokens
-	implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
-	runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
-	runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
+    // JJWT for JSON Web Tokens
+    implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
+    runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
+    runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
+
+    // spring rest docs
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+}
+
+// REST Docs 스니펫 디렉토리 설정
+ext {
+    snippetsDir = file('build/generated-snippets')
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
+    outputs.dir snippetsDir // spring rest docs
 }
 
 tasks.jacocoTestReport {
-    dependsOn test 
+    dependsOn test
     reports {
-        xml.required = true 
-        html.required = false 
+        xml.required = true
+        html.required = false
     }
 }
 
 // QueryDSL이 생성하는 소스 디렉터리를 main 소스셋에 추가하고
 // Java 컴파일러의 APT 생성 경로를 명시적으로 설정합니다.
 sourceSets {
-	main {
-		java {
-			srcDirs += "$buildDir/generated/sources/annotationProcessor/java/main"
-		}
-	}
+    main {
+        java {
+            srcDirs += "$buildDir/generated/sources/annotationProcessor/java/main"
+        }
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {
-	// Gradle의 annotation processor 출력 디렉터리 지정
-	options.annotationProcessorGeneratedSourcesDirectory = file("$buildDir/generated/sources/annotationProcessor/java/main")
+    // Gradle의 annotation processor 출력 디렉터리 지정
+    options.annotationProcessorGeneratedSourcesDirectory = file("$buildDir/generated/sources/annotationProcessor/java/main")
+}
+
+// spring rest docs
+asciidoctor {
+    inputs.dir snippetsDir
+    configurations 'asciidoctorExt'
+    dependsOn test
+    baseDirFollowsSourceFile()
+}
+
+// spring rest docs
+bootJar {
+    dependsOn asciidoctor
+    from("build/docs/asciidoc") {
+        into 'static/docs'
+    }
 }
