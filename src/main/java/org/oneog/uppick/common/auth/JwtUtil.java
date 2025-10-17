@@ -34,12 +34,6 @@ public class JwtUtil {
 		key = Keys.hmacShaKeyFor(bytes);
 	}
 
-	// 테스트용 setter
-	public void setSecretKeyForTest(String secretKey) {
-		this.secretKey = secretKey;
-		init();
-	}
-
 	// 토큰 생성
 	public String createToken(Long memberId, String memberNickname) {
 		Date date = new Date();

@@ -4,31 +4,30 @@ import org.oneog.uppick.common.exception.BusinessException;
 import org.oneog.uppick.domain.auth.dto.request.SignupRequest;
 import org.oneog.uppick.domain.auth.exception.AuthErrorCode;
 import org.oneog.uppick.domain.member.entity.Member;
-import org.oneog.uppick.domain.member.repository.MemberRepository;
+import org.oneog.uppick.domain.member.service.MemberExternalService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class AuthService {
-	private final MemberRepository memberRepository;
+	private final MemberExternalService memberExternalService;
 	private final PasswordEncoder passwordEncoder;
 
 	@Transactional
-	public void signup(@Valid SignupRequest signupRequest) {
-		
+	public void signup(SignupRequest signupRequest) {
+
 		// 이메일 중복 체크
-		if (memberRepository.existsByEmail(signupRequest.getEmail())) {
+		if (memberExternalService.existsByEmail(signupRequest.getEmail())) {
 			throw new BusinessException(AuthErrorCode.DUPLICATE_EMAIL);
 		}
 
 		// 닉네임 중복 체크
-		if (memberRepository.existsByNickname(signupRequest.getNickname())) {
+		if (memberExternalService.existsByNickname(signupRequest.getNickname())) {
 			throw new BusinessException(AuthErrorCode.DUPLICATE_NICKNAME);
 		}
 
@@ -41,6 +40,6 @@ public class AuthService {
 			.password(encodedPassword)
 			.build();
 
-		memberRepository.save(member);
+		memberExternalService.createUser(member);
 	}
 }

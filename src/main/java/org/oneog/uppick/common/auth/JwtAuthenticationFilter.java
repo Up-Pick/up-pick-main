@@ -1,10 +1,9 @@
 package org.oneog.uppick.common.auth;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.oneog.uppick.common.dto.AuthMember;
+import org.oneog.uppick.common.dto.GlobalApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.Authentication;
@@ -106,10 +105,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private void sendErrorResponse(HttpServletResponse response, HttpStatus status, String message) throws IOException {
 		response.setStatus(status.value());
 		response.setContentType("application/json;charset=UTF-8");
-		Map<String, Object> errorResponse = new HashMap<>();
-		errorResponse.put("status", status.name());
-		errorResponse.put("code", status.value());
-		errorResponse.put("message", message);
+		
+		GlobalApiResponse<Void> errorResponse = GlobalApiResponse.fail(null, message);
+
+		// 생성된 객체를 JSON 문자열로 변환하여 응답 본문에 작성합니다.
 		response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
 	}
 }

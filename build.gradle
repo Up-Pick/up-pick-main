@@ -101,8 +101,8 @@ sourceSets {
 tasks.withType(JavaCompile).configureEach { compileTask ->
     // Gradle의 annotation processor 출력 디렉터리 지정 (신규 API)
     def target = compileTask.name.toLowerCase().contains('test') ?
-        layout.buildDirectory.dir("generated/sources/annotationProcessor/java/test") :
-        layout.buildDirectory.dir("generated/sources/annotationProcessor/java/main")
+            layout.buildDirectory.dir("generated/sources/annotationProcessor/java/test") :
+            layout.buildDirectory.dir("generated/sources/annotationProcessor/java/main")
     compileTask.options.generatedSourceOutputDirectory.set(target)
 }
 
@@ -121,6 +121,3 @@ tasks.named('bootJar', BootJar) {
     }
 }
 
-tasks.named('build') {
-    dependsOn tasks.named('asciidoctor')
-}
