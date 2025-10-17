@@ -26,23 +26,14 @@ public class Member {
 	@Column(name = "id")
 	private Long id;
 
-	@Column(name = "email", nullable = false)
+	@Column(name = "email", nullable = false, unique = true)
 	private String email;
 
-	@Column(name = "nickname", nullable = false)
+	@Column(name = "nickname", nullable = false, unique = true)
 	private String nickname;
 
 	@Column(name = "password", nullable = false)
 	private String password;
-
-	@Column(name = "name")
-	private String name;
-
-	@Column(name = "address")
-	private String address;
-
-	@Column(name = "phone")
-	private String phone;
 
 	@Column(nullable = false)
 	private Long credit = 0L;
@@ -52,16 +43,9 @@ public class Member {
 	private LocalDateTime registeredAt;
 
 	@Builder
-	private Member(String email, String nickname, String password, String name, String address, String phone,
-		Long credit) {
-
+	private Member(String email, String nickname, String password, Long credit) {
 		this.email = email;
 		this.nickname = nickname;
 		this.password = password;
-		this.name = name;
-		this.address = address;
-		this.phone = phone;
-		this.credit = credit;
-
 	}
 }
