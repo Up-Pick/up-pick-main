@@ -5,6 +5,7 @@ import org.oneog.uppick.common.dto.GlobalApiResponse;
 import org.oneog.uppick.common.dto.GlobalPageResponse;
 import org.oneog.uppick.domain.product.dto.request.ProductRegisterRequest;
 import org.oneog.uppick.domain.product.dto.response.ProductInfoResponse;
+import org.oneog.uppick.domain.product.dto.response.ProductPurchasedInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductSimpleInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductSoldInfoResponse;
 import org.oneog.uppick.domain.product.service.ProductInternalService;
@@ -64,5 +65,16 @@ public class ProductController {
 
 		ProductSimpleInfoResponse response = productInternalService.getProductSimpleInfoById(productId);
 		return GlobalApiResponse.ok(response);
+	}
+
+	// 구매 완료 상품 내역 조회
+	@GetMapping("/purchased")
+	public GlobalPageResponse<ProductPurchasedInfoResponse> getPurchasedProducts(
+		@AuthenticationPrincipal AuthMember authMember,
+		@PageableDefault(size = 20) Pageable pageable) {
+
+		Page<ProductPurchasedInfoResponse> responses = productInternalService.getPurchasedProductInfoByMemberId(
+			authMember.getMemberId(), pageable);
+		return GlobalPageResponse.of(responses);
 	}
 }

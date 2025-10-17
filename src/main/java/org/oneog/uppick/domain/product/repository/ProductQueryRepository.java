@@ -3,6 +3,7 @@ package org.oneog.uppick.domain.product.repository;
 import static org.oneog.uppick.domain.auction.entity.QAuction.*;
 import static org.oneog.uppick.domain.category.entity.QCategory.*;
 import static org.oneog.uppick.domain.member.entity.QMember.*;
+import static org.oneog.uppick.domain.member.entity.QPurchaseDetail.*;
 import static org.oneog.uppick.domain.member.entity.QSellDetail.*;
 import static org.oneog.uppick.domain.product.entity.QProduct.*;
 
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.oneog.uppick.domain.product.dto.response.ProductInfoResponse;
+import org.oneog.uppick.domain.product.dto.response.ProductPurchasedInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductSimpleInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductSoldInfoResponse;
 import org.springframework.data.domain.Page;
@@ -78,13 +80,12 @@ public class ProductQueryRepository {
 			.fetch();
 
 		Long total = Optional.ofNullable(
-				queryFactory
-					.select(product.count())
-					.from(product)
-					.join(sellDetail).on(product.id.eq(sellDetail.productId))
-					.where(memberId != null ? product.registerId.eq(memberId) : null)
-					.fetchOne())
-			.orElse(0L);
+			queryFactory
+				.select(product.count())
+				.from(product)
+				.join(sellDetail).on(product.id.eq(sellDetail.productId))
+				.where(memberId != null ? product.registerId.eq(memberId) : null)
+				.fetchOne()).orElse(0L);
 
 		return new PageImpl<>(qResponseList, pageable, total);
 	}
@@ -106,5 +107,34 @@ public class ProductQueryRepository {
 				.join(auction).on(product.id.eq(auction.productId))
 				.where(productId != null ? product.id.eq(productId) : null)
 				.fetchOne());
+	}
+
+	public Page<ProductPurchasedInfoResponse> getPurchasedProductInfoByMemberId(Long memberId, Pageable pageable) {
+
+		List<ProductPurchasedInfoResponse> qResponseList = queryFactory
+			.select(
+				Projections.constructor(
+					ProductPurchasedInfoResponse.class,
+					product.id,
+					product.name,
+					product.image,
+					purchaseDetail.purchasePrice,
+					purchaseDetail.purchaseAt))
+			.from(product)
+			.join(purchaseDetail).on(purchaseDetail.productId.eq(product.id))
+			.where(memberId != null ? purchaseDetail.buyerId.eq(memberId) : null)
+			.offset(pageable.getOffset())
+			.limit(pageable.getPageSize())
+			.fetch();
+
+		Long total = Optional.ofNullable(
+			queryFactory
+				.select(product.count())
+				.from(product)
+				.join(purchaseDetail).on(purchaseDetail.productId.eq(product.id))
+				.where(memberId != null ? purchaseDetail.buyerId.eq(memberId) : null)
+				.fetchOne()).orElse(0L);
+
+		return new PageImpl<>(qResponseList, pageable, total);
 	}
 }
