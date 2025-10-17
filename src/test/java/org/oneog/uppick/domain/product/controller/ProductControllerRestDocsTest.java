@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.oneog.uppick.common.auth.JwtUtil;
 import org.oneog.uppick.domain.product.dto.response.ProductInfoResponse;
 import org.oneog.uppick.domain.product.service.ProductInternalService;
 import org.oneog.uppick.support.RestDocsBase;
@@ -29,6 +30,9 @@ class ProductControllerRestDocsTest extends RestDocsBase {
 
 	@Autowired
 	private MockMvc mockMvc;
+
+	@MockitoBean
+	private JwtUtil jwtUtil;
 
 	@MockitoBean
 	private ProductInternalService productInternalService;
