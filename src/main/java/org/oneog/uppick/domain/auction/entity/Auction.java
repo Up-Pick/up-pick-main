@@ -43,7 +43,7 @@ public class Auction {
 
 	@Column(name = "status", nullable = false)
 	@Enumerated(EnumType.STRING)
-	private AuctionStatus auctionStatus;
+	private AuctionStatus status;
 
 	@CreatedDate
 	@Column(name = "start_at", nullable = false, updatable = false)
@@ -53,12 +53,12 @@ public class Auction {
 	private LocalDateTime endAt;
 
 	@Builder
-	private Auction(Long productId, Long currentPrice, Long minPrice, AuctionStatus auctionStatus,
+	private Auction(Long productId, Long currentPrice, Long minPrice, AuctionStatus status,
 		LocalDateTime endAt) {
 		this.productId = productId;
 		this.currentPrice = currentPrice;
 		this.minPrice = minPrice;
-		this.auctionStatus = auctionStatus;
+		this.status = status;
 		this.endAt = endAt;
 	}
 
@@ -73,7 +73,7 @@ public class Auction {
 
 	//경매마감시 상태변경(판매된거)
 	public void markAsSold() {
-		this.auctionStatus = AuctionStatus.FINISHED;
+		this.status = AuctionStatus.FINISHED;
 	}
 
 }

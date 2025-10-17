@@ -89,7 +89,7 @@ public class ProductQueryRepositoryTest {
 			.productId(savedProduct.getId())
 			.currentPrice(30_000L)
 			.minPrice(10_000L)
-			.auctionStatus(AuctionStatus.IN_PROGRESS)
+			.status(AuctionStatus.IN_PROGRESS)
 			.endAt(LocalDateTime.now().plusDays(3L))
 			.build();
 		Auction savedAuction = auctionRepository.save(auction);
@@ -179,7 +179,7 @@ public class ProductQueryRepositoryTest {
 			.productId(savedProduct.getId())
 			// .currentPrice(30_000L) -> currentPrice가 Null인 경우
 			.minPrice(10_000L)
-			.auctionStatus(AuctionStatus.IN_PROGRESS)
+			.status(AuctionStatus.IN_PROGRESS)
 			.endAt(LocalDateTime.now().plusDays(3L))
 			.build();
 		auctionRepository.save(newAuction);

@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.oneog.uppick.domain.auction.entity.QAuction;
-import org.oneog.uppick.domain.auction.enums.Status;
+import org.oneog.uppick.domain.auction.enums.AuctionStatus;
 import org.oneog.uppick.domain.product.entity.QProduct;
 import org.oneog.uppick.domain.searching.dto.projection.SearchProductProjection;
 import org.springframework.data.domain.Page;
@@ -24,104 +24,102 @@ import lombok.RequiredArgsConstructor;
 @Repository
 @RequiredArgsConstructor
 public class SearchingQueryRepository {
-    private final JPAQueryFactory jpaQueryFactory;
+	private static final QAuction AUCTION = QAuction.auction;
+	private static final QProduct PRODUCT = QProduct.product;
+	private static final String SORT_END_AT_DESC = "endAtDesc";
+	private final JPAQueryFactory jpaQueryFactory;
 
-    private static final QAuction AUCTION = QAuction.auction;
-    private static final QProduct PRODUCT = QProduct.product;
+	public Page<SearchProductProjection> findProductsWithFilters(
+		Pageable pageable,
+		long categoryId,
+		LocalDateTime endAtFrom,
+		boolean onlyNotSold,
+		String sortBy,
+		String keyword) {
+		BooleanExpression whereClause = buildWhereClause(categoryId, endAtFrom, onlyNotSold, keyword);
 
-    private static final String SORT_END_AT_DESC = "endAtDesc";
+		List<SearchProductProjection> results = buildSelectQuery(whereClause, sortBy, pageable).fetch();
 
-    public Page<SearchProductProjection> findProductsWithFilters(
-        Pageable pageable,
-        long categoryId,
-        LocalDateTime endAtFrom,
-        boolean onlyNotSold,
-        String sortBy,
-        String keyword) {
-        BooleanExpression whereClause = buildWhereClause(categoryId, endAtFrom, onlyNotSold, keyword);
+		JPAQuery<Long> countQuery = buildCountQuery(whereClause);
 
-        List<SearchProductProjection> results = buildSelectQuery(whereClause, sortBy, pageable).fetch();
+		return PageableExecutionUtils.getPage(results, pageable, countQuery::fetchOne);
+	}
 
-        JPAQuery<Long> countQuery = buildCountQuery(whereClause);
+	private OrderSpecifier<?> getOrderSpecifier(String sortBy, QAuction auction,
+		QProduct product) {
+		if (SORT_END_AT_DESC.equals(sortBy)) {
+			return auction.endAt.desc();
+		} else {
+			// 기본: 등록 날짜 내림차순
+			return product.registeredAt.desc();
+		}
+	}
 
-        return PageableExecutionUtils.getPage(results, pageable, countQuery::fetchOne);
-    }
+	private BooleanExpression buildWhereClause(long categoryId, LocalDateTime endAtFrom, boolean onlyNotSold,
+		String keyword) {
+		BooleanExpression clause = categoryPredicate(categoryId);
 
-    private OrderSpecifier<?> getOrderSpecifier(String sortBy, QAuction auction,
-        QProduct product) {
-        if (SORT_END_AT_DESC.equals(sortBy)) {
-            return auction.endAt.desc();
-        } else {
-            // 기본: 등록 날짜 내림차순
-            return product.registeredAt.desc();
-        }
-    }
+		if (endAtFrom != null) {
+			clause = clause.and(endAtPredicate(endAtFrom));
+		}
 
-    private BooleanExpression buildWhereClause(long categoryId, LocalDateTime endAtFrom, boolean onlyNotSold,
-        String keyword) {
-        BooleanExpression clause = categoryPredicate(categoryId);
+		if (onlyNotSold) {
+			clause = clause.and(onlyNotSoldPredicate());
+		}
 
-        if (endAtFrom != null) {
-            clause = clause.and(endAtPredicate(endAtFrom));
-        }
+		if (keyword != null && !keyword.isBlank()) {
+			clause = clause.and(nameContains(keyword));
+		}
 
-        if (onlyNotSold) {
-            clause = clause.and(onlyNotSoldPredicate());
-        }
+		return clause;
+	}
 
-        if (keyword != null && !keyword.isBlank()) {
-            clause = clause.and(nameContains(keyword));
-        }
+	private BooleanExpression categoryPredicate(long categoryId) {
+		return PRODUCT.categoryId.eq(categoryId);
+	}
 
-        return clause;
-    }
+	private BooleanExpression endAtPredicate(LocalDateTime endAtFrom) {
+		return AUCTION.endAt.goe(endAtFrom);
+	}
 
-    private BooleanExpression categoryPredicate(long categoryId) {
-        return PRODUCT.categoryId.eq(categoryId);
-    }
+	private BooleanExpression onlyNotSoldPredicate() {
+		return AUCTION.status.ne(AuctionStatus.FINISHED);
+	}
 
-    private BooleanExpression endAtPredicate(LocalDateTime endAtFrom) {
-        return AUCTION.endAt.goe(endAtFrom);
-    }
+	private BooleanExpression nameContains(String keyword) {
+		return PRODUCT.name.contains(keyword);
+	}
 
-    private BooleanExpression onlyNotSoldPredicate() {
-        return AUCTION.status.ne(Status.FINISHED);
-    }
+	private JPAQuery<SearchProductProjection> buildSelectQuery(BooleanExpression whereClause, String sortBy,
+		Pageable pageable) {
+		return jpaQueryFactory
+			.select(Projections.constructor(SearchProductProjection.class,
+				PRODUCT.id,
+				PRODUCT.image,
+				PRODUCT.name,
+				PRODUCT.registeredAt,
+				AUCTION.endAt,
+				AUCTION.currentPrice,
+				AUCTION.minPrice,
+				AUCTION.status.eq(AuctionStatus.FINISHED)))
+			.from(PRODUCT)
+			.join(AUCTION).on(PRODUCT.id.eq(AUCTION.productId))
+			.where(whereClause)
+			.orderBy(
+				new CaseBuilder()
+					.when(AUCTION.status.eq(AuctionStatus.FINISHED)).then(1)
+					.otherwise(0)
+					.asc(), // 0(미완료) 먼저, 1(완료) 나중
+				getOrderSpecifier(sortBy, AUCTION, PRODUCT))
+			.offset(pageable.getOffset())
+			.limit(pageable.getPageSize());
+	}
 
-    private BooleanExpression nameContains(String keyword) {
-        return PRODUCT.name.contains(keyword);
-    }
-
-    private JPAQuery<SearchProductProjection> buildSelectQuery(BooleanExpression whereClause, String sortBy,
-        Pageable pageable) {
-        return jpaQueryFactory
-            .select(Projections.constructor(SearchProductProjection.class,
-                PRODUCT.id,
-                PRODUCT.image,
-                PRODUCT.name,
-                PRODUCT.registeredAt,
-                AUCTION.endAt,
-                AUCTION.currentPrice,
-                AUCTION.minPrice,
-                AUCTION.status.eq(Status.FINISHED)))
-            .from(PRODUCT)
-            .join(AUCTION).on(PRODUCT.id.eq(AUCTION.productId))
-            .where(whereClause)
-            .orderBy(
-                new CaseBuilder()
-                    .when(AUCTION.status.eq(Status.FINISHED)).then(1)
-                    .otherwise(0)
-                    .asc(), // 0(미완료) 먼저, 1(완료) 나중
-                getOrderSpecifier(sortBy, AUCTION, PRODUCT))
-            .offset(pageable.getOffset())
-            .limit(pageable.getPageSize());
-    }
-
-    private JPAQuery<Long> buildCountQuery(BooleanExpression whereClause) {
-        return jpaQueryFactory
-            .select(PRODUCT.count())
-            .from(PRODUCT)
-            .join(AUCTION).on(PRODUCT.id.eq(AUCTION.productId))
-            .where(whereClause);
-    }
+	private JPAQuery<Long> buildCountQuery(BooleanExpression whereClause) {
+		return jpaQueryFactory
+			.select(PRODUCT.count())
+			.from(PRODUCT)
+			.join(AUCTION).on(PRODUCT.id.eq(AUCTION.productId))
+			.where(whereClause);
+	}
 }

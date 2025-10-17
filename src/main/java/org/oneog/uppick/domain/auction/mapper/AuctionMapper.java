@@ -15,7 +15,7 @@ public class AuctionMapper {
 			.productId(productID)
 			.currentPrice(null)
 			.minPrice(minPrice)
-			.auctionStatus(AuctionStatus.IN_PROGRESS)
+			.status(AuctionStatus.IN_PROGRESS)
 			.endAt(endAt)
 			.build();
 	}
