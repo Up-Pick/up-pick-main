@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/search")
+@RequestMapping("/api/v1/searching")
 public class SearchingController {
     private final SearchingInternalService searchingInternalService;
 
-    @PostMapping("/search")
+    @PostMapping("/products")
     public GlobalApiResponse<GlobalPageResponse<SearchProductInfoResponse>> searchProduct(
         @Valid @RequestBody(required = false)
         SearchProductRequest searchProductRequest) {
