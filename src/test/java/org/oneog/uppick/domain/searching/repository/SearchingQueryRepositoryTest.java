@@ -7,6 +7,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.oneog.uppick.common.config.JpaAuditingConfig;
+import org.oneog.uppick.common.config.QueryDSLConfig;
 import org.oneog.uppick.domain.auction.entity.Auction;
 import org.oneog.uppick.domain.auction.enums.Status;
 import org.oneog.uppick.domain.auction.repository.AuctionRepository;
@@ -14,14 +16,20 @@ import org.oneog.uppick.domain.product.entity.Product;
 import org.oneog.uppick.domain.product.repository.ProductRepository;
 import org.oneog.uppick.domain.searching.dto.projection.SearchProductProjection;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
+import jakarta.persistence.EntityManager;
+
+@DataJpaTest
 @Transactional
+@Import({QueryDSLConfig.class, SearchingQueryRepository.class, JpaAuditingConfig.class})
 public class SearchingQueryRepositoryTest {
+    @Autowired
+    private EntityManager em;
 
     @Autowired
     private ProductRepository productRepository;
@@ -77,6 +85,9 @@ public class SearchingQueryRepositoryTest {
             .build();
 
         auctionRepository.saveAll(List.of(a1, a2));
+
+        em.flush();
+        em.clear();
     }
 
     @Test
