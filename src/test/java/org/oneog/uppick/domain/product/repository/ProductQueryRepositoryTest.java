@@ -3,6 +3,7 @@ package org.oneog.uppick.domain.product.repository;
 import static org.assertj.core.api.Assertions.*;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -121,12 +122,14 @@ public class ProductQueryRepositoryTest {
 		assertThat(result.getName()).isEqualTo(product.getName());
 		assertThat(result.getDescription()).isEqualTo(product.getDescription());
 		assertThat(result.getViewCount()).isEqualTo(product.getViewCount());
-		assertThat(result.getRegisteredAt().toLocalDate()).isEqualTo(product.getRegisteredAt().toLocalDate());
+		assertThat(result.getRegisteredAt().truncatedTo(ChronoUnit.SECONDS)).isEqualTo(
+			product.getRegisteredAt().truncatedTo(ChronoUnit.SECONDS));
 		assertThat(result.getImage()).isEqualTo(product.getImage());
 		assertThat(result.getCategoryName()).isEqualTo(String.format("%s/%s", category.getBig(), category.getSmall()));
 		assertThat(result.getSoldAt()).isEqualTo(product.getSoldAt());
 		assertThat(result.getCurrentBid()).isEqualTo(auction.getCurrentPrice());
-		assertThat(result.getEndAt().toLocalDate()).isEqualTo(auction.getEndAt().toLocalDate());
+		assertThat(result.getEndAt().truncatedTo(ChronoUnit.SECONDS)).isEqualTo(
+			auction.getEndAt().truncatedTo(ChronoUnit.SECONDS));
 		assertThat(result.getSellerName()).isEqualTo(member.getNickname());
 	}
 
@@ -144,7 +147,8 @@ public class ProductQueryRepositoryTest {
 		assertThat(result.getDescription()).isEqualTo(product.getDescription());
 		assertThat(result.getImage()).isEqualTo(product.getImage());
 		assertThat(result.getFinalPrice()).isEqualTo(sellDetail.getFinalPrice());
-		assertThat(result.getSoldAt().toLocalDate()).isEqualTo(sellDetail.getSellAt().toLocalDate());
+		assertThat(result.getSoldAt().truncatedTo(ChronoUnit.SECONDS)).isEqualTo(
+			sellDetail.getSellAt().truncatedTo(ChronoUnit.SECONDS));
 	}
 
 	@Test
@@ -200,6 +204,7 @@ public class ProductQueryRepositoryTest {
 		assertThat(result.getName()).isEqualTo(product.getName());
 		assertThat(result.getImage()).isEqualTo(product.getImage());
 		assertThat(result.getFinalPrice()).isEqualTo(purchaseDetail.getPurchasePrice());
-		assertThat(result.getBuyAt().toLocalDate()).isEqualTo(purchaseDetail.getPurchaseAt().toLocalDate());
+		assertThat(result.getBuyAt().truncatedTo(ChronoUnit.SECONDS)).isEqualTo(
+			purchaseDetail.getPurchaseAt().truncatedTo(ChronoUnit.SECONDS));
 	}
 }
