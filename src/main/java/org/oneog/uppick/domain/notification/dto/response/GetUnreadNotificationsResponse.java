@@ -3,10 +3,7 @@ package org.oneog.uppick.domain.notification.dto.response;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.oneog.uppick.common.constants.FormatConstants;
 import org.oneog.uppick.domain.notification.entity.NotificationType;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -28,7 +25,6 @@ public class GetUnreadNotificationsResponse {
         private NotificationType type;
         private String title;
         private String message;
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = FormatConstants.JSON_DATE_FORMAT)
         private LocalDateTime notifiedAt;
     }
 }
