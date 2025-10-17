@@ -67,6 +67,10 @@ ext {
     snippetsDir = file('build/generated-snippets')
 }
 
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
 apply from: 'gradle/scripts/restdocs-index.gradle'
 
 tasks.named('test', Test) {
