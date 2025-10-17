@@ -32,3 +32,6 @@ docker-compose down
 
 start build/docs/asciidoc/index.html
 
+### 참고할 예시 테스트
+`ProductControllerRestDocsTest.java`
+
