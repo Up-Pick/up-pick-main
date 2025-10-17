@@ -53,7 +53,8 @@ public class ProductController {
 		@AuthenticationPrincipal AuthMember authMember,
 		@PageableDefault Pageable pageable) {
 
-		Page<ProductSoldInfoResponse> responses = productInternalService.getProductSoldInfoByMemberId(authMember.getMemberId(), pageable);
+		Page<ProductSoldInfoResponse> responses = productInternalService.getProductSoldInfoByMemberId(
+			authMember.getMemberId(), pageable);
 		return GlobalPageResponse.of(responses);
 	}
 
