@@ -1,9 +1,8 @@
-package org.oneog.uppick.auth;
+package org.oneog.uppick.common.auth;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
-import org.oneog.uppick.common.auth.JwtAuthenticationToken;
 import org.oneog.uppick.common.dto.AuthMember;
 
 class JwtAuthenticationTokenTest {
