@@ -13,7 +13,7 @@ import org.oneog.uppick.common.config.JpaAuditingConfig;
 import org.oneog.uppick.common.config.QueryDSLConfig;
 import org.oneog.uppick.domain.auction.entity.Auction;
 import org.oneog.uppick.domain.auction.entity.BiddingDetail;
-import org.oneog.uppick.domain.auction.enums.Status;
+import org.oneog.uppick.domain.auction.enums.AuctionStatus;
 import org.oneog.uppick.domain.auction.repository.AuctionRepository;
 import org.oneog.uppick.domain.auction.repository.BiddingDetailRepository;
 import org.oneog.uppick.domain.product.entity.Product;
@@ -249,7 +249,7 @@ class RankingQueryRepositoryTest {
 			.productId(productId)
 			.minPrice(10000L)
 			.currentPrice(10000L)
-			.status(Status.IN_PROGRESS)
+			.status(AuctionStatus.IN_PROGRESS)
 			.endAt(LocalDateTime.now().plusDays(7))
 			.build();
 		return auctionRepository.save(auction);
