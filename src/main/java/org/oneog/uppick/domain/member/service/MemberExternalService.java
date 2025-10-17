@@ -22,8 +22,15 @@ public class MemberExternalService implements MemberExternalServiceApi {
 	}
 
 	@Override
-	public void createUser(Member member) {
+	public void createUser(String email, String nickname, String encodedPassword) {
+		// 회원 엔티티 생성
+		Member member = Member.builder()
+			.email(email)
+			.nickname(nickname)
+			.password(encodedPassword)
+			.build();
+
 		memberRepository.save(member);
 	}
-
 }
+

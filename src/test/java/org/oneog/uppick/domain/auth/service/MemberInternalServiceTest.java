@@ -13,46 +13,49 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.oneog.uppick.common.exception.BusinessException;
 import org.oneog.uppick.domain.auth.dto.request.SignupRequest;
 import org.oneog.uppick.domain.auth.exception.AuthErrorCode;
-import org.oneog.uppick.domain.member.entity.Member;
-import org.oneog.uppick.domain.member.repository.MemberRepository;
+import org.oneog.uppick.domain.member.service.MemberExternalService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-@ExtendWith(MockitoExtension.class) // JUnit5에서 Mockito를 사용하기 위한 확장 기능
+@ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
 
-	@Mock // 가짜(Mock) MemberRepository 객체 생성
-	private MemberRepository memberRepository;
+	@Mock
+	private MemberExternalService memberExternalService;
 
-	@Mock // 가짜(Mock) PasswordEncoder 객체 생성
+	@Mock
 	private PasswordEncoder passwordEncoder;
 
-	@InjectMocks // @Mock으로 만든 가짜 객체들을 AuthService에 주입
+	@InjectMocks
 	private AuthService authService;
 
 	@Test
-	@DisplayName("signup_성공적인회원가입_예외미발생")
+	@DisplayName("회원가입 성공")
 	void signup_정상적인요청_성공() {
-		// given (주어진 상황)
+		// given
 		SignupRequest request = SignupRequest.builder()
 			.email("test@email.com")
 			.nickname("테스트유저")
 			.password("Password123!")
 			.build();
+		String encodedPassword = "encodedPassword";
 
-		when(memberRepository.existsByEmail(anyString())).thenReturn(false); // 이메일이 중복되지 않음
-		when(memberRepository.existsByNickname(anyString())).thenReturn(false); // 닉네임이 중복되지 않음
-		when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword"); // 패스워드 인코딩 결과
+		when(memberExternalService.existsByEmail(anyString())).thenReturn(false);
+		when(memberExternalService.existsByNickname(anyString())).thenReturn(false);
+		when(passwordEncoder.encode(anyString())).thenReturn(encodedPassword);
 
-		// when
-		// then
-		assertDoesNotThrow(() -> authService.signup(request)); // 예외가 발생하지 않아야 함
+		// when & then
+		assertDoesNotThrow(() -> authService.signup(request));
 
-		// 추가 검증: memberRepository.save가 Member 객체를 인자로 1번 호출되었는지 확인
-		verify(memberRepository, times(1)).save(any(Member.class));
+		// memberExternalService.createUser()가 정확한 인자들로 1번 호출되었는지 검증합니다.
+		verify(memberExternalService, times(1)).createUser(
+			request.getEmail(),
+			request.getNickname(),
+			encodedPassword
+		);
 	}
 
 	@Test
-	@DisplayName("signup_중복된이메일_BusinessException발생")
+	@DisplayName("중복된 이메일로 인한 회원가입 실패")
 	void signup_중복된이메일_실패() {
 		// given
 		SignupRequest request = SignupRequest.builder()
@@ -61,19 +64,21 @@ class AuthServiceTest {
 			.password("Password123!")
 			.build();
 
-		when(memberRepository.existsByEmail(request.getEmail())).thenReturn(true); // 이메일이 이미 존재함
+		when(memberExternalService.existsByEmail(request.getEmail())).thenReturn(true);
 
 		// when & then
 		BusinessException exception = assertThrows(BusinessException.class, () -> {
 			authService.signup(request);
 		});
 
-		assertEquals(AuthErrorCode.DUPLICATE_EMAIL, exception.getErrorCode()); // 발생한 예외 코드가 DUPLICATE_EMAIL인지 확인
-		verify(memberRepository, never()).save(any(Member.class)); // save 메소드가 절대 호출되지 않았는지 확인
+		assertEquals(AuthErrorCode.DUPLICATE_EMAIL, exception.getErrorCode());
+
+		// createUser 메서드가 호출되지 않았는지 확인.
+		verify(memberExternalService, never()).createUser(anyString(), anyString(), anyString());
 	}
 
 	@Test
-	@DisplayName("signup_중복된닉네임_BusinessException발생")
+	@DisplayName("중복된 닉네임으로 인한 회원가입 실패")
 	void signup_중복된닉네임_실패() {
 		// given
 		SignupRequest request = SignupRequest.builder()
@@ -81,15 +86,18 @@ class AuthServiceTest {
 			.nickname("테스트유저")
 			.password("Password123!")
 			.build();
-		when(memberRepository.existsByEmail(request.getEmail())).thenReturn(false); // 이메일은 중복되지 않음
-		when(memberRepository.existsByNickname(request.getNickname())).thenReturn(true); // 닉네임이 이미 존재함
+
+		when(memberExternalService.existsByEmail(request.getEmail())).thenReturn(false);
+		when(memberExternalService.existsByNickname(request.getNickname())).thenReturn(true);
 
 		// when & then
 		BusinessException exception = assertThrows(BusinessException.class, () -> {
 			authService.signup(request);
 		});
 
-		assertEquals(AuthErrorCode.DUPLICATE_NICKNAME, exception.getErrorCode()); // 발생한 예외 코드가 DUPLICATE_NICKNAME인지 확인
-		verify(memberRepository, never()).save(any(Member.class)); // save 메소드가 절대 호출되지 않았는지 확인
+		assertEquals(AuthErrorCode.DUPLICATE_NICKNAME, exception.getErrorCode());
+
+		// createUser 메서드가 호출되지 않았는지 확인.
+		verify(memberExternalService, never()).createUser(anyString(), anyString(), anyString());
 	}
 }

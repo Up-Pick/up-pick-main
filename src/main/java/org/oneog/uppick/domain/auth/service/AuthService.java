@@ -3,7 +3,6 @@ package org.oneog.uppick.domain.auth.service;
 import org.oneog.uppick.common.exception.BusinessException;
 import org.oneog.uppick.domain.auth.dto.request.SignupRequest;
 import org.oneog.uppick.domain.auth.exception.AuthErrorCode;
-import org.oneog.uppick.domain.member.entity.Member;
 import org.oneog.uppick.domain.member.service.MemberExternalService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -33,13 +32,10 @@ public class AuthService {
 
 		String encodedPassword = passwordEncoder.encode(signupRequest.getPassword());
 
-		// 회원 엔티티 생성
-		Member member = Member.builder()
-			.email(signupRequest.getEmail())
-			.nickname(signupRequest.getNickname())
-			.password(encodedPassword)
-			.build();
-
-		memberExternalService.createUser(member);
+		memberExternalService.createUser(
+			signupRequest.getEmail(),
+			signupRequest.getNickname(),
+			encodedPassword
+		);
 	}
 }
