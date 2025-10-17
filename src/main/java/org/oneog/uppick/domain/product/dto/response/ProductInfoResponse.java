@@ -18,6 +18,7 @@ public class ProductInfoResponse {
 
 	private String categoryName;
 	private LocalDateTime soldAt;
+	private Long minPrice;
 	private Long currentBid;
 	private LocalDateTime endAt;
 	private String sellerName;

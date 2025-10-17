@@ -45,6 +45,7 @@ public class ProductQueryRepository {
 					product.image,
 					Expressions.stringTemplate("CONCAT({0}, '/', {1})", category.big, category.small),
 					product.soldAt,
+					auction.minPrice,
 					auction.currentPrice,
 					auction.endAt,
 					member.nickname))
@@ -99,10 +100,8 @@ public class ProductQueryRepository {
 						ProductSimpleInfoResponse.class,
 						product.name,
 						product.image,
-						Expressions.cases()
-							.when(auction.currentPrice.isNotNull())
-							.then(auction.currentPrice)
-							.otherwise(auction.minPrice)))
+						auction.minPrice,
+						auction.currentPrice))
 				.from(product)
 				.join(auction).on(product.id.eq(auction.productId))
 				.where(productId != null ? product.id.eq(productId) : null)
