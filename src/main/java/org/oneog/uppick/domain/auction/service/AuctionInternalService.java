@@ -33,18 +33,27 @@ public class AuctionInternalService {
 
 		Auction auction = findAuctionById(auctionId);
 
-		// 상품의 현재 입찰가가 null 이거나 유저의 입찰금액이 더 커야함
-		if (auction.getCurrentPrice() == null || request.getBiddingPrice() > auction.getCurrentPrice()) {
+		Long biddingPrice = request.getBiddingPrice(); //입찰 금액
+		Long currentPrice = auction.getCurrentPrice(); //현재 입찰가
+		Long minPrice = auction.getMinPrice(); //최소 입찰가
+
+		// 1. 첫 입찰일 경우(currentPrice가 null) 최소 입찰가보다는 크거나 같아야한다.
+		// 2. 현재 입찰가 보다 유저의 입찰금액이 더 커야함
+		boolean validBid =
+			(currentPrice == null && biddingPrice >= minPrice) ||
+				(currentPrice != null && biddingPrice > currentPrice);
+
+		if (validBid) {
 			//성공 로직
 			// 입찰 시 경매의 현재 입찰가가 갱신되어야한다.
 			auction.updateCurrentPrice(request.getBiddingPrice());
-			// 입찰 시 입찰 내역에 기록이 남아야한다.
-			BiddingDetail biddingDetail = BiddingDetail.builder()
-				.auctionId(auctionId)
-				.memberId(memberId)
-				.bidPrice(request.getBiddingPrice())
-				.build();
 
+			BiddingDetail biddingDetail = auctionMapper.toEntity(
+				auctionId,
+				memberId,
+				request.getBiddingPrice()
+			);
+			// 입찰 시 입찰 내역에 기록이 남아야한다.
 			biddingDetailRepository.save(biddingDetail);
 		} else {
 			//입찰 실패 로직
