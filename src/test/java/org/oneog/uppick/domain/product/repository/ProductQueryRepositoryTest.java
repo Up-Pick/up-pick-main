@@ -62,7 +62,6 @@ public class ProductQueryRepositoryTest {
 	@BeforeEach
 	void init() {
 		member = Member.builder()
-			.name("이름")
 			.email("이메일")
 			.nickname("닉네임")
 			.password("패스워드")
