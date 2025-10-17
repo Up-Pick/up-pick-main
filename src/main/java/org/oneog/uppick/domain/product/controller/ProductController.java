@@ -60,7 +60,7 @@ public class ProductController {
 	@GetMapping("/sold/me")
 	public GlobalPageResponse<ProductSoldInfoResponse> getSoldProducts(
 		@AuthenticationPrincipal AuthMember authMember,
-		@PageableDefault Pageable pageable) {
+		@PageableDefault(size = 20) Pageable pageable) {
 
 		Page<ProductSoldInfoResponse> responses = productInternalService.getProductSoldInfoByMemberId(
 			authMember.getMemberId(), pageable);
