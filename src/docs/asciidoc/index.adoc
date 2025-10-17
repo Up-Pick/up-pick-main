@@ -1,0 +1,11 @@
+= Up-Pick API 문서
+:toc: left
+:toclevels: 2
+:sectnums:
+:sectanchors:
+:source-highlighter: highlightjs
+:highlightjs-theme: github
+:icons: font
+:sectlinks:
+
+include::{snippets}/auto-index.adoc[]

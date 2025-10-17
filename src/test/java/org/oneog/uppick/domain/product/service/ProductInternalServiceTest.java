@@ -1,5 +1,10 @@
 package org.oneog.uppick.domain.product.service;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.BDDMockito.*;
+
+import java.time.LocalDateTime;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,27 +14,23 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.oneog.uppick.domain.auction.service.AuctionExternalServiceApi;
 import org.oneog.uppick.domain.product.dto.request.ProductRegisterRequest;
-import org.oneog.uppick.domain.product.dto.response.ProductSimpleInfoResponse;
 import org.oneog.uppick.domain.product.entity.Product;
 import org.oneog.uppick.domain.product.mapper.ProductMapper;
 import org.oneog.uppick.domain.product.repository.ProductQueryRepository;
 import org.oneog.uppick.domain.product.repository.ProductRepository;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.BDDMockito.*;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 public class ProductInternalServiceTest {
 
 	private final ProductMapper productMapper = new ProductMapper();
 
-	@Mock ProductRepository productRepository;
-	@Mock ProductQueryRepository productQueryRepository;
-	@Mock AuctionExternalServiceApi auctionExternalServiceApi;
-
+	@Mock
+	ProductRepository productRepository;
+	@Mock
+	ProductQueryRepository productQueryRepository;
+	@Mock
+	AuctionExternalServiceApi auctionExternalServiceApi;
+	
 	@InjectMocks
 	ProductInternalService productInternalService;
 
@@ -42,7 +43,7 @@ public class ProductInternalServiceTest {
 			productQueryRepository,
 			productMapper,
 			auctionExternalServiceApi
-			);
+		);
 
 		product = Product.builder()
 			.name("상품 이름")

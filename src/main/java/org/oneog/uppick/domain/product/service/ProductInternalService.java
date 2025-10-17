@@ -65,6 +65,7 @@ public class ProductInternalService {
 
 	// ***** Internal Private Method ***** //
 	private Product findProductByIdOrElseThrow(Long productId) {
-		return productRepository.findById(productId).orElseThrow(() -> new BusinessException(ProductErrorCode.PRODUCT_NOT_FOUND));
+		return productRepository.findById(productId)
+			.orElseThrow(() -> new BusinessException(ProductErrorCode.PRODUCT_NOT_FOUND));
 	}
 }
