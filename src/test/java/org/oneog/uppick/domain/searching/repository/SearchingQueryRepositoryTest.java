@@ -40,8 +40,8 @@ public class SearchingQueryRepositoryTest {
     @Autowired
     private SearchingQueryRepository searchingQueryRepository;
 
-    private Product p1; // category 1
-    private Product p2; // category 2
+    private Product p1;
+    private Product p2;
 
     @BeforeEach
     void setUp() {
@@ -66,7 +66,6 @@ public class SearchingQueryRepositoryTest {
 
         productRepository.saveAll(List.of(p1, p2));
 
-        // p1: 진행중 경매
         Auction a1 = Auction.builder()
             .productId(p1.getId())
             .currentPrice(500L)
@@ -75,7 +74,6 @@ public class SearchingQueryRepositoryTest {
             .endAt(LocalDateTime.now().plusDays(1))
             .build();
 
-        // p2: 종료된 경매
         Auction a2 = Auction.builder()
             .productId(p2.getId())
             .currentPrice(1000L)
@@ -92,13 +90,11 @@ public class SearchingQueryRepositoryTest {
 
     @Test
     void findProductsWithFilters_기본조회_카테고리1만반환() {
-        // categoryId가 null일 경우 레포지토리 내부에서 기본값으로 1을 사용하도록 되어 있음
         Page<SearchProductProjection> page = searchingQueryRepository.findProductsWithFilters(PageRequest.of(0, 10),
             1L, null, false, null, null);
 
         assertThat(page.getTotalElements()).isGreaterThanOrEqualTo(1);
         List<SearchProductProjection> content = page.getContent();
-        // 기본 카테고리(1)에 속한 상품1이 포함되어야 함
         assertThat(content).extracting("name").contains("상품1");
     }
 
@@ -117,7 +113,6 @@ public class SearchingQueryRepositoryTest {
         Page<SearchProductProjection> page = searchingQueryRepository.findProductsWithFilters(PageRequest.of(0, 10),
             1L, from, false, null, null);
 
-        // p1의 endAt은 now+1 day -> 포함, p2는 과거 -> 제외
         assertThat(page.getTotalElements()).isGreaterThanOrEqualTo(1);
         assertThat(page.getContent()).allMatch(p -> p.getEndAt().isAfter(from) || p.getEndAt().isEqual(from));
     }
@@ -127,7 +122,6 @@ public class SearchingQueryRepositoryTest {
         Page<SearchProductProjection> page = searchingQueryRepository.findProductsWithFilters(PageRequest.of(0, 10),
             1L, null, true, null, null);
 
-        // p2는 FINISHED이므로 제외되어야 함
         assertThat(page.getContent()).noneMatch(p -> Boolean.TRUE.equals(p.isSold()));
     }
 
@@ -138,20 +132,17 @@ public class SearchingQueryRepositoryTest {
 
         List<SearchProductProjection> content = page.getContent();
         if (content.size() >= 2) {
-            // 내림차순이면 첫번째 endAt이 두번째보다 늦거나 같아야 함
             assertThat(content.get(0).getEndAt()).isAfterOrEqualTo(content.get(1).getEndAt());
         }
     }
 
     @Test
     void findProductsWithFilters_keyword검색_상품제목기준으로필터링() {
-        // keyword로 '상품1'을 검색하면 '상품1'만 포함되어야 함
         Page<SearchProductProjection> page = searchingQueryRepository.findProductsWithFilters(PageRequest.of(0, 10),
             1L, null, false, null, "상품1");
 
         assertThat(page.getTotalElements()).isGreaterThanOrEqualTo(1);
         List<SearchProductProjection> content = page.getContent();
-        // 결과에 '상품1'이 포함되고 '상품2'는 포함되지 않아야 함
         assertThat(content).extracting(SearchProductProjection::getName).contains("상품1").doesNotContain("상품2");
     }
 }
