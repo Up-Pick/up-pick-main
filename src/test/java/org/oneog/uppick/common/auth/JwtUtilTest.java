@@ -1,10 +1,9 @@
-package org.oneog.uppick.auth;
+package org.oneog.uppick.common.auth;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.oneog.uppick.common.auth.JwtUtil;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import io.jsonwebtoken.Claims;
@@ -18,7 +17,7 @@ public class JwtUtilTest {
 		jwtUtil = new JwtUtil();
 		// 테스트용 secretKey (Base64 인코딩)
 		String testSecretKey = "bXlTdXBlclNlY3JldEtleU15U2VjcmV0S2V5MTIzNDU2";
-		
+
 		//ReflectionTestUtils를 사용해 private 필드인 'secretKey'에 값을 직접 주입
 		ReflectionTestUtils.setField(jwtUtil, "secretKey", testSecretKey);
 

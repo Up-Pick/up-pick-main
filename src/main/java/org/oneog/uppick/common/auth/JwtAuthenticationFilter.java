@@ -34,9 +34,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	@Override
 	protected void doFilterInternal(
-		@NonNull HttpServletRequest request,
-		@NonNull HttpServletResponse response,
-		@NonNull FilterChain filterChain)
+		@NonNull
+		HttpServletRequest request,
+		@NonNull
+		HttpServletResponse response,
+		@NonNull
+		FilterChain filterChain)
 		throws ServletException, IOException {
 
 		// HTTP 요청 헤더에서 "Authorization" 헤더값을 가져옴
@@ -57,8 +60,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	}
 
 	// JWT 토큰을 검증하고 SecurityContext에 인증 정보를 설정하는 메서드
-	private boolean processAuthentication(String token, HttpServletRequest request, HttpServletResponse response) throws
-		IOException {
+	private boolean processAuthentication(String token, HttpServletRequest request, HttpServletResponse response)
+		throws IOException {
 		try {
 
 			Claims userInfo = jwtUtil.getUserInfoFromToken(token);
@@ -105,7 +108,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private void sendErrorResponse(HttpServletResponse response, HttpStatus status, String message) throws IOException {
 		response.setStatus(status.value());
 		response.setContentType("application/json;charset=UTF-8");
-		
+
 		GlobalApiResponse<Void> errorResponse = GlobalApiResponse.fail(null, message);
 
 		// 생성된 객체를 JSON 문자열로 변환하여 응답 본문에 작성합니다.
