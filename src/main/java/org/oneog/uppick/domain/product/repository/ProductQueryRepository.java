@@ -1,5 +1,11 @@
 package org.oneog.uppick.domain.product.repository;
 
+import static org.oneog.uppick.domain.auction.entity.QAuction.*;
+import static org.oneog.uppick.domain.category.entity.QCategory.*;
+import static org.oneog.uppick.domain.member.entity.QMember.*;
+import static org.oneog.uppick.domain.member.entity.QSellDetail.*;
+import static org.oneog.uppick.domain.product.entity.QProduct.*;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -14,12 +20,6 @@ import org.springframework.stereotype.Repository;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-
-import static org.oneog.uppick.domain.product.entity.QProduct.product;
-import static org.oneog.uppick.domain.category.entity.QCategory.category;
-import static org.oneog.uppick.domain.auction.entity.QAuction.auction;
-import static org.oneog.uppick.domain.member.entity.QMember.member;
-import static org.oneog.uppick.domain.member.entity.QSellDetail.sellDetail;
 
 import lombok.RequiredArgsConstructor;
 
@@ -78,12 +78,12 @@ public class ProductQueryRepository {
 			.fetch();
 
 		Long total = Optional.ofNullable(
-			queryFactory
-				.select(product.count())
-				.from(product)
-				.join(sellDetail).on(product.id.eq(sellDetail.productId))
-				.where(memberId != null ? product.registerId.eq(memberId) : null)
-				.fetchOne())
+				queryFactory
+					.select(product.count())
+					.from(product)
+					.join(sellDetail).on(product.id.eq(sellDetail.productId))
+					.where(memberId != null ? product.registerId.eq(memberId) : null)
+					.fetchOne())
 			.orElse(0L);
 
 		return new PageImpl<>(qResponseList, pageable, total);

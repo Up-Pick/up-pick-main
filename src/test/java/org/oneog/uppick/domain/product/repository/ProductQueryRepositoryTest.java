@@ -1,5 +1,7 @@
 package org.oneog.uppick.domain.product.repository;
 
+import static org.assertj.core.api.Assertions.*;
+
 import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -23,8 +25,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
-
-import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -123,7 +123,7 @@ public class ProductQueryRepositoryTest {
 			pageable);
 
 		assertThat(results).isNotNull();
-
+		
 		ProductSoldInfoResponse result = results.getContent().getFirst();
 		assertThat(result.getId()).isEqualTo(product.getId());
 		assertThat(result.getName()).isEqualTo(product.getName());
