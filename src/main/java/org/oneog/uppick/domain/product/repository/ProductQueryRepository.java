@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.oneog.uppick.domain.product.dto.response.ProductInfoResponse;
+import org.oneog.uppick.domain.product.dto.response.ProductSimpleInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductSoldInfoResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -91,5 +92,27 @@ public class ProductQueryRepository {
 		).orElse(0L);
 
 		return new PageImpl<>(qResponseList, pageable, total);
+	}
+
+	public Optional<ProductSimpleInfoResponse> getProductSimpleInfoById(Long productId) {
+
+		return Optional.ofNullable(
+			queryFactory
+			.select(
+				Projections.constructor(
+					ProductSimpleInfoResponse.class,
+					product.name,
+					product.image,
+					Expressions.cases()
+						.when(auction.currentPrice.isNotNull())
+						.then(auction.currentPrice)
+						.otherwise(auction.minPrice)
+				)
+			)
+			.from(product)
+			.join(auction).on(product.id.eq(auction.productId))
+			.where(productId != null ? product.id.eq(productId) : null)
+			.fetchOne()
+		);
 	}
 }

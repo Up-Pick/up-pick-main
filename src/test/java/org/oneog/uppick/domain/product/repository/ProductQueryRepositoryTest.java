@@ -12,6 +12,7 @@ import org.oneog.uppick.domain.category.repository.CategoryRepository;
 import org.oneog.uppick.domain.member.entity.Member;
 import org.oneog.uppick.domain.member.repository.MemberRepository;
 import org.oneog.uppick.domain.product.dto.response.ProductInfoResponse;
+import org.oneog.uppick.domain.product.dto.response.ProductSimpleInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductSoldInfoResponse;
 import org.oneog.uppick.domain.product.entity.Product;
 import org.oneog.uppick.domain.product.entity.SellDetail;
@@ -115,13 +116,52 @@ public class ProductQueryRepositoryTest {
 		Page<ProductSoldInfoResponse> results = productQueryRepository.getProductSoldInfoByMemberId(member.getId(), pageable);
 
 		assertThat(results).isNotNull();
-		ProductSoldInfoResponse result = results.getContent().getFirst();
 
+		ProductSoldInfoResponse result = results.getContent().getFirst();
 		assertThat(result.getId()).isEqualTo(product.getId());
 		assertThat(result.getName()).isEqualTo(product.getName());
 		assertThat(result.getDescription()).isEqualTo(product.getDescription());
 		assertThat(result.getImage()).isEqualTo(product.getImage());
 		assertThat(result.getFinalPrice()).isEqualTo(sellDetail.getFinalPrice());
 		assertThat(result.getSoldAt().toLocalDate()).isEqualTo(sellDetail.getSellAt().toLocalDate());
+	}
+
+	@Test
+	void 입찰중인_상품의_간단한_정보_조회_가능() {
+		ProductSimpleInfoResponse result = productQueryRepository.getProductSimpleInfoById(product.getId()).orElseThrow();
+
+		assertThat(result).isNotNull();
+		assertThat(result.getName()).isEqualTo(product.getName());
+		assertThat(result.getImage()).isEqualTo(product.getImage());
+		assertThat(result.getCurrentBidPrice()).isEqualTo(auction.getCurrentPrice());
+	}
+
+	@Test
+	void 입찰한_사람이_없는_상품의_간단한_정보_조회_가능() {
+
+		Product newProduct = Product.builder()
+			.name("새 상품 이름")
+			.description("새 상품 설명")
+			.image("새 상품 이미지 경로")
+			.categoryId(category.getId())
+			.registerId(member.getId())
+			.build();
+		Product savedProduct = productRepository.save(newProduct);
+
+		Auction newAuction = Auction.builder()
+			.productId(savedProduct.getId())
+			// .currentPrice(30_000L) -> currentPrice가 Null인 경우
+			.minPrice(10_000L)
+			.status(Status.IN_PROGRESS)
+			.endAt(LocalDateTime.now().plusDays(3L))
+			.build();
+		auctionRepository.save(newAuction);
+
+		ProductSimpleInfoResponse result = productQueryRepository.getProductSimpleInfoById(newProduct.getId()).orElseThrow();
+
+		assertThat(result).isNotNull();
+		assertThat(result.getName()).isEqualTo(newProduct.getName());
+		assertThat(result.getImage()).isEqualTo(newProduct.getImage());
+		assertThat(result.getCurrentBidPrice()).isEqualTo(newAuction.getMinPrice());
 	}
 }

@@ -4,6 +4,7 @@ import org.oneog.uppick.common.exception.BusinessException;
 import org.oneog.uppick.domain.auction.service.AuctionExternalServiceApi;
 import org.oneog.uppick.domain.product.dto.request.ProductRegisterRequest;
 import org.oneog.uppick.domain.product.dto.response.ProductInfoResponse;
+import org.oneog.uppick.domain.product.dto.response.ProductSimpleInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductSoldInfoResponse;
 import org.oneog.uppick.domain.product.entity.Product;
 import org.oneog.uppick.domain.product.exception.ProductErrorCode;
@@ -30,7 +31,7 @@ public class ProductInternalService {
 	// ****** External Domain API ***** //
 	private final AuctionExternalServiceApi auctionExternalServiceApi;
 
-	// ***** Service Method ***** //
+	// ***** Internal Service Method ***** //
 	@Transactional
 	public void registerProduct(ProductRegisterRequest request, Long registerId) {
 
@@ -48,15 +49,21 @@ public class ProductInternalService {
 		Product product = findProductByIdOrElseThrow(productId);
 		product.increaseViewCount();
 
-		return productQueryRepository.getProductInfoById(productId).orElseThrow(() -> new BusinessException(ProductErrorCode.CANNOT_READ_PRODUCT_INFO));
+		return productQueryRepository.getProductInfoById(productId).orElseThrow(
+			() -> new BusinessException(ProductErrorCode.CANNOT_READ_PRODUCT_INFO));
 	}
 
 	public Page<ProductSoldInfoResponse> getProductSoldInfoByMemberId(Long memberId, Pageable pageable) {
-
 		return productQueryRepository.getProductSoldInfoByMemberId(memberId, pageable);
 	}
 
-	// ***** Internal Method ***** //
+	public ProductSimpleInfoResponse getProductSimpleInfoById(Long productId) {
+
+		return productQueryRepository.getProductSimpleInfoById(productId).orElseThrow(
+			() -> new BusinessException(ProductErrorCode.CANNOT_READ_PRODUCT_SIMPLE_INFO));
+	}
+
+	// ***** Internal Private Method ***** //
 	private Product findProductByIdOrElseThrow(Long productId) {
 		return productRepository.findById(productId).orElseThrow(() -> new BusinessException(ProductErrorCode.PRODUCT_NOT_FOUND));
 	}
