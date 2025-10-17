@@ -1,3 +1,6 @@
+import org.asciidoctor.gradle.jvm.AsciidoctorTask
+import org.springframework.boot.gradle.tasks.bundling.BootJar
+
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.5.6'
@@ -25,7 +28,7 @@ configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
-    asciidoctorExt  // spring rest docs
+    asciidoctorExtensions
 }
 
 repositories {
@@ -55,9 +58,8 @@ dependencies {
     runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
     runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
 
-    // spring rest docs
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
-    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+    asciidoctorExtensions 'org.springframework.restdocs:spring-restdocs-asciidoctor'
 }
 
 // REST Docs 스니펫 디렉토리 설정
@@ -65,9 +67,12 @@ ext {
     snippetsDir = file('build/generated-snippets')
 }
 
-tasks.named('test') {
+apply from: 'gradle/scripts/restdocs-index.gradle'
+
+tasks.named('test', Test) {
+    outputs.dir snippetsDir
     useJUnitPlatform()
-    outputs.dir snippetsDir // spring rest docs
+    finalizedBy 'asciidoctor'
 }
 
 tasks.jacocoTestReport {
@@ -77,6 +82,7 @@ tasks.jacocoTestReport {
         html.required = false
     }
 }
+
 
 // QueryDSL이 생성하는 소스 디렉터리를 main 소스셋에 추가하고
 // Java 컴파일러의 APT 생성 경로를 명시적으로 설정합니다.
@@ -88,23 +94,29 @@ sourceSets {
     }
 }
 
-tasks.withType(JavaCompile).configureEach {
-    // Gradle의 annotation processor 출력 디렉터리 지정
-    options.annotationProcessorGeneratedSourcesDirectory = file("$buildDir/generated/sources/annotationProcessor/java/main")
+tasks.withType(JavaCompile).configureEach { compileTask ->
+    // Gradle의 annotation processor 출력 디렉터리 지정 (신규 API)
+    def target = compileTask.name.toLowerCase().contains('test') ?
+        layout.buildDirectory.dir("generated/sources/annotationProcessor/java/test") :
+        layout.buildDirectory.dir("generated/sources/annotationProcessor/java/main")
+    compileTask.options.generatedSourceOutputDirectory.set(target)
 }
 
-// spring rest docs
-asciidoctor {
+tasks.named('asciidoctor', AsciidoctorTask) {
     inputs.dir snippetsDir
-    configurations 'asciidoctorExt'
-    dependsOn test
-    baseDirFollowsSourceFile()
+    configurations('asciidoctorExtensions')
+    dependsOn tasks.named('generateRestDocsIndex')
+    baseDirFollowsSourceDir()
+    attributes('snippets': snippetsDir)
 }
 
-// spring rest docs
-bootJar {
-    dependsOn asciidoctor
-    from("build/docs/asciidoc") {
+tasks.named('bootJar', BootJar) {
+    dependsOn tasks.named('asciidoctor')
+    from(layout.buildDirectory.dir('docs/asciidoc').map { it.asFile }) {
         into 'static/docs'
     }
+}
+
+tasks.named('build') {
+    dependsOn tasks.named('asciidoctor')
 }

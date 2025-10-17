@@ -1,60 +1,11 @@
-= REST API 문서
-:doctype: book
-:icons: font
-:source-highlighter: highlightjs
+= Up-Pick API 문서
 :toc: left
 :toclevels: 2
+:sectnums:
+:sectanchors:
+:source-highlighter: highlightjs
+:highlightjs-theme: github
+:icons: font
 :sectlinks:
 
-== 개요
-up-pick 프로젝트 API 문서입니다.
-
-== 공통 응답 포맷
-
-모든 API는 `GlobalApiResponse` 형식으로 응답합니다:
-
-[source,json]
-----
-{
-  "success": true,
-  "message": "요청에 성공했습니다.",
-  "data": { ... }
-}
-----
-
-[cols="1,1,2"]
-|===
-|필드|타입|설명
-
-|success
-|Boolean
-|성공 여부 (true/false)
-
-|message
-|String
-|응답 메시지
-
-|data
-|Object/Array/etc
-|실제 응답 데이터 (API마다 다름)
-|===
-
-== 헬스 체크 도메인
-
-=== 헬스체크(간단)
-
-서버의 상태를 확인합니다.
-
-==== Request
-operation::health-check[snippets='http-request']
-
-==== Response(간단 버젼)
-operation::health-check[snippets='http-response']
-
-=== 헬스체크(상세)
-
-==== Request
-operation::health-check-2[snippets='http-request']
-
-==== Response(Response fields 버젼)
-operation::health-check-2[snippets='http-response,response-fields']
+include::{snippets}/auto-index.adoc[]
