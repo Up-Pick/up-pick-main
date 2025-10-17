@@ -122,6 +122,7 @@ public class ProductQueryRepository {
 			.from(product)
 			.join(purchaseDetail).on(purchaseDetail.productId.eq(product.id))
 			.where(memberId != null ? purchaseDetail.buyerId.eq(memberId) : null)
+			.orderBy(purchaseDetail.purchaseAt.desc())
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
 			.fetch();
