@@ -12,7 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.oneog.uppick.domain.auction.entity.Auction;
-import org.oneog.uppick.domain.auction.enums.Status;
+import org.oneog.uppick.domain.auction.enums.AuctionStatus;
 import org.oneog.uppick.domain.auction.mapper.AuctionMapper;
 import org.oneog.uppick.domain.auction.repository.AuctionRepository;
 
@@ -40,7 +40,7 @@ public class AuctionExternalServiceTest {
 			.productId(productId)
 			.currentPrice(null)
 			.minPrice(minPrice)
-			.status(Status.IN_PROGRESS)
+			.auctionStatus(AuctionStatus.IN_PROGRESS)
 			.endAt(endAt)
 			.build();
 

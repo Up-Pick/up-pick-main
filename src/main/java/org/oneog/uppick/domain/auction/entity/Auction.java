@@ -3,7 +3,7 @@ package org.oneog.uppick.domain.auction.entity;
 import java.time.LocalDateTime;
 
 import org.oneog.uppick.common.exception.BusinessException;
-import org.oneog.uppick.domain.auction.enums.Status;
+import org.oneog.uppick.domain.auction.enums.AuctionStatus;
 import org.oneog.uppick.domain.auction.exception.AuctionErrorCode;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -43,7 +43,7 @@ public class Auction {
 
 	@Column(name = "status", nullable = false)
 	@Enumerated(EnumType.STRING)
-	private Status status;
+	private AuctionStatus auctionStatus;
 
 	@CreatedDate
 	@Column(name = "start_at", nullable = false, updatable = false)
@@ -53,11 +53,12 @@ public class Auction {
 	private LocalDateTime endAt;
 
 	@Builder
-	private Auction(Long productId, Long currentPrice, Long minPrice, Status status, LocalDateTime endAt) {
+	private Auction(Long productId, Long currentPrice, Long minPrice, AuctionStatus auctionStatus,
+		LocalDateTime endAt) {
 		this.productId = productId;
 		this.currentPrice = currentPrice;
 		this.minPrice = minPrice;
-		this.status = status;
+		this.auctionStatus = auctionStatus;
 		this.endAt = endAt;
 	}
 
@@ -69,4 +70,10 @@ public class Auction {
 		}
 		this.currentPrice = biddingPrice;
 	}
+
+	//경매마감시 상태변경(판매된거)
+	public void markAsSold() {
+		this.auctionStatus = AuctionStatus.FINISHED;
+	}
+
 }
