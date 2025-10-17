@@ -13,7 +13,6 @@ import org.oneog.uppick.domain.auction.repository.AuctionRepository;
 import org.oneog.uppick.domain.auction.repository.BiddingDetailRepository;
 import org.oneog.uppick.domain.notification.entity.NotificationType;
 import org.oneog.uppick.domain.notification.service.NotificationExternalServiceApi;
-import org.oneog.uppick.domain.product.service.ProductExternalServiceApi;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,7 +33,6 @@ public class AuctionInternalService {
 
 	// ****** External Domain API ***** //
 	private final NotificationExternalServiceApi notificationExternalServiceApi;
-	private final ProductExternalServiceApi productExternalServiceApi;
 
 	//특정 상품에 입찰 시도를 한다
 	@Transactional
@@ -82,7 +80,8 @@ public class AuctionInternalService {
 	 * 입찰 발생 시 알림 전송
 	 */
 	private void sendBidNotifications(Auction auction, Long bidderId, Long biddingPrice) {
-		Long sellerId = productExternalServiceApi.findByProdcutId(auction.getProductId()); //물품아이디를 통해 판매자 ID를 받아와야함
+		Long sellerId = auctionQueryRepository.findSellerIdByAuctionId(
+			auction.getProductId()); //물품아이디를 통해 판매자 ID를 받아와야함
 
 		// 판매자에게 알림
 		notificationExternalServiceApi.sendNotification(
