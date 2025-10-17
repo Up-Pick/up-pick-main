@@ -37,8 +37,8 @@ public class AuctionInternalService {
 		Long currentPrice = auction.getCurrentPrice(); //현재 입찰가
 		Long minPrice = auction.getMinPrice(); //최소 입찰가
 
-		// 1. 첫 입찰일 경우 최소 입찰가보다는 커야한다.
-		// 2. 상품의 현재 입찰가가 null 이거나(현재 아무도 입찰하지 않음) 유저의 입찰금액이 더 커야함
+		// 1. 첫 입찰일 경우(currentPrice가 null) 최소 입찰가보다는 커야한다.
+		// 2. 현재 입찰가 보다 유저의 입찰금액이 더 커야함
 		boolean validBid =
 			(currentPrice == null && biddingPrice >= minPrice) ||
 				(currentPrice != null && biddingPrice > currentPrice);
