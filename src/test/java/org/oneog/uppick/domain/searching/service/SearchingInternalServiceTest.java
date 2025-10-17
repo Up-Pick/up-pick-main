@@ -2,12 +2,18 @@ package org.oneog.uppick.domain.searching.service;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -17,7 +23,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.oneog.uppick.domain.searching.dto.projection.SearchProductProjection;
 import org.oneog.uppick.domain.searching.dto.request.SearchProductRequest;
 import org.oneog.uppick.domain.searching.dto.response.SearchProductInfoResponse;
+import org.oneog.uppick.domain.searching.entity.SearchHistory;
 import org.oneog.uppick.domain.searching.mapper.SearchingMapper;
+import org.oneog.uppick.domain.searching.repository.SearchHistoryJpaRepository;
 import org.oneog.uppick.domain.searching.repository.SearchingQueryRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -33,10 +41,19 @@ public class SearchingInternalServiceTest {
     @Mock
     SearchingMapper searchingMapper;
 
+    @Mock
+    SearchHistoryJpaRepository searchHistoryJpaRepository;
+
     @InjectMocks
     SearchingInternalService searchingInternalService;
 
     private static final LocalDateTime FIXED_NOW = LocalDateTime.of(2025, 1, 1, 12, 0);
+
+    @BeforeEach
+    void setUp() {
+        given(searchHistoryJpaRepository.save(any(SearchHistory.class)))
+            .willAnswer(invocation -> invocation.getArgument(0));
+    }
 
     @Test
     void searchProduct_입력값이_널이면_디폴트값을_사용한다() {

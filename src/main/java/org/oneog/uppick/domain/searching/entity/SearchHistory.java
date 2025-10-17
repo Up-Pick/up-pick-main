@@ -31,4 +31,8 @@ public class SearchHistory {
     @CreatedDate
     @Column(name = "searched_at", nullable = false, updatable = false)
     private LocalDateTime searchedAt;
+
+    public SearchHistory(String keyword) {
+        this.keyword = keyword;
+    }
 }

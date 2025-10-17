@@ -5,12 +5,16 @@ import java.time.LocalDateTime;
 import org.oneog.uppick.domain.searching.dto.projection.SearchProductProjection;
 import org.oneog.uppick.domain.searching.dto.request.SearchProductRequest;
 import org.oneog.uppick.domain.searching.dto.response.SearchProductInfoResponse;
+import org.oneog.uppick.domain.searching.entity.SearchHistory;
 import org.oneog.uppick.domain.searching.mapper.SearchingMapper;
+import org.oneog.uppick.domain.searching.repository.SearchHistoryJpaRepository;
 import org.oneog.uppick.domain.searching.repository.SearchingQueryRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,11 +23,13 @@ import lombok.RequiredArgsConstructor;
 public class SearchingInternalService {
     private final SearchingQueryRepository searchingQueryRepository;
     private final SearchingMapper searchingMapper;
+    private final SearchHistoryJpaRepository searchHistoryJpaRepository;
 
     private static final long DEFAULT_CATEGORY_ID = 1L;
     private static final boolean DEFAULT_ONLY_NOT_SOLD = false;
     private static final int DEFAULT_SIZE = 20;
 
+    @Transactional
     public Page<SearchProductInfoResponse> searchProduct(SearchProductRequest searchProductRequest) {
         Long categoryId = searchProductRequest.getCategoryId();
 
@@ -66,6 +72,13 @@ public class SearchingInternalService {
             onlyNotSold,
             searchProductRequest.getSortBy(),
             searchProductRequest.getKeyword());
+
+        if (StringUtils.hasText(searchProductRequest.getKeyword())) {
+            String[] keywords = searchProductRequest.getKeyword().trim().split(" ");
+            for (String keyword : keywords) {
+                searchHistoryJpaRepository.save(new SearchHistory(keyword));
+            }
+        }
 
         return searchingMapper.toResponse(productProjections);
     }
