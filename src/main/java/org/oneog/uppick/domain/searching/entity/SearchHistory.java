@@ -1,5 +1,7 @@
 package org.oneog.uppick.domain.searching.entity;
 
+import java.time.LocalDateTime;
+
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -28,5 +30,5 @@ public class SearchHistory {
 
     @CreatedDate
     @Column(name = "searched_at", nullable = false, updatable = false)
-    private Long searchedAt;
+    private LocalDateTime searchedAt;
 }

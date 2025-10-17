@@ -19,8 +19,7 @@ import static org.oneog.uppick.domain.product.entity.QProduct.product;
 import static org.oneog.uppick.domain.category.entity.QCategory.category;
 import static org.oneog.uppick.domain.auction.entity.QAuction.auction;
 import static org.oneog.uppick.domain.member.entity.QMember.member;
-import static org.oneog.uppick.domain.product.entity.QSellDetail.sellDetail;
-
+import static org.oneog.uppick.domain.member.entity.QSellDetail.sellDetail;
 
 import lombok.RequiredArgsConstructor;
 
@@ -46,9 +45,7 @@ public class ProductQueryRepository {
 					product.soldAt,
 					auction.currentPrice,
 					auction.endAt,
-					member.nickname
-				)
-			)
+					member.nickname))
 			.from(product)
 			.join(category).on(product.categoryId.eq(category.id))
 			.join(auction).on(product.id.eq(auction.productId))
@@ -71,9 +68,7 @@ public class ProductQueryRepository {
 					product.description,
 					product.image,
 					sellDetail.finalPrice,
-					sellDetail.sellAt
-				)
-			)
+					sellDetail.sellAt))
 			.from(product)
 			.join(sellDetail).on(product.id.eq(sellDetail.productId))
 			.where(memberId != null ? product.registerId.eq(memberId) : null)
@@ -83,13 +78,13 @@ public class ProductQueryRepository {
 			.fetch();
 
 		Long total = Optional.ofNullable(
-				queryFactory
-					.select(product.count())
-					.from(product)
-					.join(sellDetail).on(product.id.eq(sellDetail.productId))
-					.where(memberId != null ? product.registerId.eq(memberId) : null)
-					.fetchOne()
-		).orElse(0L);
+			queryFactory
+				.select(product.count())
+				.from(product)
+				.join(sellDetail).on(product.id.eq(sellDetail.productId))
+				.where(memberId != null ? product.registerId.eq(memberId) : null)
+				.fetchOne())
+			.orElse(0L);
 
 		return new PageImpl<>(qResponseList, pageable, total);
 	}
@@ -98,21 +93,18 @@ public class ProductQueryRepository {
 
 		return Optional.ofNullable(
 			queryFactory
-			.select(
-				Projections.constructor(
-					ProductSimpleInfoResponse.class,
-					product.name,
-					product.image,
-					Expressions.cases()
-						.when(auction.currentPrice.isNotNull())
-						.then(auction.currentPrice)
-						.otherwise(auction.minPrice)
-				)
-			)
-			.from(product)
-			.join(auction).on(product.id.eq(auction.productId))
-			.where(productId != null ? product.id.eq(productId) : null)
-			.fetchOne()
-		);
+				.select(
+					Projections.constructor(
+						ProductSimpleInfoResponse.class,
+						product.name,
+						product.image,
+						Expressions.cases()
+							.when(auction.currentPrice.isNotNull())
+							.then(auction.currentPrice)
+							.otherwise(auction.minPrice)))
+				.from(product)
+				.join(auction).on(product.id.eq(auction.productId))
+				.where(productId != null ? product.id.eq(productId) : null)
+				.fetchOne());
 	}
 }
