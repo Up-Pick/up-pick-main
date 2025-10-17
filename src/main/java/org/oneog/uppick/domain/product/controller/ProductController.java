@@ -5,6 +5,7 @@ import org.oneog.uppick.common.dto.GlobalApiResponse;
 import org.oneog.uppick.common.dto.GlobalPageResponse;
 import org.oneog.uppick.domain.product.dto.request.ProductRegisterRequest;
 import org.oneog.uppick.domain.product.dto.response.ProductInfoResponse;
+import org.oneog.uppick.domain.product.dto.response.ProductSimpleInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductSoldInfoResponse;
 import org.oneog.uppick.domain.product.service.ProductInternalService;
 import org.springframework.data.domain.Page;
@@ -54,5 +55,13 @@ public class ProductController {
 
 		Page<ProductSoldInfoResponse> responses = productInternalService.getProductSoldInfoByMemberId(authMember.getMemberId(), pageable);
 		return GlobalPageResponse.of(responses);
+	}
+
+	// 입찰 시 상품 간단 조회
+	@GetMapping("/{productId}/simple-info")
+	public GlobalApiResponse<ProductSimpleInfoResponse> getProductSimpleInfo(@PathVariable Long productId) {
+
+		ProductSimpleInfoResponse response = productInternalService.getProductSimpleInfoById(productId);
+		return GlobalApiResponse.ok(response);
 	}
 }

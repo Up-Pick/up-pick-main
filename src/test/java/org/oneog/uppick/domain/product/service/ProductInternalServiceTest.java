@@ -9,19 +9,17 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.oneog.uppick.domain.auction.service.AuctionExternalServiceApi;
 import org.oneog.uppick.domain.product.dto.request.ProductRegisterRequest;
+import org.oneog.uppick.domain.product.dto.response.ProductSimpleInfoResponse;
 import org.oneog.uppick.domain.product.entity.Product;
 import org.oneog.uppick.domain.product.mapper.ProductMapper;
 import org.oneog.uppick.domain.product.repository.ProductQueryRepository;
 import org.oneog.uppick.domain.product.repository.ProductRepository;
 
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
-
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 public class ProductInternalServiceTest {
@@ -35,6 +33,8 @@ public class ProductInternalServiceTest {
 	@InjectMocks
 	ProductInternalService productInternalService;
 
+	private Product product;
+
 	@BeforeEach
 	public void init() {
 		productInternalService = new ProductInternalService(
@@ -44,8 +44,15 @@ public class ProductInternalServiceTest {
 			auctionExternalServiceApi
 			);
 
-		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-		Validator validator = factory.getValidator();
+		product = Product.builder()
+			.name("상품 이름")
+			.description("상품 설명")
+			.categoryId(1L)
+			.registerId(1L)
+			.build();
+
+		// ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		// Validator validator = factory.getValidator();
 	}
 
 	/* ---------- Service Test ---------- */
@@ -80,12 +87,6 @@ public class ProductInternalServiceTest {
 	void 상품을_상세_조회하면_조회수가_올라감() {
 
 		// given
-		Product product = Product.builder()
-			.name("상품 이름")
-			.description("상품 설명")
-			.categoryId(1L)
-			.registerId(1L)
-			.build();
 		Long prevViewCount = product.getViewCount();
 
 		// when
@@ -93,5 +94,20 @@ public class ProductInternalServiceTest {
 
 		// then
 		assertThat(product.getViewCount()).isEqualTo(prevViewCount + 1);
+	}
+
+	@Test
+	void 상품_간단_정보_조회가_정상적으로_작동함() {
+
+		// given
+		Long productId = product.getId();
+		given(productRepository.findById(productId)).willReturn(Optional.ofNullable(product));
+
+		// when
+		ProductSimpleInfoResponse result = productInternalService.getProductSimpleInfoById(productId);
+
+		// then
+		assertThat(result.getName()).isEqualTo(product.getName());
+		assertThat(result.getImage()).isEqualTo(product.getImage());
 	}
 }
