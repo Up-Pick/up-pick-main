@@ -1,7 +1,6 @@
 package org.oneog.uppick.domain.searching.dto.response;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
