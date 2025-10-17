@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,9 @@ import org.oneog.uppick.domain.auction.mapper.AuctionMapper;
 import org.oneog.uppick.domain.auction.repository.AuctionQueryRepository;
 import org.oneog.uppick.domain.auction.repository.AuctionRepository;
 import org.oneog.uppick.domain.auction.repository.BiddingDetailRepository;
+import org.oneog.uppick.domain.notification.entity.NotificationType;
+import org.oneog.uppick.domain.notification.service.NotificationExternalServiceApi;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 public class AuctionInternalServiceTest {
@@ -33,6 +37,8 @@ public class AuctionInternalServiceTest {
 	private AuctionMapper auctionMapper;
 	@Mock
 	private BiddingDetailRepository biddingDetailRepository;
+	@Mock
+	private NotificationExternalServiceApi notificationExternalServiceApi;
 
 	@InjectMocks
 	private AuctionInternalService auctionInternalService;
@@ -97,4 +103,52 @@ public class AuctionInternalServiceTest {
 			.hasMessage(AuctionErrorCode.WRONG_BIDDING_PRICE.getMessage());
 
 	}
+
+	@Test
+	void sendBidNotifications_입찰을한상황_데이터가정상적으로반환() {
+		// given
+		Auction auction = Auction.builder()
+			.productId(10L)
+			.minPrice(1000L)
+			.currentPrice(1500L)
+			.status(Status.IN_PROGRESS)
+			.endAt(LocalDateTime.now().plusDays(1))
+			.build();
+
+		//  Auction ID 세팅
+		ReflectionTestUtils.setField(auction, "id", 1L);
+
+		long auctionId = 1L; // 테스트 중 사용할 경매 ID
+		long bidderId = 200L;  // 입찰자(요청자)
+		long sellerId = 300L; // 판매자
+		long biddingPrice = 2500L; // 새로 입찰한 금액
+
+		// 경매 ID로 경매를 찾으면 위에서 만든 auction 객체를 반환하도록 지정
+		given(auctionRepository.findById(anyLong())).willReturn(Optional.of(auction));
+		//경매 ID로 판매자 ID 조회 시 300L을 반환하도록 지정
+		given(auctionQueryRepository.findSellerIdByAuctionId(anyLong())).willReturn(sellerId);
+		//해당 경매에 참여한 사용자 목록 반환 (본인 포함)
+		given(biddingDetailRepository.findDistinctMemberIdsByAuctionId(anyLong()))
+			.willReturn(List.of(100L, 200L, 150L));
+
+		// when
+		auctionInternalService.bid(new AuctionBidRequest(biddingPrice), auctionId, bidderId);
+
+		// then
+		//판매자한테 갈 알림
+		then(notificationExternalServiceApi).should().sendNotification(
+			eq(sellerId), eq(NotificationType.BID), anyString(), contains("입찰했습니다.")
+		);
+
+		// 기존 참여자(본인 제외)에게 “경쟁 입찰” 알림이 2회 전송되었는지 확인
+		then(notificationExternalServiceApi).should(times(2)).sendNotification(
+			anyLong(), eq(NotificationType.BID), eq("새로운 경쟁 입찰 발생"), anyString()
+		);
+
+		// 본인에게 “입찰 완료” 알림이 1회 전송되었는지 확인
+		then(notificationExternalServiceApi).should().sendNotification(
+			eq(bidderId), eq(NotificationType.TRADE), eq("입찰 완료"), anyString()
+		);
+	}
+
 }
