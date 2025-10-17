@@ -104,13 +104,5 @@ public class AuctionInternalService {
 				);
 			}
 		}
-
-		// 입찰자 본인에게 확인 알림
-		notificationExternalServiceApi.sendNotification(
-			bidderId,
-			NotificationType.TRADE,
-			"입찰 완료",
-			"상품 '" + auction.getProductId() + "'에 " + biddingPrice + "원으로 입찰이 완료되었습니다."
-		);
 	}
 }

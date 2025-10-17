@@ -144,11 +144,6 @@ public class AuctionInternalServiceTest {
 		then(notificationExternalServiceApi).should(times(2)).sendNotification(
 			anyLong(), eq(NotificationType.BID), eq("새로운 경쟁 입찰 발생"), anyString()
 		);
-
-		// 본인에게 “입찰 완료” 알림이 1회 전송되었는지 확인
-		then(notificationExternalServiceApi).should().sendNotification(
-			eq(bidderId), eq(NotificationType.TRADE), eq("입찰 완료"), anyString()
-		);
 	}
 
 }
