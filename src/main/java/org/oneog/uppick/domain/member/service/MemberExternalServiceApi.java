@@ -1,9 +1,14 @@
 package org.oneog.uppick.domain.member.service;
 
+import org.oneog.uppick.domain.auth.dto.request.SignupRequest;
+import org.oneog.uppick.domain.member.entity.Member;
+
 public interface MemberExternalServiceApi {
 	boolean existsByEmail(String email);
 
 	boolean existsByNickname(String nickname);
 
-	void createUser(String email, String nickname, String encodedPassword);
+	void createUser(SignupRequest request, String encodedPassword);
+
+	Member findByEmail(String email);
 }
