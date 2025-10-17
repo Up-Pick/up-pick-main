@@ -1,8 +1,13 @@
 package org.oneog.uppick.domain.product.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.oneog.uppick.domain.product.dto.response.ProductInfoResponse;
+import org.oneog.uppick.domain.product.dto.response.ProductSoldInfoResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import com.querydsl.core.types.Projections;
@@ -54,4 +59,37 @@ public class ProductQueryRepository {
 		return Optional.ofNullable(qResponse);
 	}
 
+	public Page<ProductSoldInfoResponse> getProductSoldInfoByMemberId(Long memberId, Pageable pageable) {
+
+		List<ProductSoldInfoResponse> qResponseList = queryFactory
+			.select(
+				Projections.constructor(
+					ProductSoldInfoResponse.class,
+					product.id,
+					product.name,
+					product.description,
+					product.image,
+					sellDetail.finalPrice,
+					sellDetail.sellAt
+				)
+			)
+			.from(product)
+			.join(sellDetail).on(product.id.eq(sellDetail.productId))
+			.where(memberId != null ? product.registerId.eq(memberId) : null)
+			.orderBy(sellDetail.sellAt.desc())
+			.offset(pageable.getOffset())
+			.limit(pageable.getPageSize())
+			.fetch();
+
+		Long total = Optional.ofNullable(
+				queryFactory
+					.select(product.count())
+					.from(product)
+					.join(sellDetail).on(product.id.eq(sellDetail.productId))
+					.where(memberId != null ? product.registerId.eq(memberId) : null)
+					.fetchOne()
+		).orElse(0L);
+
+		return new PageImpl<>(qResponseList, pageable, total);
+	}
 }

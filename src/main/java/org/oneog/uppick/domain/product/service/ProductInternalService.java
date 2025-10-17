@@ -4,11 +4,14 @@ import org.oneog.uppick.common.exception.BusinessException;
 import org.oneog.uppick.domain.auction.service.AuctionExternalServiceApi;
 import org.oneog.uppick.domain.product.dto.request.ProductRegisterRequest;
 import org.oneog.uppick.domain.product.dto.response.ProductInfoResponse;
+import org.oneog.uppick.domain.product.dto.response.ProductSoldInfoResponse;
 import org.oneog.uppick.domain.product.entity.Product;
 import org.oneog.uppick.domain.product.exception.ProductErrorCode;
 import org.oneog.uppick.domain.product.mapper.ProductMapper;
 import org.oneog.uppick.domain.product.repository.ProductQueryRepository;
 import org.oneog.uppick.domain.product.repository.ProductRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,6 +49,11 @@ public class ProductInternalService {
 		product.increaseViewCount();
 
 		return productQueryRepository.getProductInfoById(productId).orElseThrow(() -> new BusinessException(ProductErrorCode.CANNOT_READ_PRODUCT_INFO));
+	}
+
+	public Page<ProductSoldInfoResponse> getProductSoldInfoByMemberId(Long memberId, Pageable pageable) {
+
+		return productQueryRepository.getProductSoldInfoByMemberId(memberId, pageable);
 	}
 
 	// ***** Internal Method ***** //
