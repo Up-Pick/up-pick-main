@@ -94,9 +94,10 @@ public class ProductQueryRepository {
 		return new PageImpl<>(qResponseList, pageable, total);
 	}
 
-	public ProductSimpleInfoResponse getProductSimpleInfoById(Long productId) {
+	public Optional<ProductSimpleInfoResponse> getProductSimpleInfoById(Long productId) {
 
-		return queryFactory
+		return Optional.ofNullable(
+			queryFactory
 			.select(
 				Projections.constructor(
 					ProductSimpleInfoResponse.class,
@@ -111,6 +112,7 @@ public class ProductQueryRepository {
 			.from(product)
 			.join(auction).on(product.id.eq(auction.productId))
 			.where(productId != null ? product.id.eq(productId) : null)
-			.fetchOne();
+			.fetchOne()
+		);
 	}
 }

@@ -49,7 +49,8 @@ public class ProductInternalService {
 		Product product = findProductByIdOrElseThrow(productId);
 		product.increaseViewCount();
 
-		return productQueryRepository.getProductInfoById(productId).orElseThrow(() -> new BusinessException(ProductErrorCode.CANNOT_READ_PRODUCT_INFO));
+		return productQueryRepository.getProductInfoById(productId).orElseThrow(
+			() -> new BusinessException(ProductErrorCode.CANNOT_READ_PRODUCT_INFO));
 	}
 
 	public Page<ProductSoldInfoResponse> getProductSoldInfoByMemberId(Long memberId, Pageable pageable) {
@@ -57,7 +58,9 @@ public class ProductInternalService {
 	}
 
 	public ProductSimpleInfoResponse getProductSimpleInfoById(Long productId) {
-		return productQueryRepository.getProductSimpleInfoById(productId);
+
+		return productQueryRepository.getProductSimpleInfoById(productId).orElseThrow(
+			() -> new BusinessException(ProductErrorCode.CANNOT_READ_PRODUCT_SIMPLE_INFO));
 	}
 
 	// ***** Internal Private Method ***** //

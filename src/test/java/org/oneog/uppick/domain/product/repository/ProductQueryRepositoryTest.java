@@ -128,7 +128,7 @@ public class ProductQueryRepositoryTest {
 
 	@Test
 	void 입찰중인_상품의_간단한_정보_조회_가능() {
-		ProductSimpleInfoResponse result = productQueryRepository.getProductSimpleInfoById(product.getId());
+		ProductSimpleInfoResponse result = productQueryRepository.getProductSimpleInfoById(product.getId()).orElseThrow();
 
 		assertThat(result).isNotNull();
 		assertThat(result.getName()).isEqualTo(product.getName());
@@ -157,7 +157,7 @@ public class ProductQueryRepositoryTest {
 			.build();
 		auctionRepository.save(newAuction);
 
-		ProductSimpleInfoResponse result = productQueryRepository.getProductSimpleInfoById(newProduct.getId());
+		ProductSimpleInfoResponse result = productQueryRepository.getProductSimpleInfoById(newProduct.getId()).orElseThrow();
 
 		assertThat(result).isNotNull();
 		assertThat(result.getName()).isEqualTo(newProduct.getName());
