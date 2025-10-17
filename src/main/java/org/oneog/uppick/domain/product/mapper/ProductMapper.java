@@ -17,11 +17,4 @@ public class ProductMapper {
 			.registerId(registerId)
 			.build();
 	}
-
-	public ProductSimpleInfoResponse toSimpleInfoResponse(Product product) {
-		return ProductSimpleInfoResponse.builder()
-			.name(product.getName())
-			.image(product.getImage())
-			.build();
-	}
 }

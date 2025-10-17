@@ -53,14 +53,11 @@ public class ProductInternalService {
 	}
 
 	public Page<ProductSoldInfoResponse> getProductSoldInfoByMemberId(Long memberId, Pageable pageable) {
-
 		return productQueryRepository.getProductSoldInfoByMemberId(memberId, pageable);
 	}
 
 	public ProductSimpleInfoResponse getProductSimpleInfoById(Long productId) {
-
-		Product product = findProductByIdOrElseThrow(productId);
-		return productMapper.toSimpleInfoResponse(product);
+		return productQueryRepository.getProductSimpleInfoById(productId);
 	}
 
 	// ***** Internal Private Method ***** //

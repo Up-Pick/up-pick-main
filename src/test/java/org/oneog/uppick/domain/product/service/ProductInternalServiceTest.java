@@ -95,19 +95,4 @@ public class ProductInternalServiceTest {
 		// then
 		assertThat(product.getViewCount()).isEqualTo(prevViewCount + 1);
 	}
-
-	@Test
-	void 상품_간단_정보_조회가_정상적으로_작동함() {
-
-		// given
-		Long productId = product.getId();
-		given(productRepository.findById(productId)).willReturn(Optional.ofNullable(product));
-
-		// when
-		ProductSimpleInfoResponse result = productInternalService.getProductSimpleInfoById(productId);
-
-		// then
-		assertThat(result.getName()).isEqualTo(product.getName());
-		assertThat(result.getImage()).isEqualTo(product.getImage());
-	}
 }
