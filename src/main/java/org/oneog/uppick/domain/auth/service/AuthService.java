@@ -40,7 +40,6 @@ public class AuthService {
 		memberExternalService.createUser(signupRequest, encodedPassword);
 	}
 
-	@Transactional
 	public LoginResponse login(LoginRequest loginRequest) {
 		Member member = memberExternalService.findByEmail(loginRequest.getEmail());
 
@@ -51,9 +50,7 @@ public class AuthService {
 		// 3. JWT 생성
 		String token = jwtUtil.createToken(member.getId(), member.getNickname());
 
-		return LoginResponse.builder()
-			.accessToken(token)
-			.build();
+		return new LoginResponse(token);
 
 	}
 }
