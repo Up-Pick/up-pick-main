@@ -68,7 +68,7 @@ public class ProductController {
 	}
 
 	// 구매 완료 상품 내역 조회
-	@GetMapping("/purchased")
+	@GetMapping("/purchased/me")
 	public GlobalPageResponse<ProductPurchasedInfoResponse> getPurchasedProducts(
 		@AuthenticationPrincipal AuthMember authMember,
 		@PageableDefault(size = 20) Pageable pageable) {
