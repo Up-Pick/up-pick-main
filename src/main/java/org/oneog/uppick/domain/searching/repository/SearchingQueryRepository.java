@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
@@ -46,7 +47,7 @@ public class SearchingQueryRepository {
         return PageableExecutionUtils.getPage(results, pageable, countQuery::fetchOne);
     }
 
-    private com.querydsl.core.types.OrderSpecifier<?> getOrderSpecifier(String sortBy, QAuction auction,
+    private OrderSpecifier<?> getOrderSpecifier(String sortBy, QAuction auction,
         QProduct product) {
         if (SORT_END_AT_DESC.equals(sortBy)) {
             return auction.endAt.desc();
