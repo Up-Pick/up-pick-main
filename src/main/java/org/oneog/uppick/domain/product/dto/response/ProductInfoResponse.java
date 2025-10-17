@@ -11,7 +11,6 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = ResponseConstants.JSON_DATE_FORMAT)
 public class ProductInfoResponse {
 
 	private Long id;
@@ -22,8 +21,10 @@ public class ProductInfoResponse {
 	private String image;
 
 	private String categoryName;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = ResponseConstants.JSON_DATE_FORMAT)
 	private LocalDateTime soldAt;
 	private Long currentBid;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = ResponseConstants.JSON_DATE_FORMAT)
 	private LocalDateTime endAt;
 	private String sellerName;
 }
