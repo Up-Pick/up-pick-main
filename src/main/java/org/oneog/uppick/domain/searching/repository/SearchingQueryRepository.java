@@ -25,11 +25,9 @@ import lombok.RequiredArgsConstructor;
 public class SearchingQueryRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
-    // QueryDSL Q-types for reuse
     private static final QAuction AUCTION = QAuction.auction;
     private static final QProduct PRODUCT = QProduct.product;
 
-    // Defaults
     private static final long DEFAULT_CATEGORY_ID = 1L;
     private static final String SORT_END_AT_DESC = "endAtDesc";
 
@@ -58,9 +56,6 @@ public class SearchingQueryRepository {
         return product.registeredAt.desc();
     }
 
-    /**
-     * Build the combined where-clause from provided optional filters.
-     */
     private BooleanExpression buildWhereClause(Long categoryId, LocalDateTime endAtFrom, Boolean onlyNotSold) {
         BooleanExpression clause = categoryPredicate(categoryId);
 
@@ -87,9 +82,6 @@ public class SearchingQueryRepository {
         return AUCTION.status.ne(Status.FINISHED);
     }
 
-    /**
-     * Builds the select query with ordering and pagination applied.
-     */
     private JPAQuery<SearchProductProjection> buildSelectQuery(BooleanExpression whereClause, String sortBy,
         Pageable pageable) {
         return jpaQueryFactory
