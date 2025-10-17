@@ -8,7 +8,7 @@ import java.time.temporal.ChronoUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.oneog.uppick.domain.auction.entity.Auction;
-import org.oneog.uppick.domain.auction.enums.Status;
+import org.oneog.uppick.domain.auction.enums.AuctionStatus;
 import org.oneog.uppick.domain.auction.repository.AuctionRepository;
 import org.oneog.uppick.domain.category.entity.Category;
 import org.oneog.uppick.domain.category.repository.CategoryRepository;
@@ -88,7 +88,7 @@ public class ProductQueryRepositoryTest {
 			.productId(savedProduct.getId())
 			.currentPrice(30_000L)
 			.minPrice(10_000L)
-			.status(Status.IN_PROGRESS)
+			.status(AuctionStatus.IN_PROGRESS)
 			.endAt(LocalDateTime.now().plusDays(3L))
 			.build();
 		Auction savedAuction = auctionRepository.save(auction);
@@ -178,7 +178,7 @@ public class ProductQueryRepositoryTest {
 			.productId(savedProduct.getId())
 			// .currentPrice(30_000L) -> currentPrice가 Null인 경우
 			.minPrice(10_000L)
-			.status(Status.IN_PROGRESS)
+			.status(AuctionStatus.IN_PROGRESS)
 			.endAt(LocalDateTime.now().plusDays(3L))
 			.build();
 		auctionRepository.save(newAuction);
