@@ -67,10 +67,6 @@ ext {
     snippetsDir = file('build/generated-snippets')
 }
 
-tasks.named('test') {
-    useJUnitPlatform()
-}
-
 apply from: 'gradle/scripts/restdocs-index.gradle'
 
 tasks.named('test', Test) {
@@ -121,3 +117,6 @@ tasks.named('bootJar', BootJar) {
     }
 }
 
+tasks.named('build') {
+    dependsOn tasks.named('asciidoctor')
+}
