@@ -190,7 +190,8 @@ public class ProductQueryRepositoryTest {
 		assertThat(result).isNotNull();
 		assertThat(result.getName()).isEqualTo(newProduct.getName());
 		assertThat(result.getImage()).isEqualTo(newProduct.getImage());
-		assertThat(result.getCurrentBidPrice()).isEqualTo(newAuction.getMinPrice());
+		assertThat(result.getMinBidPrice()).isEqualTo(newAuction.getMinPrice());
+		assertThat(result.getCurrentBidPrice()).isNull();
 	}
 
 	@Test
