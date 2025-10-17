@@ -48,6 +48,14 @@ public class ProductController {
 		return GlobalApiResponse.ok(response);
 	}
 
+	// 입찰 시 상품 간단 조회
+	@GetMapping("/{productId}/simple-info")
+	public GlobalApiResponse<ProductSimpleInfoResponse> getProductSimpleInfo(@PathVariable Long productId) {
+
+		ProductSimpleInfoResponse response = productInternalService.getProductSimpleInfoById(productId);
+		return GlobalApiResponse.ok(response);
+	}
+
 	// 판매 완료된 상품 내역 조회
 	@GetMapping("/sold/me")
 	public GlobalPageResponse<ProductSoldInfoResponse> getSoldProducts(
@@ -57,14 +65,6 @@ public class ProductController {
 		Page<ProductSoldInfoResponse> responses = productInternalService.getProductSoldInfoByMemberId(
 			authMember.getMemberId(), pageable);
 		return GlobalPageResponse.of(responses);
-	}
-
-	// 입찰 시 상품 간단 조회
-	@GetMapping("/{productId}/simple-info")
-	public GlobalApiResponse<ProductSimpleInfoResponse> getProductSimpleInfo(@PathVariable Long productId) {
-
-		ProductSimpleInfoResponse response = productInternalService.getProductSimpleInfoById(productId);
-		return GlobalApiResponse.ok(response);
 	}
 
 	// 구매 완료 상품 내역 조회

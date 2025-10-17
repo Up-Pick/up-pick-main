@@ -60,6 +60,23 @@ public class ProductQueryRepository {
 		return Optional.ofNullable(qResponse);
 	}
 
+	public Optional<ProductSimpleInfoResponse> getProductSimpleInfoById(Long productId) {
+
+		return Optional.ofNullable(
+			queryFactory
+				.select(
+					Projections.constructor(
+						ProductSimpleInfoResponse.class,
+						product.name,
+						product.image,
+						auction.minPrice,
+						auction.currentPrice))
+				.from(product)
+				.join(auction).on(product.id.eq(auction.productId))
+				.where(productId != null ? product.id.eq(productId) : null)
+				.fetchOne());
+	}
+
 	public Page<ProductSoldInfoResponse> getProductSoldInfoByMemberId(Long memberId, Pageable pageable) {
 
 		List<ProductSoldInfoResponse> qResponseList = queryFactory
@@ -89,23 +106,6 @@ public class ProductQueryRepository {
 				.fetchOne()).orElse(0L);
 
 		return new PageImpl<>(qResponseList, pageable, total);
-	}
-
-	public Optional<ProductSimpleInfoResponse> getProductSimpleInfoById(Long productId) {
-
-		return Optional.ofNullable(
-			queryFactory
-				.select(
-					Projections.constructor(
-						ProductSimpleInfoResponse.class,
-						product.name,
-						product.image,
-						auction.minPrice,
-						auction.currentPrice))
-				.from(product)
-				.join(auction).on(product.id.eq(auction.productId))
-				.where(productId != null ? product.id.eq(productId) : null)
-				.fetchOne());
 	}
 
 	public Page<ProductPurchasedInfoResponse> getPurchasedProductInfoByMemberId(Long memberId, Pageable pageable) {

@@ -54,13 +54,13 @@ public class ProductInternalService {
 			() -> new BusinessException(ProductErrorCode.CANNOT_READ_PRODUCT_INFO));
 	}
 
-	public Page<ProductSoldInfoResponse> getProductSoldInfoByMemberId(Long memberId, Pageable pageable) {
-		return productQueryRepository.getProductSoldInfoByMemberId(memberId, pageable);
-	}
-
 	public ProductSimpleInfoResponse getProductSimpleInfoById(Long productId) {
 		return productQueryRepository.getProductSimpleInfoById(productId).orElseThrow(
 			() -> new BusinessException(ProductErrorCode.CANNOT_READ_PRODUCT_SIMPLE_INFO));
+	}
+
+	public Page<ProductSoldInfoResponse> getProductSoldInfoByMemberId(Long memberId, Pageable pageable) {
+		return productQueryRepository.getProductSoldInfoByMemberId(memberId, pageable);
 	}
 
 	public Page<ProductPurchasedInfoResponse> getPurchasedProductInfoByMemberId(Long memberId, Pageable pageable) {
