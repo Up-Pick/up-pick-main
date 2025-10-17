@@ -6,7 +6,7 @@ import java.util.List;
 import org.oneog.uppick.domain.auction.entity.QAuction;
 import org.oneog.uppick.domain.auction.enums.Status;
 import org.oneog.uppick.domain.product.entity.QProduct;
-import org.oneog.uppick.domain.searching.dto.response.SearchProductProjection;
+import org.oneog.uppick.domain.searching.dto.projection.SearchProductProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
@@ -28,16 +28,16 @@ public class SearchingQueryRepository {
     private static final QAuction AUCTION = QAuction.auction;
     private static final QProduct PRODUCT = QProduct.product;
 
-    private static final long DEFAULT_CATEGORY_ID = 1L;
     private static final String SORT_END_AT_DESC = "endAtDesc";
 
     public Page<SearchProductProjection> findProductsWithFilters(
         Pageable pageable,
-        Long categoryId,
+        long categoryId,
         LocalDateTime endAtFrom,
-        Boolean onlyNotSold,
-        String sortBy) {
-        BooleanExpression whereClause = buildWhereClause(categoryId, endAtFrom, onlyNotSold);
+        boolean onlyNotSold,
+        String sortBy,
+        String keyword) {
+        BooleanExpression whereClause = buildWhereClause(categoryId, endAtFrom, onlyNotSold, keyword);
 
         List<SearchProductProjection> results = buildSelectQuery(whereClause, sortBy, pageable).fetch();
 
@@ -50,28 +50,33 @@ public class SearchingQueryRepository {
         QProduct product) {
         if (SORT_END_AT_DESC.equals(sortBy)) {
             return auction.endAt.desc();
+        } else {
+            // 기본: 등록 날짜 내림차순
+            return product.registeredAt.desc();
         }
-
-        // 기본: 등록 날짜 내림차순
-        return product.registeredAt.desc();
     }
 
-    private BooleanExpression buildWhereClause(Long categoryId, LocalDateTime endAtFrom, Boolean onlyNotSold) {
+    private BooleanExpression buildWhereClause(long categoryId, LocalDateTime endAtFrom, boolean onlyNotSold,
+        String keyword) {
         BooleanExpression clause = categoryPredicate(categoryId);
 
         if (endAtFrom != null) {
             clause = clause.and(endAtPredicate(endAtFrom));
         }
 
-        if (Boolean.TRUE.equals(onlyNotSold)) {
+        if (onlyNotSold) {
             clause = clause.and(onlyNotSoldPredicate());
+        }
+
+        if (keyword != null && !keyword.isBlank()) {
+            clause = clause.and(nameContains(keyword));
         }
 
         return clause;
     }
 
-    private BooleanExpression categoryPredicate(Long categoryId) {
-        return PRODUCT.categoryId.eq(categoryId != null ? categoryId : DEFAULT_CATEGORY_ID);
+    private BooleanExpression categoryPredicate(long categoryId) {
+        return PRODUCT.categoryId.eq(categoryId);
     }
 
     private BooleanExpression endAtPredicate(LocalDateTime endAtFrom) {
@@ -82,10 +87,15 @@ public class SearchingQueryRepository {
         return AUCTION.status.ne(Status.FINISHED);
     }
 
+    private BooleanExpression nameContains(String keyword) {
+        return PRODUCT.name.contains(keyword);
+    }
+
     private JPAQuery<SearchProductProjection> buildSelectQuery(BooleanExpression whereClause, String sortBy,
         Pageable pageable) {
         return jpaQueryFactory
             .select(Projections.constructor(SearchProductProjection.class,
+                PRODUCT.id,
                 PRODUCT.image,
                 PRODUCT.name,
                 PRODUCT.registeredAt,
