@@ -54,7 +54,7 @@ public class AuctionInternalServiceTest {
 			.productId(10L)
 			.minPrice(1000L)
 			.currentPrice(1500L)
-			.auctionStatus(AuctionStatus.IN_PROGRESS)
+			.status(AuctionStatus.IN_PROGRESS)
 			.endAt(LocalDateTime.now().plusDays(1))
 			.build();
 
@@ -89,7 +89,7 @@ public class AuctionInternalServiceTest {
 			.productId(10L)
 			.minPrice(1000L)
 			.currentPrice(2000L)
-			.auctionStatus(AuctionStatus.IN_PROGRESS)
+			.status(AuctionStatus.IN_PROGRESS)
 			.endAt(LocalDateTime.now().plusDays(1))
 			.build();
 
@@ -111,7 +111,7 @@ public class AuctionInternalServiceTest {
 			.productId(10L)
 			.minPrice(1000L)
 			.currentPrice(1500L)
-			.auctionStatus(AuctionStatus.IN_PROGRESS)
+			.status(AuctionStatus.IN_PROGRESS)
 			.endAt(LocalDateTime.now().plusDays(1))
 			.build();
 

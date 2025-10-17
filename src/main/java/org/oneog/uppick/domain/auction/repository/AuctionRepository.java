@@ -8,5 +8,5 @@ import org.oneog.uppick.domain.auction.enums.AuctionStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface AuctionRepository extends JpaRepository<Auction, Long> {
-	List<Auction> findAllByEndAtBeforeAndAuctionStatus(LocalDateTime now, AuctionStatus auctionStatus);
+	List<Auction> findAllByEndAtBeforeAndStatus(LocalDateTime now, AuctionStatus Status);
 }

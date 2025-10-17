@@ -40,7 +40,7 @@ public class AuctionExternalServiceTest {
 			.productId(productId)
 			.currentPrice(null)
 			.minPrice(minPrice)
-			.auctionStatus(AuctionStatus.IN_PROGRESS)
+			.status(AuctionStatus.IN_PROGRESS)
 			.endAt(endAt)
 			.build();
 

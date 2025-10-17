@@ -52,7 +52,7 @@ class AuctionSchedulerServiceTest {
 
 		Auction auction = Auction.builder()
 			.productId(productId)
-			.auctionStatus(AuctionStatus.IN_PROGRESS)
+			.status(AuctionStatus.IN_PROGRESS)
 			.endAt(LocalDateTime.now().minusMinutes(1))
 			.build();
 
@@ -65,7 +65,7 @@ class AuctionSchedulerServiceTest {
 			.build();
 
 		// mock 동작 정의
-		given(auctionRepository.findAllByEndAtBeforeAndAuctionStatus(any(), eq(AuctionStatus.IN_PROGRESS)))
+		given(auctionRepository.findAllByEndAtBeforeAndStatus(any(), eq(AuctionStatus.IN_PROGRESS)))
 			.willReturn(List.of(auction));
 		given(biddingDetailRepository.findTopByAuctionIdOrderByBidPriceDesc(auctionId))
 			.willReturn(Optional.of(topBid));
@@ -103,14 +103,14 @@ class AuctionSchedulerServiceTest {
 
 		Auction auction = Auction.builder()
 			.productId(productId)
-			.auctionStatus(AuctionStatus.IN_PROGRESS)
+			.status(AuctionStatus.IN_PROGRESS)
 			.endAt(LocalDateTime.now().minusMinutes(1))
 			.build();
 
 		ReflectionTestUtils.setField(auction, "id", auctionId);
 
 		// 경매는 종료되었지만 입찰자가 없음
-		given(auctionRepository.findAllByEndAtBeforeAndAuctionStatus(any(), eq(AuctionStatus.IN_PROGRESS)))
+		given(auctionRepository.findAllByEndAtBeforeAndStatus(any(), eq(AuctionStatus.IN_PROGRESS)))
 			.willReturn(List.of(auction));
 		given(biddingDetailRepository.findTopByAuctionIdOrderByBidPriceDesc(auctionId))
 			.willReturn(Optional.empty());

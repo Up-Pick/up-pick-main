@@ -42,7 +42,7 @@ public class AuctionSchedulerService {
 		LocalDateTime now = LocalDateTime.now();
 
 		// 종료 시간이 현재 시간 이전인 '진행 중' 경매 조회
-		List<Auction> endedAuctions = auctionRepository.findAllByEndAtBeforeAndAuctionStatus(now,
+		List<Auction> endedAuctions = auctionRepository.findAllByEndAtBeforeAndStatus(now,
 			AuctionStatus.IN_PROGRESS);
 
 		// 확인용
