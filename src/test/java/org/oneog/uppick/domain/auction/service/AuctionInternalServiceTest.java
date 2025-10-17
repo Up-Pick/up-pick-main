@@ -38,7 +38,7 @@ public class AuctionInternalServiceTest {
 	private AuctionInternalService auctionInternalService;
 
 	@Test
-	void 입찰실행시_입찰가갱신_입찰내역저장_성공() {
+	void bid_입찰시도_성공() {
 		// given
 		long auctionId = 1L;
 		long memberId = 100L;
@@ -56,16 +56,25 @@ public class AuctionInternalServiceTest {
 
 		given(auctionRepository.findById(auctionId)).willReturn(Optional.of(auction));
 
+		BiddingDetail biddingDetail = BiddingDetail.builder()
+			.auctionId(auctionId)
+			.memberId(memberId)
+			.bidPrice(newBidPrice)
+			.build();
+
+		given(auctionMapper.toEntity(auctionId, memberId, newBidPrice))
+			.willReturn(biddingDetail);
+
 		// when
 		auctionInternalService.bid(request, auctionId, memberId);
 
 		// then
-		assertThat(auction.getCurrentPrice()).isEqualTo(newBidPrice); // 현재가 갱신 검증
-		then(biddingDetailRepository).should().save(any(BiddingDetail.class)); // 저장 호출 검증
+		assertThat(auction.getCurrentPrice()).isEqualTo(newBidPrice);
+		then(biddingDetailRepository).should().save(any(BiddingDetail.class));
 	}
 
 	@Test
-	void 입찰가잘못입력해서입찰실패() {
+	void bid_잘못된입찰가_실패() {
 		// given
 		long auctionId = 1L;
 		long memberId = 100L;
