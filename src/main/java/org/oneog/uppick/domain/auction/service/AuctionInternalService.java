@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AuctionInternalService {
 
 	// ***** Auction Domain ***** //
@@ -41,6 +42,7 @@ public class AuctionInternalService {
 			BiddingDetail biddingDetail = BiddingDetail.builder()
 				.auctionId(auctionId)
 				.memberId(memberId)
+				.bidPrice(request.getBiddingPrice())
 				.build();
 
 			biddingDetailRepository.save(biddingDetail);

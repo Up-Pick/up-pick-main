@@ -33,13 +33,17 @@ public class BiddingDetail {
 	@Column(name = "bidder_id", nullable = false)
 	private Long memberId;
 
+	@Column(name = "bid_price", nullable = false)
+	private Long bidPrice;
+
 	@CreatedDate
 	@Column(name = "bid_at", nullable = false, updatable = false)
 	private LocalDateTime bidAt; //입찰시각
 
 	@Builder
-	private BiddingDetail(Long auctionId, Long memberId) {
+	private BiddingDetail(Long auctionId, Long memberId, Long bidPrice) {
 		this.auctionId = auctionId;
 		this.memberId = memberId;
+		this.bidPrice = bidPrice;
 	}
 }
