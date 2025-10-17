@@ -77,16 +77,16 @@ class ProductControllerRestDocsTest extends RestDocsBase {
                         fieldWithPath("data.description").type(JsonFieldType.STRING).description("상품 설명"),
                         fieldWithPath("data.viewCount").type(JsonFieldType.NUMBER).description("상품 조회수"),
                         fieldWithPath("data.registeredAt").type(JsonFieldType.STRING).description("상품 등록 일시")
-                            .attributes(key("format").value("yyyy-MM-dd'T'HH:mm:ss")),
+                            .attributes(key("format").value("yyyy-MM-dd")),
                         fieldWithPath("data.image").type(JsonFieldType.STRING).description("상품 이미지 URL"),
                         fieldWithPath("data.categoryName").type(JsonFieldType.STRING).description("카테고리 이름"),
                         fieldWithPath("data.soldAt").type(JsonFieldType.STRING).optional()
-                            .description("판매 완료 일시")
-                            .attributes(key("format").value("yyyy-MM-dd'T'HH:mm:ss")),
+                            .description("판매 완료 날짜")
+                            .attributes(key("format").value("yyyy-MM-dd")),
                         fieldWithPath("data.currentBid").type(JsonFieldType.NUMBER).description("현재 입찰가")
                             .attributes(key("example").value("150000")),
-                        fieldWithPath("data.endAt").type(JsonFieldType.STRING).description("경매 종료 예정 일시")
-                            .attributes(key("format").value("yyyy-MM-dd'T'HH:mm:ss")),
+                        fieldWithPath("data.endAt").type(JsonFieldType.STRING).description("경매 종료 예정 날짜")
+                            .attributes(key("format").value("yyyy-MM-dd")),
                         fieldWithPath("data.sellerName").type(JsonFieldType.STRING).description("판매자 닉네임"))));
     }
 }
