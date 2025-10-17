@@ -3,7 +3,7 @@ package org.oneog.uppick.domain.member.service;
 public interface MemberExternalServiceApi {
 
 	/**
-	 * 🛒 구매 내역 등록
+	 * 구매 내역 등록
 	 *
 	 * @param auctionId 경매 ID
 	 * @param buyerId 구매자 회원 ID
@@ -17,7 +17,7 @@ public interface MemberExternalServiceApi {
 	;
 
 	/**
-	 * 💰 판매 내역 등록
+	 *  판매 내역 등록
 	 *
 	 * @param auctionId 경매 ID
 	 * @param sellerId 판매자 회원 ID
