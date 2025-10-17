@@ -8,5 +8,6 @@ import lombok.Getter;
 public class ProductSimpleInfoResponse {
 	private String name;
 	private String image;
+	private Long minBidPrice;
 	private Long currentBidPrice;
 }

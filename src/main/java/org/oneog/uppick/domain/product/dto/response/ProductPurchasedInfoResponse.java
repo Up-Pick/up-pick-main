@@ -7,11 +7,10 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class ProductSoldInfoResponse {
+public class ProductPurchasedInfoResponse {
 	private Long id;
 	private String name;
-	private String description;
 	private String image;
 	private Long finalPrice;
-	private LocalDateTime soldAt;
+	private LocalDateTime buyAt;
 }
