@@ -23,7 +23,7 @@ public class AuctionController {
 
 	//경매올라온 상품 입찰하기
 	@PostMapping("/{auctionId}/bid")
-	public GlobalApiResponse<Void> AuctionBid(
+	public GlobalApiResponse<Void> auctionBid(
 		@Valid @RequestBody AuctionBidRequest request,
 		@PathVariable long auctionId,
 		@AuthenticationPrincipal AuthMember authMember) {
