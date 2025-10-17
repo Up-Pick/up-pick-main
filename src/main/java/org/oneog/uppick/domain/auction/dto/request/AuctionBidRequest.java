@@ -10,6 +10,6 @@ import lombok.Getter;
 public class AuctionBidRequest {
 
 	@NotNull(message = "입찰가를 비울 수 없습니다.")
-	@Positive
+	@Positive(message = "양수만 입력이 가능합니다.")
 	private Long biddingPrice;
 }
