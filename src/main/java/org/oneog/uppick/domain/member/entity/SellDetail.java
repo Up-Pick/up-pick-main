@@ -1,4 +1,4 @@
-package org.oneog.uppick.domain.product.entity;
+package org.oneog.uppick.domain.member.entity;
 
 import java.time.LocalDateTime;
 

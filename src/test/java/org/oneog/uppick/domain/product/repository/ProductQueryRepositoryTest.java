@@ -10,12 +10,13 @@ import org.oneog.uppick.domain.auction.repository.AuctionRepository;
 import org.oneog.uppick.domain.category.entity.Category;
 import org.oneog.uppick.domain.category.repository.CategoryRepository;
 import org.oneog.uppick.domain.member.entity.Member;
+import org.oneog.uppick.domain.member.entity.SellDetail;
 import org.oneog.uppick.domain.member.repository.MemberRepository;
+import org.oneog.uppick.domain.member.repository.SellDetailRepository;
 import org.oneog.uppick.domain.product.dto.response.ProductInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductSimpleInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductSoldInfoResponse;
 import org.oneog.uppick.domain.product.entity.Product;
-import org.oneog.uppick.domain.product.entity.SellDetail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
@@ -32,11 +33,16 @@ public class ProductQueryRepositoryTest {
 	@Autowired
 	private ProductQueryRepository productQueryRepository;
 
-	@Autowired private ProductRepository productRepository;
-	@Autowired private CategoryRepository categoryRepository;
-	@Autowired private AuctionRepository auctionRepository;
-	@Autowired private MemberRepository memberRepository;
-	@Autowired private SellDetailRepository sellDetailRepository;
+	@Autowired
+	private ProductRepository productRepository;
+	@Autowired
+	private CategoryRepository categoryRepository;
+	@Autowired
+	private AuctionRepository auctionRepository;
+	@Autowired
+	private MemberRepository memberRepository;
+	@Autowired
+	private SellDetailRepository sellDetailRepository;
 
 	private Member member;
 	private Category category;
@@ -113,7 +119,8 @@ public class ProductQueryRepositoryTest {
 	@Test
 	void 판매_완료된_상품의_정보_조회_가능() {
 		Pageable pageable = PageRequest.of(0, 10);
-		Page<ProductSoldInfoResponse> results = productQueryRepository.getProductSoldInfoByMemberId(member.getId(), pageable);
+		Page<ProductSoldInfoResponse> results = productQueryRepository.getProductSoldInfoByMemberId(member.getId(),
+			pageable);
 
 		assertThat(results).isNotNull();
 
@@ -128,7 +135,8 @@ public class ProductQueryRepositoryTest {
 
 	@Test
 	void 입찰중인_상품의_간단한_정보_조회_가능() {
-		ProductSimpleInfoResponse result = productQueryRepository.getProductSimpleInfoById(product.getId()).orElseThrow();
+		ProductSimpleInfoResponse result = productQueryRepository.getProductSimpleInfoById(product.getId())
+			.orElseThrow();
 
 		assertThat(result).isNotNull();
 		assertThat(result.getName()).isEqualTo(product.getName());
@@ -157,7 +165,8 @@ public class ProductQueryRepositoryTest {
 			.build();
 		auctionRepository.save(newAuction);
 
-		ProductSimpleInfoResponse result = productQueryRepository.getProductSimpleInfoById(newProduct.getId()).orElseThrow();
+		ProductSimpleInfoResponse result = productQueryRepository.getProductSimpleInfoById(newProduct.getId())
+			.orElseThrow();
 
 		assertThat(result).isNotNull();
 		assertThat(result.getName()).isEqualTo(newProduct.getName());
