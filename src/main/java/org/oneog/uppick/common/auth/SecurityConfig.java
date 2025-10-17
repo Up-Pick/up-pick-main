@@ -1,6 +1,5 @@
-package org.oneog.uppick.common.config;
+package org.oneog.uppick.common.auth;
 
-import org.oneog.uppick.common.auth.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -41,7 +40,7 @@ public class SecurityConfig {
 
 			// 요청 경로별 접근 허용 설정
 			.authorizeHttpRequests(auth -> auth
-				.anyRequest().permitAll() // 컨트롤러에다가 @PreAuthorize("!isAuthenticated()") 이거 사용해야해~
+				.anyRequest().permitAll() // 컨트롤러에다가 @PreAuthorize("isAuthenticated()") 이거 사용해야해~
 			)
 
 			// 불필요한 기본 로그인/로그아웃 비활성화
