@@ -112,9 +112,6 @@ public class AuctionSchedulerService {
 		// 판매 내역 등록
 		createSellHistory(auctionId, sellerId, productId, finalPrice);
 
-		// 상품 상태 변경 (판매 완료)
-		updateProductStatus(productId);
-
 		//  알림 발송
 		sendWinnerNotification(buyerId, productId, finalPrice);
 
@@ -139,14 +136,6 @@ public class AuctionSchedulerService {
 		// TODO: 판매 도메인 팀의 ExternalServiceApi로 요청
 		memberExternalServiceApi.registerSellDetail(auctionId, sellerId, productId, price);
 		log.info("판매내역 등록: 판매자={}, 상품={}, 금액={}", sellerId, productId, price);
-	}
-
-	/**
-	 *  상품 상태 변경 (판매 완료)
-	 */
-	private void updateProductStatus(Long productId) {
-
-		productExternalServiceApi.changeProductSoldAt(productId);
 	}
 
 	/**
