@@ -117,11 +117,10 @@ class RankingInternalServiceTest {
 		HotKeywordResponse response1 = new HotKeywordResponse("맥북", 1);
 		HotKeywordResponse response2 = new HotKeywordResponse("아이폰", 2);
 		HotKeywordResponse response3 = new HotKeywordResponse("에어팟", 3);
+		List<HotKeywordResponse> responses = List.of(response1, response2, response3);
 
 		given(hotKeywordRepository.findAllByOrderByRankNoAsc()).willReturn(keywords);
-		given(rankingMapper.toResponse(keyword1)).willReturn(response1);
-		given(rankingMapper.toResponse(keyword2)).willReturn(response2);
-		given(rankingMapper.toResponse(keyword3)).willReturn(response3);
+		given(rankingMapper.toResponseList(keywords)).willReturn(responses);
 
 		// when
 		List<HotKeywordResponse> result = rankingInternalService.getHotKeywords();
@@ -135,7 +134,7 @@ class RankingInternalServiceTest {
 
 		// 검증
 		verify(hotKeywordRepository, times(1)).findAllByOrderByRankNoAsc();
-		verify(rankingMapper, times(3)).toResponse(any(HotKeyword.class));
+		verify(rankingMapper, times(1)).toResponseList(keywords);
 	}
 
 	@Test
