@@ -13,7 +13,7 @@ import java.util.Optional;
 
 import org.oneog.uppick.domain.auction.entity.QAuction;
 import org.oneog.uppick.domain.auction.entity.QBiddingDetail;
-import org.oneog.uppick.domain.auction.enums.Status;
+import org.oneog.uppick.domain.auction.enums.AuctionStatus;
 import org.oneog.uppick.domain.product.dto.response.ProductBiddingInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductPurchasedInfoResponse;
@@ -164,7 +164,7 @@ public class ProductQueryRepository {
 			.join(biddingDetail).on(biddingDetail.auctionId.eq(auction.id))
 			.where(
 				biddingDetail.memberId.eq(memberId)
-					.and(auction.status.eq(Status.IN_PROGRESS))
+					.and(auction.status.eq(AuctionStatus.IN_PROGRESS))
 					.and(biddingDetail.bidAt.eq(
 						JPAExpressions.select(biddingDetailSub.bidAt.max())
 							.from(biddingDetailSub)
@@ -186,7 +186,7 @@ public class ProductQueryRepository {
 			.join(biddingDetail).on(biddingDetail.auctionId.eq(auction.id))
 			.where(
 				biddingDetail.memberId.eq(memberId)
-					.and(auction.status.eq(Status.IN_PROGRESS)))
+					.and(auction.status.eq(AuctionStatus.IN_PROGRESS)))
 			.fetchOne()).orElse(0L);
 
 		return new PageImpl<>(qResponses, pageable, total);

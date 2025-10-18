@@ -9,7 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.oneog.uppick.domain.auction.entity.Auction;
 import org.oneog.uppick.domain.auction.entity.BiddingDetail;
-import org.oneog.uppick.domain.auction.enums.Status;
+import org.oneog.uppick.domain.auction.enums.AuctionStatus;
 import org.oneog.uppick.domain.auction.repository.AuctionRepository;
 import org.oneog.uppick.domain.auction.repository.BiddingDetailRepository;
 import org.oneog.uppick.domain.category.entity.Category;
@@ -68,7 +68,6 @@ public class ProductQueryRepositoryTest {
 	@BeforeEach
 	void init() {
 		member = Member.builder()
-			.name("이름")
 			.email("이메일")
 			.nickname("닉네임")
 			.password("패스워드")
@@ -95,7 +94,7 @@ public class ProductQueryRepositoryTest {
 			.productId(savedProduct.getId())
 			.currentPrice(30_000L)
 			.minPrice(10_000L)
-			.status(Status.IN_PROGRESS)
+			.status(AuctionStatus.IN_PROGRESS)
 			.endAt(LocalDateTime.now().plusDays(3L))
 			.build();
 		Auction savedAuction = auctionRepository.save(auction);
@@ -192,7 +191,7 @@ public class ProductQueryRepositoryTest {
 			.productId(savedProduct.getId())
 			// .currentPrice(30_000L) -> currentPrice가 Null인 경우
 			.minPrice(10_000L)
-			.status(Status.IN_PROGRESS)
+			.status(AuctionStatus.IN_PROGRESS)
 			.endAt(LocalDateTime.now().plusDays(3L))
 			.build();
 		auctionRepository.save(newAuction);

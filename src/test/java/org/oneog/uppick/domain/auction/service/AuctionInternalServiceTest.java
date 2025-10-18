@@ -16,7 +16,7 @@ import org.oneog.uppick.common.exception.BusinessException;
 import org.oneog.uppick.domain.auction.dto.request.AuctionBidRequest;
 import org.oneog.uppick.domain.auction.entity.Auction;
 import org.oneog.uppick.domain.auction.entity.BiddingDetail;
-import org.oneog.uppick.domain.auction.enums.Status;
+import org.oneog.uppick.domain.auction.enums.AuctionStatus;
 import org.oneog.uppick.domain.auction.exception.AuctionErrorCode;
 import org.oneog.uppick.domain.auction.mapper.AuctionMapper;
 import org.oneog.uppick.domain.auction.repository.AuctionQueryRepository;
@@ -54,7 +54,7 @@ public class AuctionInternalServiceTest {
 			.productId(10L)
 			.minPrice(1000L)
 			.currentPrice(1500L)
-			.status(Status.IN_PROGRESS)
+			.status(AuctionStatus.IN_PROGRESS)
 			.endAt(LocalDateTime.now().plusDays(1))
 			.build();
 
@@ -89,7 +89,7 @@ public class AuctionInternalServiceTest {
 			.productId(10L)
 			.minPrice(1000L)
 			.currentPrice(2000L)
-			.status(Status.IN_PROGRESS)
+			.status(AuctionStatus.IN_PROGRESS)
 			.endAt(LocalDateTime.now().plusDays(1))
 			.build();
 
@@ -111,7 +111,7 @@ public class AuctionInternalServiceTest {
 			.productId(10L)
 			.minPrice(1000L)
 			.currentPrice(1500L)
-			.status(Status.IN_PROGRESS)
+			.status(AuctionStatus.IN_PROGRESS)
 			.endAt(LocalDateTime.now().plusDays(1))
 			.build();
 

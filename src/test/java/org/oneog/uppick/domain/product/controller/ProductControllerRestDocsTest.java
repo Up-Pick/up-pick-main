@@ -15,20 +15,13 @@ import org.junit.jupiter.api.Test;
 import org.oneog.uppick.domain.product.dto.response.ProductInfoResponse;
 import org.oneog.uppick.domain.product.service.ProductInternalService;
 import org.oneog.uppick.support.RestDocsBase;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(ProductController.class)
-@AutoConfigureMockMvc(addFilters = false)
 class ProductControllerRestDocsTest extends RestDocsBase {
-
-	@Autowired
-	private MockMvc mockMvc;
 
 	@MockitoBean
 	private ProductInternalService productInternalService;
@@ -56,8 +49,8 @@ class ProductControllerRestDocsTest extends RestDocsBase {
 		given(productInternalService.getProductInfoById(productId)).willReturn(response);
 
 		mockMvc.perform(
-				get("/api/v1/products/{productId}", productId)
-					.accept(MediaType.APPLICATION_JSON))
+			get("/api/v1/products/{productId}", productId)
+				.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("success").value(true))
 			.andExpect(jsonPath("message").value("요청에 성공했습니다."))
