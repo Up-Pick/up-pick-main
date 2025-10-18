@@ -13,9 +13,5 @@ public interface NotificationExternalServiceApi {
 	 * @param title 알림 제목
 	 * @param message 알림 내용
 	 */
-	default void sendNotification(Long receiverId, NotificationType type, String title, String message) {
-		return;
-	}
-
-	;
+	void sendNotification(Long receiverId, NotificationType type, String title, String message);
 }
