@@ -10,11 +10,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.oneog.uppick.common.auth.JwtUtil;
 import org.oneog.uppick.common.exception.BusinessException;
+import org.oneog.uppick.domain.auth.dto.request.LoginRequest;
 import org.oneog.uppick.domain.auth.dto.request.SignupRequest;
+import org.oneog.uppick.domain.auth.dto.response.LoginResponse;
 import org.oneog.uppick.domain.auth.exception.AuthErrorCode;
+import org.oneog.uppick.domain.member.entity.Member;
 import org.oneog.uppick.domain.member.service.MemberExternalService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
@@ -24,6 +29,9 @@ class AuthServiceTest {
 
 	@Mock
 	private PasswordEncoder passwordEncoder;
+
+	@Mock
+	private JwtUtil jwtUtil;
 
 	@InjectMocks
 	private AuthService authService;
@@ -48,8 +56,7 @@ class AuthServiceTest {
 
 		// memberExternalService.createUser()가 정확한 인자들로 1번 호출되었는지 검증합니다.
 		verify(memberExternalService, times(1)).createUser(
-			request.getEmail(),
-			request.getNickname(),
+			request, // request 객체 전체를 전달
 			encodedPassword
 		);
 	}
@@ -74,7 +81,7 @@ class AuthServiceTest {
 		assertEquals(AuthErrorCode.DUPLICATE_EMAIL, exception.getErrorCode());
 
 		// createUser 메서드가 호출되지 않았는지 확인.
-		verify(memberExternalService, never()).createUser(anyString(), anyString(), anyString());
+		verify(memberExternalService, never()).createUser(any(SignupRequest.class), anyString());
 	}
 
 	@Test
@@ -98,6 +105,74 @@ class AuthServiceTest {
 		assertEquals(AuthErrorCode.DUPLICATE_NICKNAME, exception.getErrorCode());
 
 		// createUser 메서드가 호출되지 않았는지 확인.
-		verify(memberExternalService, never()).createUser(anyString(), anyString(), anyString());
+		verify(memberExternalService, never()).createUser(any(SignupRequest.class), anyString());
+	}
+
+	@Test
+	@DisplayName("로그인 성공")
+	void login_성공() {
+		// given
+		LoginRequest request = new LoginRequest("test@email.com", "password123");
+		Member member = Member.builder()
+			.email("test@email.com")
+			.password("encodedPassword")
+			.nickname("테스트유저")
+			.build();
+
+		ReflectionTestUtils.setField(member, "id", 1L);
+
+		String expectedToken = "dummy-jwt-token-string";
+
+		when(memberExternalService.findByEmail(request.getEmail())).thenReturn(member);
+		when(passwordEncoder.matches(request.getPassword(), member.getPassword())).thenReturn(true);
+		when(jwtUtil.createToken(member.getId(), member.getNickname())).thenReturn(expectedToken);
+
+		// when
+		LoginResponse response = authService.login(request);
+
+		// then
+		assertNotNull(response);
+		assertEquals(expectedToken, response.getAccessToken());
+		verify(jwtUtil, times(1)).createToken(1L, "테스트유저");
+	}
+
+	@Test
+	@DisplayName("로그인 실패 - 존재하지 않는 사용자")
+	void login_실패_사용자없음() {
+		// given
+		LoginRequest request = new LoginRequest("wrong@email.com", "password123");
+
+		when(memberExternalService.findByEmail(anyString()))
+			.thenThrow(new BusinessException(AuthErrorCode.USER_NOT_FOUND));
+
+		// when & then
+		BusinessException exception = assertThrows(BusinessException.class, () -> {
+			authService.login(request);
+		});
+
+		assertEquals(AuthErrorCode.USER_NOT_FOUND, exception.getErrorCode());
+		verify(jwtUtil, never()).createToken(anyLong(), anyString());
+	}
+
+	@Test
+	@DisplayName("로그인 실패 - 비밀번호 불일치")
+	void login_실패_비밀번호불일치() {
+		// given
+		LoginRequest request = new LoginRequest("test@email.com", "wrong-password");
+		Member member = Member.builder()
+			.email("test@email.com")
+			.password("encodedPassword")
+			.build();
+
+		when(memberExternalService.findByEmail(request.getEmail())).thenReturn(member);
+		when(passwordEncoder.matches(request.getPassword(), member.getPassword())).thenReturn(false);
+
+		// when & then
+		BusinessException exception = assertThrows(BusinessException.class, () -> {
+			authService.login(request);
+		});
+
+		assertEquals(AuthErrorCode.INVALID_PASSWORD, exception.getErrorCode());
+		verify(jwtUtil, never()).createToken(anyLong(), anyString());
 	}
 }
