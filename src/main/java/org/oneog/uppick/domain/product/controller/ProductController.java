@@ -13,6 +13,7 @@ import org.oneog.uppick.domain.product.service.ProductInternalService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,6 +33,7 @@ public class ProductController {
 	private final ProductInternalService productInternalService;
 
 	// 판매 상품 등록
+	@PreAuthorize("isAuthenticated()")
 	@PostMapping
 	public GlobalApiResponse<Void> registerProduct(
 		@Valid @RequestBody ProductRegisterRequest request,
@@ -50,6 +52,7 @@ public class ProductController {
 	}
 
 	// 입찰 시 상품 간단 조회
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/{productId}/simple-info")
 	public GlobalApiResponse<ProductSimpleInfoResponse> getProductSimpleInfo(@PathVariable Long productId) {
 
@@ -58,6 +61,7 @@ public class ProductController {
 	}
 
 	// 판매 완료된 상품 내역 조회
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/sold/me")
 	public GlobalPageResponse<ProductSoldInfoResponse> getSoldProducts(
 		@AuthenticationPrincipal AuthMember authMember,
@@ -69,6 +73,7 @@ public class ProductController {
 	}
 
 	// 구매 완료 상품 내역 조회
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/purchased/me")
 	public GlobalPageResponse<ProductPurchasedInfoResponse> getPurchasedProducts(
 		@AuthenticationPrincipal AuthMember authMember,
@@ -80,6 +85,7 @@ public class ProductController {
 	}
 
 	// 입찰 중인 상품 목록 조회
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/bidding/me")
 	public GlobalPageResponse<ProductBiddingInfoResponse> getBiddingProducts(
 		@AuthenticationPrincipal AuthMember authMember,
