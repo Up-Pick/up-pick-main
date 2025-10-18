@@ -19,10 +19,7 @@ public class RankingMapper {
 	}
 
 	public HotKeywordResponse toResponse(HotKeyword hotKeyword) {
-		return HotKeywordResponse.builder()
-			.keyword(hotKeyword.getKeyword())
-			.rankNo(hotKeyword.getRankNo())
-			.build();
+		return new HotKeywordResponse(hotKeyword.getKeyword(), hotKeyword.getRankNo());
 	}
 
 }

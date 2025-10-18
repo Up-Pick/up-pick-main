@@ -7,6 +7,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public class HotKeywordCalculationDto {
 
-	String keyword;
+	private String keyword;
 
 }
