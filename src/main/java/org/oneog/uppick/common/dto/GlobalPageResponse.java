@@ -4,26 +4,27 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 
-import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 public class GlobalPageResponse<T> {
-    private int page;
-    private int size;
-    private int totalPages;
-    private long totalElements;
-    private List<T> contents;
+    private final int page;
+    private final int size;
+    private final int totalPages;
+    private final long totalElements;
+    private final List<T> contents;
 
     public static <T> GlobalPageResponse<T> of(Page<T> pageData) {
-        GlobalPageResponse<T> response = new GlobalPageResponse<>();
-        response.page = pageData.getNumber();
-        response.size = pageData.getSize();
-        response.totalPages = pageData.getTotalPages();
-        response.totalElements = pageData.getTotalElements();
-        response.contents = pageData.getContent();
-        return response;
+        return GlobalPageResponse.<T>builder()
+            .page(pageData.getNumber())
+            .size(pageData.getSize())
+            .totalPages(pageData.getTotalPages())
+            .totalElements(pageData.getTotalElements())
+            .contents(pageData.getContent())
+            .build();
     }
 }
