@@ -4,6 +4,7 @@ import org.oneog.uppick.common.dto.AuthMember;
 import org.oneog.uppick.common.exception.BusinessException;
 import org.oneog.uppick.domain.member.dto.request.CreditChargeRequest;
 import org.oneog.uppick.domain.member.dto.response.CreditChargeResponse;
+import org.oneog.uppick.domain.member.dto.response.CreditGetResponse;
 import org.oneog.uppick.domain.member.entity.Member;
 import org.oneog.uppick.domain.member.exception.MemberErrorCode;
 import org.oneog.uppick.domain.member.repository.MemberQueryRepository;
@@ -31,5 +32,13 @@ public class MemberInternalService {
 		//더티 체킹 db 자동 저장
 
 		return new CreditChargeResponse(member.getCredit());
+	}
+
+	public CreditGetResponse getCredit(AuthMember authMember) {
+
+		Member member = memberRepository.findById(authMember.getMemberId())
+			.orElseThrow(() -> new BusinessException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+		return new CreditGetResponse(member.getCredit());
 	}
 }

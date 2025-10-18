@@ -16,6 +16,7 @@ import org.oneog.uppick.common.dto.AuthMember;
 import org.oneog.uppick.common.exception.BusinessException;
 import org.oneog.uppick.domain.member.dto.request.CreditChargeRequest;
 import org.oneog.uppick.domain.member.dto.response.CreditChargeResponse;
+import org.oneog.uppick.domain.member.dto.response.CreditGetResponse;
 import org.oneog.uppick.domain.member.entity.Member;
 import org.oneog.uppick.domain.member.exception.MemberErrorCode;
 import org.oneog.uppick.domain.member.repository.MemberRepository;
@@ -105,5 +106,39 @@ public class MemberServiceTest {
 		assertEquals(MemberErrorCode.INVALID_CHARGE_AMOUNT, exception.getErrorCode());
 		// 0원 충전 시도 시, member의 크레딧은 0L 그대로여야 함
 		assertEquals(0L, testMember.getCredit());
+	}
+
+	@Test
+	@DisplayName("getCredit_정상적인 요청")
+	void getCredit_정상적인요청_성공() {
+		// given
+		when(memberRepository.findById(authMember.getMemberId())).thenReturn(Optional.of(testMember));
+
+		// when
+		CreditGetResponse response = memberInternalService.getCredit(authMember);
+
+		// then
+		assertNotNull(response);
+		// testMember의 초기 credit 0L가 정확히 반환되었는지 확인
+		assertEquals(0L, response.getCurrentCredit());
+		// findById가 1번 호출
+		verify(memberRepository, times(1)).findById(1L);
+	}
+
+	@Test
+	@DisplayName("getCredit_존재하지않는사용자_BusinessException발생")
+	void getCredit_존재하지않는사용자_BusinessException발생() {
+		// given
+		//사용자 x
+		when(memberRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+		// when & then
+		// BusinessException이 발생하는지 검증
+		BusinessException exception = assertThrows(BusinessException.class, () -> {
+			memberInternalService.getCredit(authMember);
+		});
+
+		// MEMBER_NOT_FOUND인지 확인
+		assertEquals(MemberErrorCode.MEMBER_NOT_FOUND, exception.getErrorCode());
 	}
 }
