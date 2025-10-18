@@ -150,8 +150,7 @@ public class AuctionSchedulerService {
 	 */
 	private void updateProductStatus(Long productId) {
 
-		// TODO: ProductExternalServiceApi를 통해 판매완료 시각 갱신
-		productExternalServiceApi.changeProductsoldAt(productId);
+		productExternalServiceApi.changeProductSoldAt(productId);
 	}
 
 	/**

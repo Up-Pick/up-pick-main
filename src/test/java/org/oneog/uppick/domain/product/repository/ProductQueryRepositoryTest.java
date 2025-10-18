@@ -8,8 +8,10 @@ import java.time.temporal.ChronoUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.oneog.uppick.domain.auction.entity.Auction;
+import org.oneog.uppick.domain.auction.entity.BiddingDetail;
 import org.oneog.uppick.domain.auction.enums.AuctionStatus;
 import org.oneog.uppick.domain.auction.repository.AuctionRepository;
+import org.oneog.uppick.domain.auction.repository.BiddingDetailRepository;
 import org.oneog.uppick.domain.category.entity.Category;
 import org.oneog.uppick.domain.category.repository.CategoryRepository;
 import org.oneog.uppick.domain.member.entity.Member;
@@ -18,6 +20,7 @@ import org.oneog.uppick.domain.member.entity.SellDetail;
 import org.oneog.uppick.domain.member.repository.MemberRepository;
 import org.oneog.uppick.domain.member.repository.PurchaseDetailRepository;
 import org.oneog.uppick.domain.member.repository.SellDetailRepository;
+import org.oneog.uppick.domain.product.dto.response.ProductBiddingInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductPurchasedInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductSimpleInfoResponse;
@@ -49,6 +52,8 @@ public class ProductQueryRepositoryTest {
 	private SellDetailRepository sellDetailRepository;
 	@Autowired
 	private PurchaseDetailRepository purchaseDetailRepository;
+	@Autowired
+	private BiddingDetailRepository biddingDetailRepository;
 
 	private Member member;
 	private Category category;
@@ -56,6 +61,7 @@ public class ProductQueryRepositoryTest {
 	private Auction auction;
 	private SellDetail sellDetail;
 	private PurchaseDetail purchaseDetail;
+	private BiddingDetail biddingDetail;
 
 	private Long testProductId;
 
@@ -108,6 +114,13 @@ public class ProductQueryRepositoryTest {
 			.purchasePrice(45_000L)
 			.build();
 		purchaseDetailRepository.save(purchaseDetail);
+
+		biddingDetail = BiddingDetail.builder()
+			.auctionId(auction.getId())
+			.memberId(member.getId())
+			.bidPrice(4_000L)
+			.build();
+		biddingDetailRepository.save(biddingDetail);
 
 		testProductId = product.getId();
 	}
@@ -208,5 +221,23 @@ public class ProductQueryRepositoryTest {
 		assertThat(result.getFinalPrice()).isEqualTo(purchaseDetail.getPurchasePrice());
 		assertThat(result.getBuyAt().truncatedTo(ChronoUnit.SECONDS)).isEqualTo(
 			purchaseDetail.getPurchaseAt().truncatedTo(ChronoUnit.SECONDS));
+	}
+
+	@Test
+	void 현재_입찰중인_상품_목록_조회_가능() {
+		Pageable pageable = PageRequest.of(0, 10);
+		Page<ProductBiddingInfoResponse> results = productQueryRepository.getBiddingProductInfoByMemberId(
+			member.getId(), pageable);
+
+		assertThat(results).isNotNull();
+
+		ProductBiddingInfoResponse result = results.getContent().getFirst();
+		assertThat(result.getId()).isEqualTo(product.getId());
+		assertThat(result.getName()).isEqualTo(product.getName());
+		assertThat(result.getImage()).isEqualTo(product.getImage());
+		assertThat(result.getEndAt().truncatedTo(ChronoUnit.SECONDS)).isEqualTo(
+			auction.getEndAt().truncatedTo(ChronoUnit.SECONDS));
+		assertThat(result.getCurrentBid()).isEqualTo(auction.getCurrentPrice());
+		assertThat(result.getBidPrice()).isEqualTo(biddingDetail.getBidPrice());
 	}
 }

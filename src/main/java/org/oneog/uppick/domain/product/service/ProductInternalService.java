@@ -3,6 +3,7 @@ package org.oneog.uppick.domain.product.service;
 import org.oneog.uppick.common.exception.BusinessException;
 import org.oneog.uppick.domain.auction.service.AuctionExternalServiceApi;
 import org.oneog.uppick.domain.product.dto.request.ProductRegisterRequest;
+import org.oneog.uppick.domain.product.dto.response.ProductBiddingInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductPurchasedInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductSimpleInfoResponse;
@@ -54,17 +55,21 @@ public class ProductInternalService {
 			() -> new BusinessException(ProductErrorCode.CANNOT_READ_PRODUCT_INFO));
 	}
 
-	public Page<ProductSoldInfoResponse> getProductSoldInfoByMemberId(Long memberId, Pageable pageable) {
-		return productQueryRepository.getProductSoldInfoByMemberId(memberId, pageable);
-	}
-
 	public ProductSimpleInfoResponse getProductSimpleInfoById(Long productId) {
 		return productQueryRepository.getProductSimpleInfoById(productId).orElseThrow(
 			() -> new BusinessException(ProductErrorCode.CANNOT_READ_PRODUCT_SIMPLE_INFO));
 	}
 
+	public Page<ProductSoldInfoResponse> getProductSoldInfoByMemberId(Long memberId, Pageable pageable) {
+		return productQueryRepository.getProductSoldInfoByMemberId(memberId, pageable);
+	}
+
 	public Page<ProductPurchasedInfoResponse> getPurchasedProductInfoByMemberId(Long memberId, Pageable pageable) {
 		return productQueryRepository.getPurchasedProductInfoByMemberId(memberId, pageable);
+	}
+
+	public Page<ProductBiddingInfoResponse> getBiddingProductInfoByMemberId(Long memberId, Pageable pageable) {
+		return productQueryRepository.getBiddingProductInfoByMemberId(memberId, pageable);
 	}
 
 	// ***** Internal Private Method ***** //

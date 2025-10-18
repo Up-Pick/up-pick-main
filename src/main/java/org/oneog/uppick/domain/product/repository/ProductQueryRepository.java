@@ -1,6 +1,7 @@
 package org.oneog.uppick.domain.product.repository;
 
 import static org.oneog.uppick.domain.auction.entity.QAuction.*;
+import static org.oneog.uppick.domain.auction.entity.QBiddingDetail.*;
 import static org.oneog.uppick.domain.category.entity.QCategory.*;
 import static org.oneog.uppick.domain.member.entity.QMember.*;
 import static org.oneog.uppick.domain.member.entity.QPurchaseDetail.*;
@@ -10,6 +11,10 @@ import static org.oneog.uppick.domain.product.entity.QProduct.*;
 import java.util.List;
 import java.util.Optional;
 
+import org.oneog.uppick.domain.auction.entity.QAuction;
+import org.oneog.uppick.domain.auction.entity.QBiddingDetail;
+import org.oneog.uppick.domain.auction.enums.AuctionStatus;
+import org.oneog.uppick.domain.product.dto.response.ProductBiddingInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductPurchasedInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductSimpleInfoResponse;
@@ -21,6 +26,7 @@ import org.springframework.stereotype.Repository;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -60,6 +66,23 @@ public class ProductQueryRepository {
 		return Optional.ofNullable(qResponse);
 	}
 
+	public Optional<ProductSimpleInfoResponse> getProductSimpleInfoById(Long productId) {
+
+		return Optional.ofNullable(
+			queryFactory
+				.select(
+					Projections.constructor(
+						ProductSimpleInfoResponse.class,
+						product.name,
+						product.image,
+						auction.minPrice,
+						auction.currentPrice))
+				.from(product)
+				.join(auction).on(product.id.eq(auction.productId))
+				.where(productId != null ? product.id.eq(productId) : null)
+				.fetchOne());
+	}
+
 	public Page<ProductSoldInfoResponse> getProductSoldInfoByMemberId(Long memberId, Pageable pageable) {
 
 		List<ProductSoldInfoResponse> qResponseList = queryFactory
@@ -91,23 +114,6 @@ public class ProductQueryRepository {
 		return new PageImpl<>(qResponseList, pageable, total);
 	}
 
-	public Optional<ProductSimpleInfoResponse> getProductSimpleInfoById(Long productId) {
-
-		return Optional.ofNullable(
-			queryFactory
-				.select(
-					Projections.constructor(
-						ProductSimpleInfoResponse.class,
-						product.name,
-						product.image,
-						auction.minPrice,
-						auction.currentPrice))
-				.from(product)
-				.join(auction).on(product.id.eq(auction.productId))
-				.where(productId != null ? product.id.eq(productId) : null)
-				.fetchOne());
-	}
-
 	public Page<ProductPurchasedInfoResponse> getPurchasedProductInfoByMemberId(Long memberId, Pageable pageable) {
 
 		List<ProductPurchasedInfoResponse> qResponseList = queryFactory
@@ -122,6 +128,7 @@ public class ProductQueryRepository {
 			.from(product)
 			.join(purchaseDetail).on(purchaseDetail.productId.eq(product.id))
 			.where(memberId != null ? purchaseDetail.buyerId.eq(memberId) : null)
+			.orderBy(purchaseDetail.purchaseAt.desc())
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
 			.fetch();
@@ -135,5 +142,53 @@ public class ProductQueryRepository {
 				.fetchOne()).orElse(0L);
 
 		return new PageImpl<>(qResponseList, pageable, total);
+	}
+
+	public Page<ProductBiddingInfoResponse> getBiddingProductInfoByMemberId(Long memberId, Pageable pageable) {
+
+		QBiddingDetail biddingDetailSub = new QBiddingDetail("biddingDetailSub");
+		QAuction auctionSub = new QAuction("auctionSub");
+
+		List<ProductBiddingInfoResponse> qResponses = queryFactory
+			.select(
+				Projections.constructor(
+					ProductBiddingInfoResponse.class,
+					product.id,
+					product.name,
+					product.image,
+					auction.endAt,
+					auction.currentPrice,
+					biddingDetail.bidPrice))
+			.from(product)
+			.join(auction).on(auction.productId.eq(product.id))
+			.join(biddingDetail).on(biddingDetail.auctionId.eq(auction.id))
+			.where(
+				biddingDetail.memberId.eq(memberId)
+					.and(auction.status.eq(AuctionStatus.IN_PROGRESS))
+					.and(biddingDetail.bidAt.eq(
+						JPAExpressions.select(biddingDetailSub.bidAt.max())
+							.from(biddingDetailSub)
+							.join(auctionSub).on(biddingDetailSub.auctionId.eq(auctionSub.id))
+							.where(
+								biddingDetailSub.memberId.eq(memberId)
+									.and(auctionSub.productId.eq(product.id))
+							)
+					))
+			)
+			.orderBy(biddingDetail.bidAt.desc())
+			.offset(pageable.getOffset())
+			.limit(pageable.getPageSize())
+			.fetch();
+
+		Long total = Optional.ofNullable(queryFactory
+			.select(auction.countDistinct())
+			.from(auction)
+			.join(biddingDetail).on(biddingDetail.auctionId.eq(auction.id))
+			.where(
+				biddingDetail.memberId.eq(memberId)
+					.and(auction.status.eq(AuctionStatus.IN_PROGRESS)))
+			.fetchOne()).orElse(0L);
+
+		return new PageImpl<>(qResponses, pageable, total);
 	}
 }

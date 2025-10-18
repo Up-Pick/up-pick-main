@@ -60,4 +60,8 @@ public class Product {
 	public void increaseViewCount() {
 		this.viewCount++;
 	}
+
+	public void setSoldNow() {
+		this.soldAt = LocalDateTime.now();
+	}
 }

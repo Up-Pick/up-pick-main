@@ -8,9 +8,9 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class ProductPurchasedInfoResponse {
-	private Long id;
-	private String name;
-	private String image;
-	private Long finalPrice;
-	private LocalDateTime buyAt;
+	private final Long id;
+	private final String name;
+	private final String image;
+	private final Long finalPrice;
+	private final LocalDateTime buyAt;
 }

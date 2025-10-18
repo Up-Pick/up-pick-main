@@ -7,9 +7,7 @@ public interface ProductExternalServiceApi {
 	 *
 	 * @param productId 상품 ID
 	 */
-	default void changeProductsoldAt(Long productId) {
-
-	}
+	void changeProductSoldAt(Long productId);
 
 	/**
 	 *
@@ -17,7 +15,5 @@ public interface ProductExternalServiceApi {
 	 *
 	 * @param productId 삭제할 상품의 ID
 	 */
-	default void deleteProduct(Long productId) {
-
-	}
+	void deleteProduct(Long productId);
 }
