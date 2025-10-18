@@ -17,7 +17,11 @@ import org.oneog.uppick.domain.auction.repository.BiddingDetailRepository;
 import org.oneog.uppick.domain.product.entity.Product;
 import org.oneog.uppick.domain.product.repository.ProductRepository;
 import org.oneog.uppick.domain.ranking.entity.HotDeal;
+import org.oneog.uppick.domain.ranking.entity.HotKeyword;
 import org.oneog.uppick.domain.ranking.repository.HotDealRepository;
+import org.oneog.uppick.domain.ranking.repository.HotKeywordRepository;
+import org.oneog.uppick.domain.searching.entity.SearchHistory;
+import org.oneog.uppick.domain.searching.repository.SearchHistoryJpaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,13 +45,23 @@ class RankingSchedulerServiceTest {
 	@Autowired
 	private BiddingDetailRepository biddingDetailRepository;
 
+	@Autowired
+	private HotKeywordRepository hotKeywordRepository;
+
+	@Autowired
+	private SearchHistoryJpaRepository searchHistoryJpaRepository;
+
 	@BeforeEach
 	void setUp() {
 		hotDealRepository.deleteAll();
 		biddingDetailRepository.deleteAll();
 		auctionRepository.deleteAll();
 		productRepository.deleteAll();
+		hotKeywordRepository.deleteAll();
+		searchHistoryJpaRepository.deleteAll();
 	}
+
+	// === 주간 핫딜 조회 ===
 
 	@Test
 	@DisplayName("핫딜 랭킹이 정상적으로 업데이트된다")
@@ -225,6 +239,150 @@ class RankingSchedulerServiceTest {
 		assertThat(hotDeals).extracting("productName").doesNotContain("상품4");
 	}
 
+	// === 주간 키워드 조회 ===
+
+	@Test
+	@DisplayName("주간 핫 키워드가 정상적으로 업데이트된다")
+	void updateWeeklyTop10HotKeywords_정상동작() {
+		// given
+		createSearchHistory("맥북", 5);
+		createSearchHistory("아이폰", 3);
+		createSearchHistory("에어팟", 2);
+		createSearchHistory("아이패드", 1);
+
+		// when
+		rankingSchedulerService.updateWeeklyTop10HotKeywords();
+
+		// then
+		List<HotKeyword> hotKeywords = hotKeywordRepository.findAll();
+		hotKeywords.sort(Comparator.comparing(HotKeyword::getRankNo));
+
+		assertThat(hotKeywords).hasSize(4);
+		assertThat(hotKeywords.get(0).getRankNo()).isEqualTo(1);
+		assertThat(hotKeywords.get(0).getKeyword()).isEqualTo("맥북");
+		assertThat(hotKeywords.get(1).getRankNo()).isEqualTo(2);
+		assertThat(hotKeywords.get(1).getKeyword()).isEqualTo("아이폰");
+		assertThat(hotKeywords.get(2).getRankNo()).isEqualTo(3);
+		assertThat(hotKeywords.get(2).getKeyword()).isEqualTo("에어팟");
+		assertThat(hotKeywords.get(3).getRankNo()).isEqualTo(4);
+		assertThat(hotKeywords.get(3).getKeyword()).isEqualTo("아이패드");
+	}
+
+	@Test
+	@DisplayName("기존 핫 키워드 데이터가 삭제되고 새로운 데이터가 저장된다")
+	void updateWeeklyTop10HotKeywords_기존데이터삭제() {
+		// given
+		// 기존 핫 키워드
+		HotKeyword oldKeyword = new HotKeyword("옛날키워드", 1);
+		hotKeywordRepository.save(oldKeyword);
+
+		assertThat(hotKeywordRepository.findAll()).hasSize(1);
+
+		// 새로운 검색 데이터
+		createSearchHistory("새키워드", 3);
+
+		// when
+		rankingSchedulerService.updateWeeklyTop10HotKeywords();
+
+		// then
+		List<HotKeyword> hotKeywords = hotKeywordRepository.findAll();
+		assertThat(hotKeywords).hasSize(1);
+		assertThat(hotKeywords.get(0).getKeyword()).isEqualTo("새키워드");
+
+		// 기존 데이터 없음
+		assertThat(hotKeywords).extracting("keyword")
+			.doesNotContain("옛날키워드");
+	}
+
+	@Test
+	@DisplayName("검색 기록이 없으면 핫 키워드 테이블이 비워진다")
+	void updateWeeklyTop10HotKeywords_검색없음() {
+		// given - 검색 기록 없음
+
+		// when
+		rankingSchedulerService.updateWeeklyTop10HotKeywords();
+
+		// then
+		assertThat(hotKeywordRepository.findAll()).isEmpty();
+	}
+
+	@Test
+	@DisplayName("검색이 없으면 기존 핫 키워드도 함께 삭제된다")
+	void updateWeeklyTop10HotKeywords_검색없으면_기존핫키워드삭제() {
+		// given
+		HotKeyword existingKeyword = new HotKeyword("기존키워드", 1);
+		hotKeywordRepository.save(existingKeyword);
+
+		// 검색 기록 없음
+
+		// when
+		rankingSchedulerService.updateWeeklyTop10HotKeywords();
+
+		// then
+		assertThat(hotKeywordRepository.findAll()).isEmpty();
+	}
+
+	@Test
+	@DisplayName("10개를 초과하면 상위 10개만 저장된다")
+	void updateWeeklyTop10HotKeywords_10개초과() {
+		// given
+		for (int i = 1; i <= 15; i++) {
+			createSearchHistory("키워드" + i, i); // 키워드15가 15회로 가장 많음
+		}
+
+		// when
+		rankingSchedulerService.updateWeeklyTop10HotKeywords();
+
+		// then
+		List<HotKeyword> hotKeywords = hotKeywordRepository.findAll();
+		hotKeywords.sort(Comparator.comparing(HotKeyword::getRankNo));
+
+		assertThat(hotKeywords).hasSize(10);
+		assertThat(hotKeywords.get(0).getRankNo()).isEqualTo(1);
+		assertThat(hotKeywords.get(0).getKeyword()).isEqualTo("키워드15");
+		assertThat(hotKeywords.get(9).getRankNo()).isEqualTo(10);
+		assertThat(hotKeywords.get(9).getKeyword()).isEqualTo("키워드6");
+
+		// 키워드5 이하는 제외
+		assertThat(hotKeywords).extracting("keyword")
+			.doesNotContain("키워드5", "키워드4");
+	}
+
+	@Test
+	@DisplayName("rankNo가 1부터 순서대로 부여된다")
+	void updateWeeklyTop10HotKeywords_rankNo순서() {
+		// given
+		createSearchHistory("키워드A", 3);
+		createSearchHistory("키워드B", 2);
+		createSearchHistory("키워드C", 1);
+
+		// when
+		rankingSchedulerService.updateWeeklyTop10HotKeywords();
+
+		// then
+		List<HotKeyword> hotKeywords = hotKeywordRepository.findAll();
+		assertThat(hotKeywords).hasSize(3);
+		assertThat(hotKeywords).extracting("rankNo")
+			.containsExactlyInAnyOrder(1, 2, 3);
+	}
+
+	@Test
+	@DisplayName("10개 미만의 키워드만 있어도 정상 동작한다")
+	void updateWeeklyTop10HotKeywords_10개미만() {
+		// given
+		createSearchHistory("키워드1", 2);
+		createSearchHistory("키워드2", 1);
+
+		// when
+		rankingSchedulerService.updateWeeklyTop10HotKeywords();
+
+		// then
+		List<HotKeyword> hotKeywords = hotKeywordRepository.findAll();
+		assertThat(hotKeywords).hasSize(2);
+		assertThat(hotKeywords).extracting("rankNo")
+			.containsExactlyInAnyOrder(1, 2);
+	}
+
 	// === Helper Methods ===
 
 	private Product createProduct(String name, String image) {
@@ -257,5 +415,12 @@ class RankingSchedulerServiceTest {
 			.bidPrice(bidPrice)
 			.build();
 		return biddingDetailRepository.save(bidding);
+	}
+
+	private void createSearchHistory(String keyword, int count) {
+		for (int i = 0; i < count; i++) {
+			SearchHistory searchHistory = new SearchHistory(keyword);
+			searchHistoryJpaRepository.save(searchHistory);
+		}
 	}
 }
