@@ -23,11 +23,6 @@ public class ProductExternalService implements ProductExternalServiceApi {
 		product.setSoldNow();
 	}
 
-	@Override
-	public void deleteProduct(Long productId) {
-
-	}
-
 	private Product getProductByIdOrElseThrow(Long productId) {
 		return productRepository.findById(productId)
 			.orElseThrow(() -> new BusinessException(ProductErrorCode.PRODUCT_NOT_FOUND));
