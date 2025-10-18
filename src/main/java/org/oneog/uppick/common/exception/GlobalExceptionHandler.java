@@ -1,14 +1,19 @@
 package org.oneog.uppick.common.exception;
 
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.validation.FieldError;
+import org.springframework.security.access.AccessDeniedException;
 
 import org.oneog.uppick.common.dto.GlobalApiResponse;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -31,8 +36,15 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<GlobalApiResponse<Void>> handleAccessDeniedException(AccessDeniedException e) {
+        GlobalApiResponse<Void> response = GlobalApiResponse.fail(null, "Access denied");
+        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<GlobalApiResponse<Void>> handleException(Exception e) {
+        log.error("Internal server error", e);
         GlobalApiResponse<Void> response = GlobalApiResponse.fail(null, "Internal server error");
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
