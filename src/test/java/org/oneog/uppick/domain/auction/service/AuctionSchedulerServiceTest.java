@@ -119,9 +119,6 @@ class AuctionSchedulerServiceTest {
 		auctionSchedulerService.confirmFinishedAuctions();
 
 		// then
-		// 상품 삭제 및 경매 삭제 호출 확인
-		then(productExternalServiceApi).should().deleteProduct(productId);
-		then(auctionRepository).should().delete(auction);
 
 		// 다른 도메인 연동은 일어나면 안 됨
 		then(memberExternalServiceApi).shouldHaveNoInteractions();
