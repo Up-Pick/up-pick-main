@@ -1,6 +1,11 @@
 # 워크플로우의 이름을 지정합니다. GitHub Actions 탭에서 이 이름으로 표시됩니다.
 name: Dev CI/CD
 
+# 워크플로우의 동시 실행(concurrency) 설정입니다.
+concurrency:
+  group: uppick-dev-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 # 워크플로우가 언제 실행될지를 정의하는 "트리거" 설정입니다.
 on:
   push:
