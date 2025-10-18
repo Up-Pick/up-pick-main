@@ -64,7 +64,6 @@ public class AuctionSchedulerService {
 
 		if (topBid.isEmpty()) {
 			// 입찰자가 없을 경우: 유찰 처리
-			// TODO 경매에서도 삭제되어야하고, 상품에서도 삭제되어야함
 			handleExpiredAuction(auction);
 			log.info("[Auction:{}] 유찰 처리 (입찰자 없음)", auctionId);
 			return;
@@ -81,13 +80,10 @@ public class AuctionSchedulerService {
 		Long productId = auction.getProductId();
 
 		try {
-			// 상품 삭제
-			productExternalServiceApi.deleteProduct(productId);
-			log.info("[Product:{}] 유찰된 상품 삭제 완료", productId);
-
-			// 경매 삭제
-			auctionRepository.delete(auction);
-			log.info("[Auction:{}] 유찰 경매 삭제 완료", auctionId);
+			auction.markAsExpired();
+			// 경매 상태변경
+			auctionRepository.save(auction);
+			log.info("[Auction:{}] 유찰 상태로 변경 완료", auctionId);
 
 		} catch (Exception e) {
 			log.error("[Auction:{}] 유찰 처리 중 오류 발생: {}", auctionId, e.getMessage());
