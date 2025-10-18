@@ -121,7 +121,7 @@ class AuctionSchedulerServiceTest {
 		then(auctionRepository).should().save(auction);
 
 		// 상태가 실제로 바뀌었는지
-		assertThat(auction.getStatus()).isEqualTo(AuctionStatus.FAILED); //
+		assertThat(auction.getStatus()).isEqualTo(AuctionStatus.EXPIRED); //
 	}
 
 }

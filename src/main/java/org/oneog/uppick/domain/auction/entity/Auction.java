@@ -77,6 +77,6 @@ public class Auction {
 
 	//유찰되면 상태변경
 	public void markAsExpired() {
-		this.status = AuctionStatus.FAILED;
+		this.status = AuctionStatus.EXPIRED;
 	}
 }
