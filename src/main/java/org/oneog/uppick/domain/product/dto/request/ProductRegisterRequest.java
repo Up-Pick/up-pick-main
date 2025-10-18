@@ -6,34 +6,31 @@ import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor
 @Builder
 public class ProductRegisterRequest {
 
 	@NotBlank(message = "상품 이름을 비울 수 없습니다.")
-	private String name;
+	private final String name;
 	@NotBlank(message = "설명을 비울 수 없습니다.")
-	private String description;
+	private final String description;
 
-	private String image;
+	private final String image;
 
 	@NotNull(message = "카테고리를 비울 수 없습니다.")
 	@Positive
-	private Long categoryId;
+	private final Long categoryId;
 
 	@NotNull(message = "상품 입찰가를 비울 수 없습니다.")
 	@Positive(message = "값을 입력해야 합니다.")
-	private Long startBid;
+	private final Long startBid;
 
 	@NotNull(message = "마감 날짜는 비울 수 없습니다.")
 	@Future(message = "마감 날짜는 현재 날짜 이후여야 합니다.")
-	private LocalDateTime endAt;
+	private final LocalDateTime endAt;
 }

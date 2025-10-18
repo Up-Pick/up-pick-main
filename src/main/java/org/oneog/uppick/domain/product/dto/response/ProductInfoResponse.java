@@ -9,17 +9,17 @@ import lombok.Getter;
 @AllArgsConstructor
 public class ProductInfoResponse {
 
-	private Long id;
-	private String name;
-	private String description;
-	private Long viewCount;
-	private LocalDateTime registeredAt;
-	private String image;
+	private final Long id;
+	private final String name;
+	private final String description;
+	private final Long viewCount;
+	private final LocalDateTime registeredAt;
+	private final String image;
 
-	private String categoryName;
-	private LocalDateTime soldAt;
-	private Long minPrice;
-	private Long currentBid;
-	private LocalDateTime endAt;
-	private String sellerName;
+	private final String categoryName;
+	private final LocalDateTime soldAt;
+	private final Long minPrice;
+	private final Long currentBid;
+	private final LocalDateTime endAt;
+	private final String sellerName;
 }

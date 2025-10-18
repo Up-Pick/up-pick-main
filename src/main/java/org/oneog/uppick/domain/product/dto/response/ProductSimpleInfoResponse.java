@@ -6,8 +6,8 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class ProductSimpleInfoResponse {
-	private String name;
-	private String image;
-	private Long minBidPrice;
-	private Long currentBidPrice;
+	private final String name;
+	private final String image;
+	private final Long minBidPrice;
+	private final Long currentBidPrice;
 }
