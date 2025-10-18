@@ -4,6 +4,7 @@ import org.oneog.uppick.common.dto.AuthMember;
 import org.oneog.uppick.common.dto.GlobalApiResponse;
 import org.oneog.uppick.common.dto.GlobalPageResponse;
 import org.oneog.uppick.domain.product.dto.request.ProductRegisterRequest;
+import org.oneog.uppick.domain.product.dto.response.ProductBiddingInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductPurchasedInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductSimpleInfoResponse;
@@ -74,6 +75,17 @@ public class ProductController {
 		@PageableDefault(size = 20) Pageable pageable) {
 
 		Page<ProductPurchasedInfoResponse> responses = productInternalService.getPurchasedProductInfoByMemberId(
+			authMember.getMemberId(), pageable);
+		return GlobalPageResponse.of(responses);
+	}
+
+	// 입찰 중인 상품 목록 조회
+	@GetMapping("/bidding/me")
+	public GlobalPageResponse<ProductBiddingInfoResponse> getBiddingProducts(
+		@AuthenticationPrincipal AuthMember authMember,
+		@PageableDefault Pageable pageable) {
+
+		Page<ProductBiddingInfoResponse> responses = productInternalService.getBiddingProductInfoByMemberId(
 			authMember.getMemberId(), pageable);
 		return GlobalPageResponse.of(responses);
 	}

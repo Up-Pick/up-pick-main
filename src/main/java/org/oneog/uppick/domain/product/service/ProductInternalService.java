@@ -3,6 +3,7 @@ package org.oneog.uppick.domain.product.service;
 import org.oneog.uppick.common.exception.BusinessException;
 import org.oneog.uppick.domain.auction.service.AuctionExternalServiceApi;
 import org.oneog.uppick.domain.product.dto.request.ProductRegisterRequest;
+import org.oneog.uppick.domain.product.dto.response.ProductBiddingInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductPurchasedInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductSimpleInfoResponse;
@@ -65,6 +66,10 @@ public class ProductInternalService {
 
 	public Page<ProductPurchasedInfoResponse> getPurchasedProductInfoByMemberId(Long memberId, Pageable pageable) {
 		return productQueryRepository.getPurchasedProductInfoByMemberId(memberId, pageable);
+	}
+
+	public Page<ProductBiddingInfoResponse> getBiddingProductInfoByMemberId(Long memberId, Pageable pageable) {
+		return productQueryRepository.getBiddingProductInfoByMemberId(memberId, pageable);
 	}
 
 	// ***** Internal Private Method ***** //
