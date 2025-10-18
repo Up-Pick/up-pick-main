@@ -21,6 +21,7 @@ import org.oneog.uppick.domain.auction.exception.AuctionErrorCode;
 import org.oneog.uppick.domain.auction.mapper.AuctionMapper;
 import org.oneog.uppick.domain.auction.repository.AuctionQueryRepository;
 import org.oneog.uppick.domain.auction.repository.AuctionRepository;
+import org.oneog.uppick.domain.auction.repository.BiddingDetailQueryRepository;
 import org.oneog.uppick.domain.auction.repository.BiddingDetailRepository;
 import org.oneog.uppick.domain.notification.entity.NotificationType;
 import org.oneog.uppick.domain.notification.service.NotificationExternalServiceApi;
@@ -38,6 +39,8 @@ public class AuctionInternalServiceTest {
 	@Mock
 	private BiddingDetailRepository biddingDetailRepository;
 	@Mock
+	private BiddingDetailQueryRepository biddingDetailQueryRepository;
+	@Mock
 	private NotificationExternalServiceApi notificationExternalServiceApi;
 
 	@InjectMocks
@@ -47,7 +50,8 @@ public class AuctionInternalServiceTest {
 	void bid_입찰시도_성공() {
 		// given
 		long auctionId = 1L;
-		long memberId = 100L;
+		long memberId = 100L;   // 입찰자
+		long sellerId = 200L;   // 판매자
 		long newBidPrice = 2000L;
 
 		Auction auction = Auction.builder()
@@ -61,6 +65,7 @@ public class AuctionInternalServiceTest {
 		AuctionBidRequest request = new AuctionBidRequest(newBidPrice);
 
 		given(auctionRepository.findById(auctionId)).willReturn(Optional.of(auction));
+		given(auctionQueryRepository.findSellerIdByAuctionId(auctionId)).willReturn(sellerId);
 
 		BiddingDetail biddingDetail = BiddingDetail.builder()
 			.auctionId(auctionId)
@@ -76,7 +81,8 @@ public class AuctionInternalServiceTest {
 
 		// then
 		assertThat(auction.getCurrentPrice()).isEqualTo(newBidPrice);
-		then(biddingDetailRepository).should().save(any(BiddingDetail.class));
+		verify(biddingDetailRepository).save(biddingDetail);
+		verify(auctionQueryRepository).findSellerIdByAuctionId(auctionId);
 	}
 
 	@Test
@@ -105,7 +111,36 @@ public class AuctionInternalServiceTest {
 	}
 
 	@Test
-	void sendBidNotifications_입찰을한상황_데이터가정상적으로반환() {
+	void bid_판매자_본인입찰_예외() {
+		// given
+		long auctionId = 1L;
+		long memberId = 100L; // 입찰자 = 판매자
+		long newBidPrice = 2000L;
+
+		Auction auction = Auction.builder()
+			.productId(10L)
+			.minPrice(1000L)
+			.currentPrice(1500L)
+			.status(AuctionStatus.IN_PROGRESS)
+			.endAt(LocalDateTime.now().plusDays(1))
+			.build();
+
+		AuctionBidRequest request = new AuctionBidRequest(newBidPrice);
+
+		given(auctionRepository.findById(auctionId)).willReturn(Optional.of(auction));
+		given(auctionQueryRepository.findSellerIdByAuctionId(auctionId)).willReturn(memberId); // 판매자 == 입찰자
+
+		// when & then
+		assertThatThrownBy(() -> auctionInternalService.bid(request, auctionId, memberId))
+			.isInstanceOf(BusinessException.class)
+			.hasMessageContaining("본인의 판매 물품에는 입찰할 수 없습니다.");
+
+		verify(biddingDetailRepository, never()).save(any());
+		verify(auctionQueryRepository).findSellerIdByAuctionId(auctionId);
+	}
+
+	@Test
+	void sendBidNotifications_입찰을한상황_알람내역데이터정상반환() {
 		// given
 		Auction auction = Auction.builder()
 			.productId(10L)
@@ -128,7 +163,7 @@ public class AuctionInternalServiceTest {
 		//경매 ID로 판매자 ID 조회 시 300L을 반환하도록 지정
 		given(auctionQueryRepository.findSellerIdByAuctionId(anyLong())).willReturn(sellerId);
 		//해당 경매에 참여한 사용자 목록 반환 (본인 포함)
-		given(biddingDetailRepository.findDistinctMemberIdsByAuctionId(anyLong()))
+		given(biddingDetailQueryRepository.findDistinctBidderIdsByAuctionId(anyLong()))
 			.willReturn(List.of(100L, 200L, 150L));
 
 		// when
