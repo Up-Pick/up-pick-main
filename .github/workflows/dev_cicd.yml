@@ -36,8 +36,9 @@ jobs:
 
       # 4. Gradle로 빌드
       # ./gradlew build: Spring Boot 애플리케이션을 빌드하여 실행 가능한 .jar 파일을 생성합니다.
+      # REST Docs 관련 태스크도 제외하여 테스트 없이 빌드할 수 있도록 합니다.
       - name: Build with Gradle
-        run: ./gradlew build -x test
+        run: ./gradlew build -x test -x asciidoctor -x generateRestDocsIndex
 
       # 5. AWS 자격 증명 설정
       # aws-actions/configure-aws-credentials@v2: GitHub Secrets에 저장된 AWS 키를 사용하여 AWS CLI 접근을 설정합니다.

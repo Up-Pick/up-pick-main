@@ -4,7 +4,7 @@ WORKDIR /app
 COPY build.gradle settings.gradle ./
 COPY gradle ./gradle
 COPY src ./src
-RUN gradle build --no-daemon -x test
+RUN gradle build -x test -x asciidoctor -x generateRestDocsIndex
 
 # Runtime stage
 FROM openjdk:21-jdk-slim
