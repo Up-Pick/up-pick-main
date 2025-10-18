@@ -2,6 +2,8 @@ package org.oneog.uppick.domain.member.entity;
 
 import java.time.LocalDateTime;
 
+import org.oneog.uppick.common.exception.BusinessException;
+import org.oneog.uppick.domain.member.exception.MemberErrorCode;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -47,5 +49,12 @@ public class Member {
 		this.email = email;
 		this.nickname = nickname;
 		this.password = password;
+	}
+
+	public void addCredit(Long amount) {
+		if (amount <= 0) {
+			throw new BusinessException(MemberErrorCode.INVALID_CHARGE_AMOUNT);
+		}
+		this.credit += amount;
 	}
 }
