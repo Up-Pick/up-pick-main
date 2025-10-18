@@ -17,6 +17,7 @@ import org.oneog.uppick.domain.auction.enums.AuctionStatus;
 import org.oneog.uppick.domain.product.dto.response.ProductBiddingInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductPurchasedInfoResponse;
+import org.oneog.uppick.domain.product.dto.response.ProductSellingInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductSimpleInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductSoldInfoResponse;
 import org.springframework.data.domain.Page;
@@ -186,6 +187,41 @@ public class ProductQueryRepository {
 			.join(biddingDetail).on(biddingDetail.auctionId.eq(auction.id))
 			.where(
 				biddingDetail.memberId.eq(memberId)
+					.and(auction.status.eq(AuctionStatus.IN_PROGRESS)))
+			.fetchOne()).orElse(0L);
+
+		return new PageImpl<>(qResponses, pageable, total);
+	}
+
+	public Page<ProductSellingInfoResponse> getSellingProductInfoMyMemberId(Long memberId, Pageable pageable) {
+
+		List<ProductSellingInfoResponse> qResponses = queryFactory
+			.select(
+				Projections.constructor(
+					ProductSellingInfoResponse.class,
+					product.id,
+					product.name,
+					product.image,
+					auction.endAt,
+					auction.currentPrice,
+					auction.id))
+			.from(product)
+			.join(auction).on(auction.productId.eq(product.id))
+			.where(
+				product.registerId.eq(memberId)
+					.and(auction.status.eq(AuctionStatus.IN_PROGRESS))
+			)
+			.orderBy(product.registeredAt.desc())
+			.offset(pageable.getOffset())
+			.limit(pageable.getPageSize())
+			.fetch();
+
+		Long total = Optional.ofNullable(queryFactory
+			.select(auction.count())
+			.from(product)
+			.join(auction).on(auction.productId.eq(product.id))
+			.where(
+				product.registerId.eq(memberId)
 					.and(auction.status.eq(AuctionStatus.IN_PROGRESS)))
 			.fetchOne()).orElse(0L);
 
