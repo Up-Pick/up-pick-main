@@ -44,10 +44,10 @@ public class AuctionExternalServiceTest {
 			.endAt(endAt)
 			.build();
 
-		given(auctionMapper.registerToEntity(productId, minPrice, endAt)).willReturn(auction);
+		given(auctionMapper.registerToEntity(productId, minPrice, null, endAt)).willReturn(auction);
 
 		// when
-		auctionExternalService.registerAuction(productId, minPrice, endAt); //내가 테스트 하려는거
+		auctionExternalService.registerAuction(productId, minPrice, null, endAt); //내가 테스트 하려는거
 
 		// then
 		ArgumentCaptor<Auction> captor = ArgumentCaptor.forClass(Auction.class); //Auction 객체를 캡쳐할 준비

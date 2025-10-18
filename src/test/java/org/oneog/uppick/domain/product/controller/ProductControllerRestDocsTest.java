@@ -40,7 +40,6 @@ class ProductControllerRestDocsTest extends RestDocsBase {
 			now,
 			"https://example.com/products/1",
 			"컴퓨터/키보드",
-			now.plusDays(10),
 			100000L,
 			150000L,
 			now.plusDays(7),
@@ -49,8 +48,8 @@ class ProductControllerRestDocsTest extends RestDocsBase {
 		given(productInternalService.getProductInfoById(productId)).willReturn(response);
 
 		mockMvc.perform(
-			get("/api/v1/products/{productId}", productId)
-				.accept(MediaType.APPLICATION_JSON))
+				get("/api/v1/products/{productId}", productId)
+					.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("success").value(true))
 			.andExpect(jsonPath("message").value("요청에 성공했습니다."))
@@ -71,9 +70,6 @@ class ProductControllerRestDocsTest extends RestDocsBase {
 							.attributes(key("format").value("yyyy-MM-dd")),
 						fieldWithPath("data.image").type(JsonFieldType.STRING).description("상품 이미지 URL"),
 						fieldWithPath("data.categoryName").type(JsonFieldType.STRING).description("카테고리 이름"),
-						fieldWithPath("data.soldAt").type(JsonFieldType.STRING).optional()
-							.description("판매 완료 날짜")
-							.attributes(key("format").value("yyyy-MM-dd")),
 						fieldWithPath("data.minPrice").type(JsonFieldType.NUMBER).description("최소 입찰가")
 							.attributes(key("example").value("100000")),
 						fieldWithPath("data.currentBid").type(JsonFieldType.NUMBER).description("현재 입찰가")

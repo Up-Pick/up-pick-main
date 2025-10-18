@@ -18,8 +18,8 @@ public class AuctionExternalService implements AuctionExternalServiceApi {
 	private final AuctionMapper auctionMapper;
 
 	@Transactional
-	public void registerAuction(Long productId, Long minPrice, LocalDateTime endAt) {
-		Auction auction = auctionMapper.registerToEntity(productId, minPrice, endAt);
+	public void registerAuction(Long productId, Long minPrice, LocalDateTime registerdAt, LocalDateTime endAt) {
+		Auction auction = auctionMapper.registerToEntity(productId, minPrice, registerdAt, endAt);
 		auctionRepository.save(auction);
 	}
 

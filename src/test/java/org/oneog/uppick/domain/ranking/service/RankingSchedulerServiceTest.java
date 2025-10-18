@@ -244,6 +244,7 @@ class RankingSchedulerServiceTest {
 			.minPrice(10000L)
 			.currentPrice(10000L)
 			.status(AuctionStatus.IN_PROGRESS)
+			.startAt(LocalDateTime.now())
 			.endAt(LocalDateTime.now().plusDays(7))
 			.build();
 		return auctionRepository.save(auction);
