@@ -16,7 +16,7 @@ public class AuctionMapper {
 			.currentPrice(null)
 			.minPrice(minPrice)
 			.status(AuctionStatus.IN_PROGRESS)
-			.registeredAt(registeredAt)
+			.startAt(registeredAt)
 			.endAt(endAt)
 			.build();
 	}

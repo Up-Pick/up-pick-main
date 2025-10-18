@@ -71,6 +71,7 @@ public class SearchingQueryRepositoryTest {
 			.currentPrice(500L)
 			.minPrice(100L)
 			.status(AuctionStatus.IN_PROGRESS)
+			.startAt(p1.getRegisteredAt())
 			.endAt(LocalDateTime.now().plusDays(1))
 			.build();
 
@@ -79,6 +80,7 @@ public class SearchingQueryRepositoryTest {
 			.currentPrice(1000L)
 			.minPrice(200L)
 			.status(AuctionStatus.FINISHED)
+			.startAt(p2.getRegisteredAt())
 			.endAt(LocalDateTime.now().minusDays(1))
 			.build();
 

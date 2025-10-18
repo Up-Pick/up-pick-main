@@ -51,12 +51,12 @@ public class Auction {
 	private LocalDateTime endAt;
 
 	@Builder
-	private Auction(Long productId, Long currentPrice, Long minPrice, LocalDateTime registeredAt, AuctionStatus status,
+	private Auction(Long productId, Long currentPrice, Long minPrice, LocalDateTime startAt, AuctionStatus status,
 		LocalDateTime endAt) {
 		this.productId = productId;
 		this.currentPrice = currentPrice;
 		this.minPrice = minPrice;
-		this.startAt = registeredAt;
+		this.startAt = startAt;
 		this.status = status;
 		this.endAt = endAt;
 	}
