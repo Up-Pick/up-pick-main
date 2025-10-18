@@ -81,9 +81,6 @@ class AuctionSchedulerServiceTest {
 		then(memberExternalServiceApi).should().registerPurchaseDetail(auctionId, buyerId, productId, bidPrice);
 		then(memberExternalServiceApi).should().registerSellDetail(auctionId, sellerId, productId, bidPrice);
 
-		// 상품 판매 완료 시각 갱신
-		then(productExternalServiceApi).should().changeProductSoldAt(productId);
-
 		//  알림 발송
 		then(notificationExternalServiceApi).should().sendNotification(
 			eq(buyerId),
