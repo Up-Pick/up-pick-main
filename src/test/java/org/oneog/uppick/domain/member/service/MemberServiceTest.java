@@ -33,17 +33,15 @@ public class MemberServiceTest {
 	private Member testMember;
 
 	@BeforeEach
-		// 각 테스트 실행 전에 공통 설정
 	void setUp() {
-		// 테스트용 인증 객체
+
 		authMember = new AuthMember(1L, "testUser");
 
-		// 테스트용 Member 엔티티 (
 		testMember = Member.builder()
 			.email("test@email.com")
 			.nickname("testUser")
 			.password("encodedPass")
-			.credit(0L) // Builder가 credit을 받으므로 명시적으로 0L 설정
+			.credit(0L)
 			.build();
 
 		// Member 엔티티의 ID는 @Id @GeneratedValue라 private여서 ReflectionTestUtils로 ID를 강제 주입
@@ -53,19 +51,19 @@ public class MemberServiceTest {
 	@Test
 	@DisplayName("chargeCredit_정상적인요청_성공")
 	void chargeCredit_정상적인요청_성공() {
-		// given (주어진 상황)
+		// given
 		CreditChargeRequest request = new CreditChargeRequest(10000L); // 10,000원 충전 요청
-		// memberId(1L)로 조회 시 'testMember' 객체를 반환하도록 Mock 설정
+		// memberId(1L)로 조회 시 testMember 객체를 반환
 		when(memberRepository.findById(authMember.getMemberId())).thenReturn(Optional.of(testMember));
 
-		// when (무엇을 할 때)
+		// when
 		CreditChargeResponse response = memberInternalService.chargeCredit(request, authMember);
 
-		// then (어떤 결과가 나와야 하는가)
+		// then
 		assertNotNull(response);
 		// testMember의 초기 credit 0L + 10000L = 10000L
 		assertEquals(10000L, response.getCurrentCredit());
-		// member 객체의 credit 값이 실제로 10000L이 되었는지 확인 (엔티티 로직 검증)
+		// member 객체의 credit 값이 실제로 10000L이 되었는지 확인
 		assertEquals(10000L, testMember.getCredit());
 		// memberRepository.findById가 1번 호출되었는지 검증
 		verify(memberRepository, times(1)).findById(1L);
@@ -76,7 +74,7 @@ public class MemberServiceTest {
 	void chargeCredit_존재하지않는사용자_BusinessException발생() {
 		// given
 		CreditChargeRequest request = new CreditChargeRequest(10000L);
-		// memberId(1L)로 조회 시 빈 Optional을 반환하도록 Mock 설정 (사용자 없음)
+		// memberId(1L)로 조회 시 빈 Optional을 반환
 		when(memberRepository.findById(anyLong())).thenReturn(Optional.empty());
 
 		// when & then
