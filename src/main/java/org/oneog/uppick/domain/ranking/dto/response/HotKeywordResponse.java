@@ -7,7 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class HotKeywordResponse {
 
-	String keyword;
+	private final String keyword;
 
-	Integer rankNo;
+	private final Integer rankNo;
 }
