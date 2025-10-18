@@ -17,7 +17,6 @@ public class ProductInfoResponse {
 	private final String image;
 
 	private final String categoryName;
-	private final LocalDateTime soldAt;
 	private final Long minPrice;
 	private final Long currentBid;
 	private final LocalDateTime endAt;

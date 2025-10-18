@@ -96,6 +96,7 @@ public class ProductQueryRepositoryTest {
 			.currentPrice(30_000L)
 			.minPrice(10_000L)
 			.status(AuctionStatus.IN_PROGRESS)
+			.startAt(LocalDateTime.now())
 			.endAt(LocalDateTime.now().plusDays(3L))
 			.build();
 		Auction savedAuction = auctionRepository.save(auction);
@@ -139,7 +140,6 @@ public class ProductQueryRepositoryTest {
 			product.getRegisteredAt().truncatedTo(ChronoUnit.SECONDS));
 		assertThat(result.getImage()).isEqualTo(product.getImage());
 		assertThat(result.getCategoryName()).isEqualTo(String.format("%s/%s", category.getBig(), category.getSmall()));
-		assertThat(result.getSoldAt()).isEqualTo(product.getSoldAt());
 		assertThat(result.getMinPrice()).isEqualTo(auction.getMinPrice());
 		assertThat(result.getCurrentBid()).isEqualTo(auction.getCurrentPrice());
 		assertThat(result.getEndAt().truncatedTo(ChronoUnit.SECONDS)).isEqualTo(
@@ -193,6 +193,7 @@ public class ProductQueryRepositoryTest {
 			// .currentPrice(30_000L) -> currentPrice가 Null인 경우
 			.minPrice(10_000L)
 			.status(AuctionStatus.IN_PROGRESS)
+			.startAt(LocalDateTime.now())
 			.endAt(LocalDateTime.now().plusDays(3L))
 			.build();
 		auctionRepository.save(newAuction);

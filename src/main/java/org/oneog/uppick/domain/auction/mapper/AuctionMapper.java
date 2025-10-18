@@ -10,12 +10,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuctionMapper {
 
-	public Auction registerToEntity(Long productID, Long minPrice, LocalDateTime endAt) {
+	public Auction registerToEntity(Long productID, Long minPrice, LocalDateTime registeredAt, LocalDateTime endAt) {
 		return Auction.builder()
 			.productId(productID)
 			.currentPrice(null)
 			.minPrice(minPrice)
 			.status(AuctionStatus.IN_PROGRESS)
+			.startAt(registeredAt)
 			.endAt(endAt)
 			.build();
 	}

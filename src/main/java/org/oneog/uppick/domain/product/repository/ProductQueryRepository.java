@@ -51,7 +51,6 @@ public class ProductQueryRepository {
 					product.registeredAt,
 					product.image,
 					Expressions.stringTemplate("CONCAT({0}, '/', {1})", category.big, category.small),
-					product.soldAt,
 					auction.minPrice,
 					auction.currentPrice,
 					auction.endAt,

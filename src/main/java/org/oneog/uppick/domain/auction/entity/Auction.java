@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import org.oneog.uppick.common.exception.BusinessException;
 import org.oneog.uppick.domain.auction.enums.AuctionStatus;
 import org.oneog.uppick.domain.auction.exception.AuctionErrorCode;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import jakarta.persistence.Column;
@@ -45,7 +44,6 @@ public class Auction {
 	@Enumerated(EnumType.STRING)
 	private AuctionStatus status;
 
-	@CreatedDate
 	@Column(name = "start_at", nullable = false, updatable = false)
 	private LocalDateTime startAt;
 
@@ -53,11 +51,12 @@ public class Auction {
 	private LocalDateTime endAt;
 
 	@Builder
-	private Auction(Long productId, Long currentPrice, Long minPrice, AuctionStatus status,
+	private Auction(Long productId, Long currentPrice, Long minPrice, LocalDateTime startAt, AuctionStatus status,
 		LocalDateTime endAt) {
 		this.productId = productId;
 		this.currentPrice = currentPrice;
 		this.minPrice = minPrice;
+		this.startAt = startAt;
 		this.status = status;
 		this.endAt = endAt;
 	}
@@ -76,4 +75,8 @@ public class Auction {
 		this.status = AuctionStatus.FINISHED;
 	}
 
+	//유찰되면 상태변경
+	public void markAsExpired() {
+		this.status = AuctionStatus.EXPIRED;
+	}
 }

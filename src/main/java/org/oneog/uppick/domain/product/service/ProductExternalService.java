@@ -16,18 +16,6 @@ public class ProductExternalService implements ProductExternalServiceApi {
 
 	private final ProductRepository productRepository;
 
-	@Override
-	@Transactional
-	public void changeProductSoldAt(Long productId) {
-		Product product = getProductByIdOrElseThrow(productId);
-		product.setSoldNow();
-	}
-
-	@Override
-	public void deleteProduct(Long productId) {
-
-	}
-
 	private Product getProductByIdOrElseThrow(Long productId) {
 		return productRepository.findById(productId)
 			.orElseThrow(() -> new BusinessException(ProductErrorCode.PRODUCT_NOT_FOUND));

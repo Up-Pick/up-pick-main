@@ -36,8 +36,6 @@ public class Product {
 	@CreatedDate
 	@Column(name = "registered_at", nullable = false, updatable = false)
 	private LocalDateTime registeredAt;
-	@Column(name = "sold_at")
-	private LocalDateTime soldAt;
 
 	@Column(name = "image")
 	private String image;
@@ -59,9 +57,5 @@ public class Product {
 	// ***** Method ***** //
 	public void increaseViewCount() {
 		this.viewCount++;
-	}
-
-	public void setSoldNow() {
-		this.soldAt = LocalDateTime.now();
 	}
 }

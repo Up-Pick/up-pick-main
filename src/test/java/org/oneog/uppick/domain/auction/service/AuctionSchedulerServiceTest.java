@@ -1,5 +1,6 @@
 package org.oneog.uppick.domain.auction.service;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 import java.time.LocalDateTime;
@@ -80,9 +81,6 @@ class AuctionSchedulerServiceTest {
 		then(memberExternalServiceApi).should().registerPurchaseDetail(auctionId, buyerId, productId, bidPrice);
 		then(memberExternalServiceApi).should().registerSellDetail(auctionId, sellerId, productId, bidPrice);
 
-		// 상품 판매 완료 시각 갱신
-		then(productExternalServiceApi).should().changeProductSoldAt(productId);
-
 		//  알림 발송
 		then(notificationExternalServiceApi).should().sendNotification(
 			eq(buyerId),
@@ -96,7 +94,7 @@ class AuctionSchedulerServiceTest {
 	}
 
 	@Test
-	void confirmFinishedAuctions_유찰되는경우_데이터삭제() {
+	void confirmFinishedAuctions_유찰되는경우_유찰상태로변경() {
 		// given
 		Long auctionId = 1L;
 		Long productId = 10L;
@@ -119,12 +117,11 @@ class AuctionSchedulerServiceTest {
 		auctionSchedulerService.confirmFinishedAuctions();
 
 		// then
-		// 상품 삭제 및 경매 삭제 호출 확인
-		then(productExternalServiceApi).should().deleteProduct(productId);
-		then(auctionRepository).should().delete(auction);
+		//  경매가 저장되었는지 (markAsExpired → save 호출됐는지)
+		then(auctionRepository).should().save(auction);
 
-		// 다른 도메인 연동은 일어나면 안 됨
-		then(memberExternalServiceApi).shouldHaveNoInteractions();
-		then(notificationExternalServiceApi).shouldHaveNoInteractions();
+		// 상태가 실제로 바뀌었는지
+		assertThat(auction.getStatus()).isEqualTo(AuctionStatus.EXPIRED); //
 	}
+
 }
