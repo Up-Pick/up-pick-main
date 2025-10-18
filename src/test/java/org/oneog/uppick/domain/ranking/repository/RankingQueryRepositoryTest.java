@@ -2,7 +2,7 @@ package org.oneog.uppick.domain.ranking.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
-import java.lang.reflect.Field;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,6 +19,9 @@ import org.oneog.uppick.domain.auction.repository.BiddingDetailRepository;
 import org.oneog.uppick.domain.product.entity.Product;
 import org.oneog.uppick.domain.product.repository.ProductRepository;
 import org.oneog.uppick.domain.ranking.dto.HotDealCalculationDto;
+import org.oneog.uppick.domain.ranking.dto.HotKeywordCalculationDto;
+import org.oneog.uppick.domain.searching.entity.SearchHistory;
+import org.oneog.uppick.domain.searching.repository.SearchHistoryJpaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
@@ -46,12 +49,18 @@ class RankingQueryRepositoryTest {
 	@Autowired
 	private BiddingDetailRepository biddingDetailRepository;
 
+	@Autowired
+	private SearchHistoryJpaRepository searchHistoryJpaRepository;
+
 	@BeforeEach
 	void setUp() {
 		biddingDetailRepository.deleteAll();
 		auctionRepository.deleteAll();
 		productRepository.deleteAll();
+		searchHistoryJpaRepository.deleteAll();
 	}
+
+	// === 주간 핫딜 조회 ===
 
 	@Test
 	@DisplayName("지난 24시간 입찰 많은 상품 Top 6을 조회한다")
@@ -154,30 +163,37 @@ class RankingQueryRepositoryTest {
 	void findTop6HotDealsByBidCount_24시간필터() throws Exception {
 		// given
 		Product product = createProduct("테스트상품", "test.jpg");
+		Product product2 = createProduct("테스트상품2", "test.jpg");
 		Auction auction = createAuction(product.getId());
+		Auction auction2 = createAuction(product2.getId());
 
 		// 24시간 이내 입찰 2개
 		createBidding(auction.getId(), 10000L);
 		createBidding(auction.getId(), 11000L);
 
-		// 24시간 이전 입찰 3개 (리플렉션으로 시간 변경)
-		BiddingDetail oldBid1 = createBidding(auction.getId(), 12000L);
-		BiddingDetail oldBid2 = createBidding(auction.getId(), 13000L);
-		BiddingDetail oldBid3 = createBidding(auction.getId(), 14000L);
+		// 24시간 이전 입찰 3개
+		BiddingDetail oldBid1 = createBidding(auction2.getId(), 12000L);
+		BiddingDetail oldBid2 = createBidding(auction2.getId(), 13000L);
+		BiddingDetail oldBid3 = createBidding(auction2.getId(), 14000L);
 
 		em.flush();
 
-		// 리플렉션으로 bidAt을 2일 전으로 변경
+		// bidAt을 2일 전으로 변경
 		LocalDateTime twoDaysAgo = LocalDateTime.now().minusDays(2);
-		setBidAtUsingReflection(oldBid1, twoDaysAgo);
-		setBidAtUsingReflection(oldBid2, twoDaysAgo);
-		setBidAtUsingReflection(oldBid3, twoDaysAgo);
+		setBidAtUsingNativeQuery(oldBid1, twoDaysAgo);
+		setBidAtUsingNativeQuery(oldBid2, twoDaysAgo);
+		setBidAtUsingNativeQuery(oldBid3, twoDaysAgo);
 
 		em.flush();
 		em.clear();
 
 		// when
 		List<HotDealCalculationDto> result = rankingQueryRepository.findTop6HotDealsByBidCount();
+		System.out.println("oldBid1 = " + oldBid1.getBidAt());
+		System.out.println("oldBid2 = " + oldBid2.getBidAt());
+		System.out.println("oldBid3 = " + oldBid3.getBidAt());
+		BiddingDetail check1 = biddingDetailRepository.findById(oldBid1.getId()).get();
+		System.out.println("check1 = " + check1.getBidAt());
 
 		// then
 		assertThat(result).hasSize(1);
@@ -231,7 +247,145 @@ class RankingQueryRepositoryTest {
 			.doesNotContain("입찰없음");
 	}
 
-	// === Helper Methods ===
+	// === 주간 키워드 조회 ===
+
+	@Test
+	@DisplayName("지난 7일간 검색 많은 키워드 Top 10을 조회한다")
+	void findTop10HotKeywordsByCount_기본조회() {
+		// given
+		// 키워드별 검색 횟수
+		createSearchHistory("맥북");    // 5회
+		createSearchHistory("맥북");
+		createSearchHistory("맥북");
+		createSearchHistory("맥북");
+		createSearchHistory("맥북");
+
+		createSearchHistory("아이폰");  // 3회
+		createSearchHistory("아이폰");
+		createSearchHistory("아이폰");
+
+		createSearchHistory("에어팟");  // 2회
+		createSearchHistory("에어팟");
+
+		createSearchHistory("아이패드"); // 1회
+
+		em.flush();
+		em.clear();
+
+		// when
+		List<HotKeywordCalculationDto> result = rankingQueryRepository.findTop10HotKeywordsByCount();
+
+		// then
+		assertThat(result).hasSize(4);
+		assertThat(result.get(0).getKeyword()).isEqualTo("맥북");
+		assertThat(result.get(1).getKeyword()).isEqualTo("아이폰");
+		assertThat(result.get(2).getKeyword()).isEqualTo("에어팟");
+		assertThat(result.get(3).getKeyword()).isEqualTo("아이패드");
+	}
+
+	@Test
+	@DisplayName("10개를 초과하면 상위 10개만 반환한다")
+	void findTop10HotKeywordsByCount_10개초과() {
+		// given
+		for (int i = 1; i <= 15; i++) {
+			String keyword = "키워드" + i;
+			// i번 검색 (키워드15가 15회로 가장 많음)
+			for (int j = 0; j < i; j++) {
+				createSearchHistory(keyword);
+			}
+		}
+
+		em.flush();
+		em.clear();
+
+		// when
+		List<HotKeywordCalculationDto> result = rankingQueryRepository.findTop10HotKeywordsByCount();
+
+		// then
+		assertThat(result).hasSize(10);
+		assertThat(result.get(0).getKeyword()).isEqualTo("키워드15");
+		assertThat(result.get(9).getKeyword()).isEqualTo("키워드6");
+
+		// 키워드5 이하는 제외
+		assertThat(result).extracting("keyword")
+			.doesNotContain("키워드5", "키워드4", "키워드3");
+	}
+
+	@Test
+	@DisplayName("검색 기록이 없으면 빈 리스트를 반환한다")
+	void findTop10HotKeywordsByCount_검색없음() {
+		// given - 검색 기록 없음
+
+		// when
+		List<HotKeywordCalculationDto> result = rankingQueryRepository.findTop10HotKeywordsByCount();
+
+		// then
+		assertThat(result).isEmpty();
+	}
+
+	@Test
+	@DisplayName("7일 이전 검색은 제외된다")
+	void findTop10HotKeywordsByCount_7일이전제외() throws Exception {
+		// given
+		// 7일 이내 검색 3개
+		createSearchHistory("최신키워드");
+		createSearchHistory("최신키워드");
+		createSearchHistory("최신키워드");
+
+		// 8일 전 검색 5개
+		SearchHistory old1 = createSearchHistory("옛날키워드");
+		SearchHistory old2 = createSearchHistory("옛날키워드");
+		SearchHistory old3 = createSearchHistory("옛날키워드");
+		SearchHistory old4 = createSearchHistory("옛날키워드");
+		SearchHistory old5 = createSearchHistory("옛날키워드");
+
+		em.flush();
+
+		// 8일 전으로 변경
+		LocalDateTime eightDaysAgo = LocalDateTime.now().minusDays(8);
+		setSearchedAtUsingNativeQuery(old1, eightDaysAgo);
+		setSearchedAtUsingNativeQuery(old2, eightDaysAgo);
+		setSearchedAtUsingNativeQuery(old3, eightDaysAgo);
+		setSearchedAtUsingNativeQuery(old4, eightDaysAgo);
+		setSearchedAtUsingNativeQuery(old5, eightDaysAgo);
+
+		em.flush();
+		em.clear();
+
+		// when
+		List<HotKeywordCalculationDto> result = rankingQueryRepository.findTop10HotKeywordsByCount();
+
+		// then
+		assertThat(result).hasSize(1);
+		assertThat(result.get(0).getKeyword()).isEqualTo("최신키워드");
+
+		// 8일 전 데이터는 제외
+		assertThat(result).extracting("keyword")
+			.doesNotContain("옛날키워드");
+	}
+
+	@Test
+	@DisplayName("대소문자가 다르면 다른 키워드로 집계된다")
+	void findTop10HotKeywordsByCount_대소문자구분() {
+		// given
+		createSearchHistory("Apple");
+		createSearchHistory("Apple");
+		createSearchHistory("apple");
+		createSearchHistory("APPLE");
+
+		em.flush();
+		em.clear();
+
+		// when
+		List<HotKeywordCalculationDto> result = rankingQueryRepository.findTop10HotKeywordsByCount();
+
+		// then
+		assertThat(result).hasSize(3);
+		assertThat(result).extracting("keyword")
+			.containsExactlyInAnyOrder("Apple", "apple", "APPLE");
+	}
+
+	// === 핫딜 Helper Methods ===
 
 	private Product createProduct(String name, String image) {
 		Product product = Product.builder()
@@ -265,9 +419,26 @@ class RankingQueryRepositoryTest {
 		return biddingDetailRepository.save(bidding);
 	}
 
-	private void setBidAtUsingReflection(BiddingDetail biddingDetail, LocalDateTime dateTime) throws Exception {
-		Field bidAtField = BiddingDetail.class.getDeclaredField("bidAt");
-		bidAtField.setAccessible(true);
-		bidAtField.set(biddingDetail, dateTime);
+	private void setBidAtUsingNativeQuery(BiddingDetail biddingDetail, LocalDateTime dateTime) {
+		em.createNativeQuery(
+				"UPDATE bidding_detail SET bid_at = ? WHERE id = ?")
+			.setParameter(1, Timestamp.valueOf(dateTime))
+			.setParameter(2, biddingDetail.getId())
+			.executeUpdate();
+	}
+
+	// === 키워드 Helper Methods ===
+
+	private SearchHistory createSearchHistory(String keyword) {
+		SearchHistory searchHistory = new SearchHistory(keyword);
+		return searchHistoryJpaRepository.save(searchHistory);
+	}
+
+	private void setSearchedAtUsingNativeQuery(SearchHistory searchHistory, LocalDateTime dateTime) {
+		em.createNativeQuery(
+				"UPDATE search_history SET searched_at = ? WHERE id = ?")
+			.setParameter(1, Timestamp.valueOf(dateTime))
+			.setParameter(2, searchHistory.getId())
+			.executeUpdate();
 	}
 }

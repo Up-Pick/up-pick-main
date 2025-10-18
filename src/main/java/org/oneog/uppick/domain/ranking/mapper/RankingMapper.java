@@ -1,7 +1,9 @@
 package org.oneog.uppick.domain.ranking.mapper;
 
 import org.oneog.uppick.domain.ranking.dto.response.HotDealResponse;
+import org.oneog.uppick.domain.ranking.dto.response.HotKeywordResponse;
 import org.oneog.uppick.domain.ranking.entity.HotDeal;
+import org.oneog.uppick.domain.ranking.entity.HotKeyword;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -13,6 +15,13 @@ public class RankingMapper {
 			.productId(hotDeal.getProductId())
 			.productName(hotDeal.getProductName())
 			.productImage(hotDeal.getProductImage())
+			.build();
+	}
+
+	public HotKeywordResponse toResponse(HotKeyword hotKeyword) {
+		return HotKeywordResponse.builder()
+			.keyword(hotKeyword.getKeyword())
+			.rankNo(hotKeyword.getRankNo())
 			.build();
 	}
 
