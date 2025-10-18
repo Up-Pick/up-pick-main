@@ -23,6 +23,7 @@ import org.oneog.uppick.domain.member.repository.SellDetailRepository;
 import org.oneog.uppick.domain.product.dto.response.ProductBiddingInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductPurchasedInfoResponse;
+import org.oneog.uppick.domain.product.dto.response.ProductSellingInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductSimpleInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductSoldInfoResponse;
 import org.oneog.uppick.domain.product.entity.Product;
@@ -239,5 +240,23 @@ public class ProductQueryRepositoryTest {
 			auction.getEndAt().truncatedTo(ChronoUnit.SECONDS));
 		assertThat(result.getCurrentBid()).isEqualTo(auction.getCurrentPrice());
 		assertThat(result.getBidPrice()).isEqualTo(biddingDetail.getBidPrice());
+	}
+
+	@Test
+	void 현재_경매중인_상품_목록_조회_가능() {
+		Pageable pageable = PageRequest.of(0, 10);
+		Page<ProductSellingInfoResponse> results = productQueryRepository.getSellingProductInfoMyMemberId(
+			member.getId(), pageable);
+
+		assertThat(results).isNotNull();
+
+		ProductSellingInfoResponse result = results.getContent().getFirst();
+		assertThat(result.getId()).isEqualTo(product.getId());
+		assertThat(result.getName()).isEqualTo(product.getName());
+		assertThat(result.getImage()).isEqualTo(product.getImage());
+		assertThat(result.getEndAt().truncatedTo(ChronoUnit.SECONDS)).isEqualTo(
+			auction.getEndAt().truncatedTo(ChronoUnit.SECONDS));
+		assertThat(result.getCurrentBid()).isEqualTo(auction.getCurrentPrice());
+		assertThat(result.getAuctionId()).isEqualTo(auction.getId());
 	}
 }
