@@ -6,25 +6,22 @@ import org.oneog.uppick.common.constants.FormatConstants;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
 public class SearchProductRequest {
-    private String keyword;
-    private Long categoryId;
-    private Boolean onlyNotSold;
-    private String sortBy;
-    private Integer page;
-    private Integer size;
+    private final String keyword;
+    private final Long categoryId;
+    private final Boolean onlyNotSold;
+    private final String sortBy;
+    private final Integer page;
+    private final Integer size;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = FormatConstants.JSON_DATE_FORMAT)
-    private LocalDate endAtFrom;
+    private final LocalDate endAtFrom;
 
     public static SearchProductRequest ofDefault() {
         return SearchProductRequest.builder()

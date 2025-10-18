@@ -8,12 +8,12 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class SearchProductProjection {
-    private long id;
-    private String image;
-    private String name;
-    private LocalDateTime registeredAt;
-    private LocalDateTime endAt;
-    private Long currentBidPrice;
-    private long minBidPrice;
-    private boolean isSold;
+    private final long id;
+    private final String image;
+    private final String name;
+    private final LocalDateTime registeredAt;
+    private final LocalDateTime endAt;
+    private final Long currentBidPrice;
+    private final long minBidPrice;
+    private final boolean isSold;
 }
