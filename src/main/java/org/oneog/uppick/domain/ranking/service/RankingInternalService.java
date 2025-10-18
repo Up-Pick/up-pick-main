@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.oneog.uppick.domain.ranking.dto.response.HotDealResponse;
 import org.oneog.uppick.domain.ranking.dto.response.HotKeywordResponse;
+import org.oneog.uppick.domain.ranking.entity.HotDeal;
 import org.oneog.uppick.domain.ranking.entity.HotKeyword;
 import org.oneog.uppick.domain.ranking.mapper.RankingMapper;
 import org.oneog.uppick.domain.ranking.repository.HotDealRepository;
@@ -24,16 +25,13 @@ public class RankingInternalService {
 
 	//핫딜 TOP6 상품 조회
 	public List<HotDealResponse> getHotDeals() {
-		return hotDealRepository
-			.findAllByOrderByRankNoAsc()
-			.stream()
-			.map(rankingMapper::toResponse)
-			.toList();
+		List<HotDeal> hotDeals = hotDealRepository.findAllByOrderByRankNoAsc();
+		return rankingMapper.toHotDealResponseList(hotDeals);
 	}
 
 	//핫 키워드 TOP10 조회
 	public List<HotKeywordResponse> getHotKeywords() {
 		List<HotKeyword> hotKeywords = hotKeywordRepository.findAllByOrderByRankNoAsc();
-		return rankingMapper.toResponseList(hotKeywords);
+		return rankingMapper.toHotKeywordResponseList(hotKeywords);
 	}
 }

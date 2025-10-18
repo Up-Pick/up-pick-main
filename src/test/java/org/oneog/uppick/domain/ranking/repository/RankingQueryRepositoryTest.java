@@ -247,6 +247,33 @@ class RankingQueryRepositoryTest {
 			.doesNotContain("입찰없음");
 	}
 
+	@Test
+	@DisplayName("현재 진행중인 입찰만 집계한다")
+	void findHotDealsByAuctionStatus() {
+		// given
+		Product product = createProduct("테스트상품", "test.jpg");
+		Product product2 = createProduct("테스트상품2", "test.jpg");
+		Auction auction = createAuction(product.getId());
+		Auction auction2 = createAuction(product2.getId());
+
+		// 입찰 2개
+		createBidding(auction.getId(), 10000L);
+		createBidding(auction2.getId(), 11000L);
+
+		auction2.markAsSold();
+
+		// when
+		List<HotDealCalculationDto> result = rankingQueryRepository.findTop6HotDealsByBidCount();
+
+		//then
+		assertThat(result).hasSize(1);
+
+		assertThat(result.get(0).getProductName()).isEqualTo(product.getName());
+
+		assertThat(result).extracting("productName").doesNotContain(product2.getName());
+
+	}
+
 	// === 주간 키워드 조회 ===
 
 	@Test

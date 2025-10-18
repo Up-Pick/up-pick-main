@@ -58,13 +58,11 @@ class RankingInternalServiceTest {
 		HotDealResponse response5 = createResponse(5, 5L, "아이패드", "ipad.jpg");
 		HotDealResponse response6 = createResponse(6, 6L, "다이슨 청소기", "dyson.jpg");
 
+		List<HotDealResponse> responses = Arrays.asList(response1, response2, response3, response4, response5,
+			response6);
+
 		given(hotDealRepository.findAllByOrderByRankNoAsc()).willReturn(hotDeals);
-		given(rankingMapper.toResponse(hotDeal1)).willReturn(response1);
-		given(rankingMapper.toResponse(hotDeal2)).willReturn(response2);
-		given(rankingMapper.toResponse(hotDeal3)).willReturn(response3);
-		given(rankingMapper.toResponse(hotDeal4)).willReturn(response4);
-		given(rankingMapper.toResponse(hotDeal5)).willReturn(response5);
-		given(rankingMapper.toResponse(hotDeal6)).willReturn(response6);
+		given(rankingMapper.toHotDealResponseList(hotDeals)).willReturn(responses);
 
 		// when
 		List<HotDealResponse> result = rankingInternalService.getHotDeals();
@@ -92,8 +90,8 @@ class RankingInternalServiceTest {
 		HotDealResponse response2 = createResponse(2, 2L, "상품2", "img2.jpg");
 
 		given(hotDealRepository.findAllByOrderByRankNoAsc()).willReturn(Arrays.asList(hotDeal1, hotDeal2));
-		given(rankingMapper.toResponse(hotDeal1)).willReturn(response1);
-		given(rankingMapper.toResponse(hotDeal2)).willReturn(response2);
+		given(rankingMapper.toHotDealResponseList(Arrays.asList(hotDeal1, hotDeal2))).willReturn(
+			Arrays.asList(response1, response2));
 
 		// when
 		List<HotDealResponse> result = rankingInternalService.getHotDeals();
@@ -120,7 +118,7 @@ class RankingInternalServiceTest {
 		List<HotKeywordResponse> responses = List.of(response1, response2, response3);
 
 		given(hotKeywordRepository.findAllByOrderByRankNoAsc()).willReturn(keywords);
-		given(rankingMapper.toResponseList(keywords)).willReturn(responses);
+		given(rankingMapper.toHotKeywordResponseList(keywords)).willReturn(responses);
 
 		// when
 		List<HotKeywordResponse> result = rankingInternalService.getHotKeywords();
@@ -134,7 +132,7 @@ class RankingInternalServiceTest {
 
 		// 검증
 		verify(hotKeywordRepository, times(1)).findAllByOrderByRankNoAsc();
-		verify(rankingMapper, times(1)).toResponseList(keywords);
+		verify(rankingMapper, times(1)).toHotKeywordResponseList(keywords);
 	}
 
 	@Test

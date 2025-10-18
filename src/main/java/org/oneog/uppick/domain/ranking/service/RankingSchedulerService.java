@@ -29,7 +29,9 @@ public class RankingSchedulerService {
 	@Transactional
 	public void updateDailyTop6HotDeals() {
 
-		//이틀 전 내용 삭제
+		log.info("[Scheduler] 핫딜 랭킹 업데이트 시작");
+
+		//이전 내용 삭제
 		hotDealRepository.deleteAll();
 
 		//핫딜 랭킹 가져오기(상품 id, 상품 이름, 상품 이미지)
@@ -46,6 +48,8 @@ public class RankingSchedulerService {
 				.build();
 			hotDealRepository.save(hotDeal);
 		}
+
+		log.info("[Scheduler] 핫딜 랭킹 업데이트 종료");
 	}
 
 	@Scheduled(cron = "0 0 0 * * MON")
