@@ -14,6 +14,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -45,6 +46,14 @@ public class Notification {
 
     @Column(name = "is_read", nullable = false)
     private Boolean isRead = false;
+
+    @Builder
+    private Notification(Long memberId, NotificationType type, String title, String message) {
+        this.memberId = memberId;
+        this.type = type;
+        this.title = title;
+        this.message = message;
+    }
 
     public void markAsRead() {
         this.isRead = true;
