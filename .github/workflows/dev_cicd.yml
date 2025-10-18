@@ -78,7 +78,7 @@ jobs:
         with:
           host: ${{ secrets.DEV_EC2_PUBLIC_IP }}
           username: ubuntu # Ubuntu AMI의 기본 사용자 이름
-          key: ${{ secrets.DEV_ECR_SSH_KEY }}
+          key: ${{ secrets.DEV_EC2_SSH_KEY }}
           script: |
             # 0. 혹시 모를 에러 방지를 위해 스크립트 실패 시 즉시 중단
             set -e
