@@ -23,10 +23,12 @@ import org.oneog.uppick.domain.member.repository.SellDetailRepository;
 import org.oneog.uppick.domain.product.dto.response.ProductBiddingInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductPurchasedInfoResponse;
+import org.oneog.uppick.domain.product.dto.response.ProductRecentViewInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductSellingInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductSimpleInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductSoldInfoResponse;
 import org.oneog.uppick.domain.product.entity.Product;
+import org.oneog.uppick.domain.product.entity.ProductViewHistory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
@@ -55,6 +57,8 @@ public class ProductQueryRepositoryTest {
 	private PurchaseDetailRepository purchaseDetailRepository;
 	@Autowired
 	private BiddingDetailRepository biddingDetailRepository;
+	@Autowired
+	private ProductViewHistoryRepository productViewHistoryRepository;
 
 	private Member member;
 	private Category category;
@@ -63,6 +67,7 @@ public class ProductQueryRepositoryTest {
 	private SellDetail sellDetail;
 	private PurchaseDetail purchaseDetail;
 	private BiddingDetail biddingDetail;
+	private ProductViewHistory productViewHistory;
 
 	private Long testProductId;
 
@@ -123,6 +128,9 @@ public class ProductQueryRepositoryTest {
 			.bidPrice(4_000L)
 			.build();
 		biddingDetailRepository.save(biddingDetail);
+
+		productViewHistory = new ProductViewHistory(product.getId(), member.getId());
+		productViewHistoryRepository.save(productViewHistory);
 
 		testProductId = product.getId();
 	}
@@ -259,5 +267,23 @@ public class ProductQueryRepositoryTest {
 			auction.getEndAt().truncatedTo(ChronoUnit.SECONDS));
 		assertThat(result.getCurrentBid()).isEqualTo(auction.getCurrentPrice());
 		assertThat(result.getAuctionId()).isEqualTo(auction.getId());
+	}
+
+	@Test
+	void 최근_조회한_상품_목록_조회_가능() {
+		Pageable pageable = PageRequest.of(0, 10);
+		Page<ProductRecentViewInfoResponse> results = productQueryRepository.getRecentViewProductInfoByMemberId(
+			member.getId(), pageable
+		);
+
+		assertThat(results).isNotNull();
+
+		ProductRecentViewInfoResponse result = results.getContent().getFirst();
+		assertThat(result.getId()).isEqualTo(product.getId());
+		assertThat(result.getName()).isEqualTo(product.getName());
+		assertThat(result.getImage()).isEqualTo(product.getImage());
+		assertThat(result.getCurrentBid()).isEqualTo(auction.getCurrentPrice());
+		assertThat(result.getEndAt().truncatedTo(ChronoUnit.SECONDS)).isEqualTo(
+			auction.getEndAt().truncatedTo(ChronoUnit.SECONDS));
 	}
 }
