@@ -162,9 +162,4 @@ public class AuctionSchedulerService {
 		auctionRepository.save(auction);
 		log.info("경매 {} 상태 저장 완료", auction.getId());
 	}
-
-	//상품 아이디로 상품명 가져오기
-	private String getProductName(Long productId) {
-		return auctionQueryRepository.findProductNameByProductId(productId);
-	}
 }
