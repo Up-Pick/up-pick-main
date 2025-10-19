@@ -45,10 +45,13 @@ public class ProductController {
 	}
 
 	// 상품 상세 조회
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/{productId}")
-	public GlobalApiResponse<ProductInfoResponse> getProductInfo(@PathVariable Long productId) {
+	public GlobalApiResponse<ProductInfoResponse> getProductInfo(
+		@PathVariable Long productId,
+		@AuthenticationPrincipal AuthMember authMember) {
 
-		ProductInfoResponse response = productInternalService.getProductInfoById(productId);
+		ProductInfoResponse response = productInternalService.getProductInfoById(productId, authMember.getMemberId());
 		return GlobalApiResponse.ok(response);
 	}
 

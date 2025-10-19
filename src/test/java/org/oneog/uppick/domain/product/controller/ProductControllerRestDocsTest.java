@@ -30,6 +30,7 @@ class ProductControllerRestDocsTest extends RestDocsBase {
 	@DisplayName("상품 상세 조회 API를 Rest Docs 로 문서화한다")
 	void documentGetProductInfo() throws Exception {
 		Long productId = 1L;
+		Long memberId = 1L;
 		LocalDateTime now = LocalDateTime.of(2024, 1, 1, 10, 0, 0);
 
 		ProductInfoResponse response = new ProductInfoResponse(
@@ -45,7 +46,7 @@ class ProductControllerRestDocsTest extends RestDocsBase {
 			now.plusDays(7),
 			"닉네임");
 
-		given(productInternalService.getProductInfoById(productId)).willReturn(response);
+		given(productInternalService.getProductInfoById(productId, memberId)).willReturn(response);
 
 		mockMvc.perform(
 				get("/api/v1/products/{productId}", productId)

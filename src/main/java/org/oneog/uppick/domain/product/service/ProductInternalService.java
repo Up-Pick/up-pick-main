@@ -10,10 +10,12 @@ import org.oneog.uppick.domain.product.dto.response.ProductSellingInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductSimpleInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductSoldInfoResponse;
 import org.oneog.uppick.domain.product.entity.Product;
+import org.oneog.uppick.domain.product.entity.ProductViewHistory;
 import org.oneog.uppick.domain.product.exception.ProductErrorCode;
 import org.oneog.uppick.domain.product.mapper.ProductMapper;
 import org.oneog.uppick.domain.product.repository.ProductQueryRepository;
 import org.oneog.uppick.domain.product.repository.ProductRepository;
+import org.oneog.uppick.domain.product.repository.ProductViewHistoryRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,8 @@ public class ProductInternalService {
 	// ***** Product Domain ***** //
 	private final ProductRepository productRepository;
 	private final ProductQueryRepository productQueryRepository;
+	private final ProductViewHistoryRepository productViewHistoryRepository;
+
 	private final ProductMapper productMapper;
 
 	// ****** External Domain API ***** //
@@ -47,11 +51,15 @@ public class ProductInternalService {
 	}
 
 	@Transactional
-	public ProductInfoResponse getProductInfoById(Long productId) {
+	public ProductInfoResponse getProductInfoById(Long productId, Long memberId) {
 
 		// 조회수 +1
 		Product product = findProductByIdOrElseThrow(productId);
 		product.increaseViewCount();
+
+		// 조회 내역 저장
+		ProductViewHistory productViewHistory = new ProductViewHistory(productId, memberId);
+		productViewHistoryRepository.save(productViewHistory);
 
 		return productQueryRepository.getProductInfoById(productId).orElseThrow(
 			() -> new BusinessException(ProductErrorCode.CANNOT_READ_PRODUCT_INFO));
