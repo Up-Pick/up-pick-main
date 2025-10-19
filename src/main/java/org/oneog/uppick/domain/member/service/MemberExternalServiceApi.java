@@ -15,8 +15,6 @@ public interface MemberExternalServiceApi {
 	 */
 	void registerPurchaseDetail(Long auctionId, Long buyerId, Long productId, Long price);
 
-	;
-
 	/**
 	 *  판매 내역 등록
 	 *
@@ -26,8 +24,6 @@ public interface MemberExternalServiceApi {
 	 * @param price 거래 금액
 	 */
 	void registerSellDetail(Long auctionId, Long sellerId, Long productId, Long price);
-
-	;
 
 	boolean existsByEmail(String email);
 
