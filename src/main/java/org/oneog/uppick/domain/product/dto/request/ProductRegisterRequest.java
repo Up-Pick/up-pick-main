@@ -20,8 +20,6 @@ public class ProductRegisterRequest {
 	@NotBlank(message = "설명을 비울 수 없습니다.")
 	private final String description;
 
-	private final String image;
-
 	@NotNull(message = "카테고리를 비울 수 없습니다.")
 	@Positive
 	private final Long categoryId;

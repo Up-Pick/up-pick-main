@@ -21,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
 
@@ -36,14 +37,26 @@ public class ProductInternalService {
 
 	private final ProductMapper productMapper;
 
+	// ****** S3 ***** //
+	private final S3FileStorageService s3FileStorageService;
+
 	// ****** External Domain API ***** //
 	private final AuctionExternalServiceApi auctionExternalServiceApi;
 
 	// ***** Internal Service Method ***** //
 	@Transactional
-	public void registerProduct(ProductRegisterRequest request, Long registerId) {
+	public void registerProduct(ProductRegisterRequest request, MultipartFile image, Long registerId) {
 
-		Product product = productMapper.registerToEntity(request, registerId);
+		// 1. 이미지 검증
+		if (image == null || image.isEmpty()) {
+			throw new BusinessException(ProductErrorCode.EMPTY_FILE);
+		}
+
+		// 2. S3에 이미지 업로드
+		String imageUrl = s3FileStorageService.store(image);
+
+		// 3. Product 엔티티 생성 (imageUrl 포함)
+		Product product = productMapper.registerToEntity(request, registerId, imageUrl);
 
 		// 상품 및 경매 등록
 		productRepository.save(product);
