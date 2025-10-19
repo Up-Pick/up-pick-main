@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class RankingMapper {
 
-	// 핫딜
+	// === 핫딜 ===
 	public HotDealResponse toResponse(HotDeal hotDeal) {
 		return HotDealResponse.builder()
 			.rank(hotDeal.getRankNo())
@@ -21,12 +21,18 @@ public class RankingMapper {
 			.build();
 	}
 
+	public List<HotDealResponse> toHotDealResponseList(List<HotDeal> hotDeals) {
+		return hotDeals.stream()
+			.map(this::toResponse)
+			.toList();
+	}
+
 	// === 핫키워드 ===
 	public HotKeywordResponse toResponse(HotKeyword hotKeyword) {
 		return new HotKeywordResponse(hotKeyword.getKeyword(), hotKeyword.getRankNo());
 	}
 
-	public List<HotKeywordResponse> toResponseList(List<HotKeyword> hotKeywords) {
+	public List<HotKeywordResponse> toHotKeywordResponseList(List<HotKeyword> hotKeywords) {
 		return hotKeywords.stream()
 			.map(this::toResponse)
 			.toList();
