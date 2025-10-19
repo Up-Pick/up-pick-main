@@ -12,12 +12,16 @@ import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.oneog.uppick.common.auth.JwtAuthenticationToken;
+import org.oneog.uppick.common.dto.AuthMember;
 import org.oneog.uppick.domain.product.dto.response.ProductInfoResponse;
 import org.oneog.uppick.domain.product.service.ProductInternalService;
 import org.oneog.uppick.support.RestDocsBase;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @WebMvcTest(ProductController.class)
@@ -47,6 +51,10 @@ class ProductControllerRestDocsTest extends RestDocsBase {
 			"닉네임");
 
 		given(productInternalService.getProductInfoById(productId, memberId)).willReturn(response);
+
+		AuthMember authMember = new AuthMember(1L, "닉네임");
+		Authentication authentication = new JwtAuthenticationToken(authMember);
+		SecurityContextHolder.getContext().setAuthentication(authentication);
 
 		mockMvc.perform(
 				get("/api/v1/products/{productId}", productId)
