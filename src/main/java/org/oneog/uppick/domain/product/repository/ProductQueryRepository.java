@@ -231,23 +231,29 @@ public class ProductQueryRepository {
 
 	public Page<ProductRecentViewInfoResponse> getRecentViewProductInfoByMemberId(Long memberId, Pageable pageable) {
 
-		List<ProductRecentViewInfoResponse> qResponse = queryFactory
-			.select(
-				Projections.constructor(
-					ProductRecentViewInfoResponse.class,
-					product.id,
-					product.name,
-					product.image,
-					auction.currentPrice,
-					auction.endAt))
+		// 1️⃣ 최근 productId 목록 (MAX(viewedAt) 기준)
+		List<Long> recentProductIds = queryFactory
+			.select(product.id)
 			.from(product)
-			.join(auction).on(auction.productId.eq(product.id))
 			.join(productViewHistory).on(productViewHistory.productId.eq(product.id))
 			.where(productViewHistory.memberId.eq(memberId))
 			.groupBy(product.id)
-			.orderBy(product.registeredAt.max().desc())
+			.orderBy(productViewHistory.viewedAt.max().desc())
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
+			.fetch();
+
+		List<ProductRecentViewInfoResponse> content = queryFactory
+			.select(Projections.constructor(
+				ProductRecentViewInfoResponse.class,
+				product.id,
+				product.name,
+				product.image,
+				auction.currentPrice,
+				auction.endAt))
+			.from(product)
+			.join(auction).on(auction.productId.eq(product.id))
+			.where(product.id.in(recentProductIds))
 			.fetch();
 
 		Long total = Optional.ofNullable(queryFactory
@@ -257,6 +263,6 @@ public class ProductQueryRepository {
 			.where(productViewHistory.memberId.eq(memberId))
 			.fetchOne()).orElse(0L);
 
-		return new PageImpl<>(qResponse, pageable, total);
+		return new PageImpl<>(content, pageable, total);
 	}
 }
