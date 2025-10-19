@@ -22,6 +22,7 @@ import org.oneog.uppick.domain.product.dto.response.ProductRecentViewInfoRespons
 import org.oneog.uppick.domain.product.dto.response.ProductSellingInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductSimpleInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductSoldInfoResponse;
+import org.oneog.uppick.domain.product.entity.QProductViewHistory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -231,6 +232,8 @@ public class ProductQueryRepository {
 
 	public Page<ProductRecentViewInfoResponse> getRecentViewProductInfoByMemberId(Long memberId, Pageable pageable) {
 
+		QProductViewHistory productViewHistorySub = new QProductViewHistory("productViewHistorySub");
+
 		List<ProductRecentViewInfoResponse> content = queryFactory
 			.select(
 				Projections.constructor(
@@ -243,9 +246,15 @@ public class ProductQueryRepository {
 					productViewHistory.viewedAt))
 			.from(product)
 			.join(auction).on(auction.productId.eq(product.id))
-			.join(productViewHistory).on(productViewHistory.productId.eq(product.id))
+			.join(productViewHistory).on(productViewHistory.productId.eq(product.id)
+				.and(productViewHistory.viewedAt.eq(
+					JPAExpressions
+						.select(productViewHistorySub.viewedAt.max())
+						.from(productViewHistorySub)
+						.where(productViewHistorySub.productId.eq(product.id)
+							.and(productViewHistorySub.memberId.eq(memberId)))
+				)))
 			.where(productViewHistory.memberId.eq(memberId))
-			.groupBy(product.id)
 			.orderBy(productViewHistory.viewedAt.desc())
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
