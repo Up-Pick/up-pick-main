@@ -18,6 +18,7 @@ import org.oneog.uppick.domain.product.entity.Product;
 import org.oneog.uppick.domain.product.mapper.ProductMapper;
 import org.oneog.uppick.domain.product.repository.ProductQueryRepository;
 import org.oneog.uppick.domain.product.repository.ProductRepository;
+import org.oneog.uppick.domain.product.repository.ProductViewHistoryRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class ProductInternalServiceTest {
@@ -29,8 +30,10 @@ public class ProductInternalServiceTest {
 	@Mock
 	ProductQueryRepository productQueryRepository;
 	@Mock
+	ProductViewHistoryRepository productViewHistoryRepository;
+	@Mock
 	AuctionExternalServiceApi auctionExternalServiceApi;
-	
+
 	@InjectMocks
 	ProductInternalService productInternalService;
 
@@ -41,6 +44,8 @@ public class ProductInternalServiceTest {
 		productInternalService = new ProductInternalService(
 			productRepository,
 			productQueryRepository,
+			productViewHistoryRepository,
+
 			productMapper,
 			auctionExternalServiceApi
 		);

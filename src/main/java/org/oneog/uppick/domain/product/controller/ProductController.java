@@ -7,6 +7,7 @@ import org.oneog.uppick.domain.product.dto.request.ProductRegisterRequest;
 import org.oneog.uppick.domain.product.dto.response.ProductBiddingInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductPurchasedInfoResponse;
+import org.oneog.uppick.domain.product.dto.response.ProductRecentViewInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductSellingInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductSimpleInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductSoldInfoResponse;
@@ -45,10 +46,13 @@ public class ProductController {
 	}
 
 	// 상품 상세 조회
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/{productId}")
-	public GlobalApiResponse<ProductInfoResponse> getProductInfo(@PathVariable Long productId) {
+	public GlobalApiResponse<ProductInfoResponse> getProductInfo(
+		@PathVariable Long productId,
+		@AuthenticationPrincipal AuthMember authMember) {
 
-		ProductInfoResponse response = productInternalService.getProductInfoById(productId);
+		ProductInfoResponse response = productInternalService.getProductInfoById(productId, authMember.getMemberId());
 		return GlobalApiResponse.ok(response);
 	}
 
@@ -105,6 +109,18 @@ public class ProductController {
 		@PageableDefault Pageable pageable) {
 
 		Page<ProductSellingInfoResponse> responses = productInternalService.getSellingProductInfoByMemberId(
+			authMember.getMemberId(), pageable);
+		return GlobalPageResponse.of(responses);
+	}
+
+	// 최근 본 상품 조회
+	@PreAuthorize("isAuthenticated()")
+	@GetMapping("/recently-viewed/me")
+	public GlobalPageResponse<ProductRecentViewInfoResponse> getRecentlyViewedProducts(
+		@AuthenticationPrincipal AuthMember authMember,
+		@PageableDefault Pageable pageable) {
+
+		Page<ProductRecentViewInfoResponse> responses = productInternalService.getRecentViewProductInfoByMemberId(
 			authMember.getMemberId(), pageable);
 		return GlobalPageResponse.of(responses);
 	}

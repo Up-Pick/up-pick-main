@@ -7,6 +7,7 @@ import static org.oneog.uppick.domain.member.entity.QMember.*;
 import static org.oneog.uppick.domain.member.entity.QPurchaseDetail.*;
 import static org.oneog.uppick.domain.member.entity.QSellDetail.*;
 import static org.oneog.uppick.domain.product.entity.QProduct.*;
+import static org.oneog.uppick.domain.product.entity.QProductViewHistory.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,9 +18,11 @@ import org.oneog.uppick.domain.auction.enums.AuctionStatus;
 import org.oneog.uppick.domain.product.dto.response.ProductBiddingInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductPurchasedInfoResponse;
+import org.oneog.uppick.domain.product.dto.response.ProductRecentViewInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductSellingInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductSimpleInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductSoldInfoResponse;
+import org.oneog.uppick.domain.product.entity.QProductViewHistory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -225,5 +228,46 @@ public class ProductQueryRepository {
 			.fetchOne()).orElse(0L);
 
 		return new PageImpl<>(qResponses, pageable, total);
+	}
+
+	public Page<ProductRecentViewInfoResponse> getRecentViewProductInfoByMemberId(Long memberId, Pageable pageable) {
+
+		QProductViewHistory productViewHistorySub = new QProductViewHistory("productViewHistorySub");
+
+		List<ProductRecentViewInfoResponse> content = queryFactory
+			.select(
+				Projections.constructor(
+					ProductRecentViewInfoResponse.class,
+					product.id,
+					product.name,
+					product.image,
+					auction.currentPrice,
+					auction.endAt,
+					productViewHistory.viewedAt))
+			.from(product)
+			.join(auction).on(auction.productId.eq(product.id))
+			.join(productViewHistory).on(productViewHistory.productId.eq(product.id)
+				.and(productViewHistory.viewedAt.eq(
+					JPAExpressions
+						.select(productViewHistorySub.viewedAt.max())
+						.from(productViewHistorySub)
+						.where(productViewHistorySub.productId.eq(product.id)
+							.and(productViewHistorySub.memberId.eq(memberId)))
+				)))
+			.where(productViewHistory.memberId.eq(memberId)
+				.and(auction.status.ne(AuctionStatus.EXPIRED)))
+			.orderBy(productViewHistory.viewedAt.desc())
+			.offset(pageable.getOffset())
+			.limit(pageable.getPageSize())
+			.fetch();
+
+		Long total = Optional.ofNullable(queryFactory
+			.select(product.countDistinct())
+			.from(product)
+			.join(productViewHistory).on(productViewHistory.productId.eq(product.id))
+			.where(productViewHistory.memberId.eq(memberId))
+			.fetchOne()).orElse(0L);
+
+		return new PageImpl<>(content, pageable, total);
 	}
 }
