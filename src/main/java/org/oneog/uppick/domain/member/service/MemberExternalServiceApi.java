@@ -13,9 +13,7 @@ public interface MemberExternalServiceApi {
 	 * @param productId 상품 ID
 	 * @param price 거래 금액
 	 */
-	default void registerPurchaseDetail(Long auctionId, Long buyerId, Long productId, Long price) {
-
-	}
+	void registerPurchaseDetail(Long auctionId, Long buyerId, Long productId, Long price);
 
 	;
 
@@ -27,11 +25,10 @@ public interface MemberExternalServiceApi {
 	 * @param productId 상품 ID
 	 * @param price 거래 금액
 	 */
-	default void registerSellDetail(Long auctionId, Long sellerId, Long productId, Long price) {
-
-	}
+	void registerSellDetail(Long auctionId, Long sellerId, Long productId, Long price);
 
 	;
+
 	boolean existsByEmail(String email);
 
 	boolean existsByNickname(String nickname);
