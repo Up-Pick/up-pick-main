@@ -13,4 +13,5 @@ public class ProductRecentViewInfoResponse {
 	private String image;
 	private Long currentBid;
 	private LocalDateTime endAt;
+	private LocalDateTime viewedAt;
 }
