@@ -7,7 +7,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.oneog.uppick.domain.auction.entity.Auction;
 import org.oneog.uppick.domain.auction.entity.BiddingDetail;
@@ -64,8 +63,7 @@ class RankingSchedulerServiceTest {
 	// === 주간 핫딜 조회 ===
 
 	@Test
-	@DisplayName("핫딜 랭킹이 정상적으로 업데이트된다")
-	void updateDailyTop6HotDeals_정상동작() {
+	void updateDailyTop6HotDeals_정상동작_랭킹업데이트됨() {
 		// given
 		Product product1 = createProduct("맥북 프로", "macbook.jpg");
 		Product product2 = createProduct("아이폰 15", "iphone.jpg");
@@ -110,8 +108,7 @@ class RankingSchedulerServiceTest {
 	}
 
 	@Test
-	@DisplayName("기존 핫딜 데이터가 삭제되고 새로운 데이터가 저장된다")
-	void updateDailyTop6HotDeals_기존데이터삭제() {
+	void updateDailyTop6HotDeals_기존데이터존재_삭제후새데이터저장됨() {
 		// given
 		// 기존 핫딜 데이터
 		HotDeal oldHotDeal = HotDeal.builder()
@@ -144,8 +141,7 @@ class RankingSchedulerServiceTest {
 	}
 
 	@Test
-	@DisplayName("입찰 데이터가 없으면 핫딜 테이블이 비워진다")
-	void updateDailyTop6HotDeals_입찰없음() {
+	void updateDailyTop6HotDeals_입찰없음_핫딜테이블비워짐() {
 		// given
 		Product product = createProduct("상품", "image.jpg");
 		createAuction(product.getId());
@@ -159,8 +155,7 @@ class RankingSchedulerServiceTest {
 	}
 
 	@Test
-	@DisplayName("입찰이 없으면 기존 핫딜도 함께 삭제된다")
-	void updateDailyTop6HotDeals_입찰없으면_기존핫딜도삭제() {
+	void updateDailyTop6HotDeals_입찰없음_기존핫딜도삭제됨() {
 		// given
 		// 기존 핫딜 저장
 		HotDeal existingHotDeal = HotDeal.builder()
@@ -183,8 +178,7 @@ class RankingSchedulerServiceTest {
 	}
 
 	@Test
-	@DisplayName("6개 미만의 상품만 있어도 정상 동작한다")
-	void updateDailyTop6HotDeals_6개미만() {
+	void updateDailyTop6HotDeals_6개미만_정상동작함() {
 		// given
 		Product product1 = createProduct("상품1", "img1.jpg");
 		Product product2 = createProduct("상품2", "img2.jpg");
@@ -206,8 +200,7 @@ class RankingSchedulerServiceTest {
 	}
 
 	@Test
-	@DisplayName("6개를 초과하면 상위 6개만 저장된다")
-	void updateDailyTop6HotDeals_6개초과() {
+	void updateDailyTop6HotDeals_6개초과_상위6개만저장됨() {
 		// given
 		for (int i = 1; i <= 10; i++) {
 			Product product = createProduct("상품" + i, "image" + i + ".jpg");
@@ -242,8 +235,7 @@ class RankingSchedulerServiceTest {
 	// === 주간 키워드 조회 ===
 
 	@Test
-	@DisplayName("주간 핫 키워드가 정상적으로 업데이트된다")
-	void updateWeeklyTop10HotKeywords_정상동작() {
+	void updateWeeklyTop10HotKeywords_정상동작_핫키워드업데이트됨() {
 		// given
 		createSearchHistory("맥북", 5);
 		createSearchHistory("아이폰", 3);
@@ -269,8 +261,7 @@ class RankingSchedulerServiceTest {
 	}
 
 	@Test
-	@DisplayName("기존 핫 키워드 데이터가 삭제되고 새로운 데이터가 저장된다")
-	void updateWeeklyTop10HotKeywords_기존데이터삭제() {
+	void updateWeeklyTop10HotKeywords_기존데이터존재_삭제후새데이터저장됨() {
 		// given
 		// 기존 핫 키워드
 		HotKeyword oldKeyword = new HotKeyword("옛날키워드", 1);
@@ -295,8 +286,7 @@ class RankingSchedulerServiceTest {
 	}
 
 	@Test
-	@DisplayName("검색 기록이 없으면 핫 키워드 테이블이 비워진다")
-	void updateWeeklyTop10HotKeywords_검색없음() {
+	void updateWeeklyTop10HotKeywords_기존데이터없고검색없음_빈테이블유지됨() {
 		// given - 검색 기록 없음
 
 		// when
@@ -307,8 +297,7 @@ class RankingSchedulerServiceTest {
 	}
 
 	@Test
-	@DisplayName("검색이 없으면 기존 핫 키워드도 함께 삭제된다")
-	void updateWeeklyTop10HotKeywords_검색없으면_기존핫키워드삭제() {
+	void updateWeeklyTop10HotKeywords_기존데이터있고검색없음_기존데이터삭제됨() {
 		// given
 		HotKeyword existingKeyword = new HotKeyword("기존키워드", 1);
 		hotKeywordRepository.save(existingKeyword);
@@ -323,8 +312,7 @@ class RankingSchedulerServiceTest {
 	}
 
 	@Test
-	@DisplayName("10개를 초과하면 상위 10개만 저장된다")
-	void updateWeeklyTop10HotKeywords_10개초과() {
+	void updateWeeklyTop10HotKeywords_10개초과_상위10개만저장됨() {
 		// given
 		for (int i = 1; i <= 15; i++) {
 			createSearchHistory("키워드" + i, i); // 키워드15가 15회로 가장 많음
@@ -349,8 +337,7 @@ class RankingSchedulerServiceTest {
 	}
 
 	@Test
-	@DisplayName("rankNo가 1부터 순서대로 부여된다")
-	void updateWeeklyTop10HotKeywords_rankNo순서() {
+	void updateWeeklyTop10HotKeywords_정상동작_rankNo순서대로부여됨() {
 		// given
 		createSearchHistory("키워드A", 3);
 		createSearchHistory("키워드B", 2);
@@ -367,8 +354,7 @@ class RankingSchedulerServiceTest {
 	}
 
 	@Test
-	@DisplayName("10개 미만의 키워드만 있어도 정상 동작한다")
-	void updateWeeklyTop10HotKeywords_10개미만() {
+	void updateWeeklyTop10HotKeywords_10개미만_정상동작함() {
 		// given
 		createSearchHistory("키워드1", 2);
 		createSearchHistory("키워드2", 1);

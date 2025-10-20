@@ -8,7 +8,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.List;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.oneog.uppick.domain.ranking.dto.response.HotDealResponse;
 import org.oneog.uppick.domain.ranking.dto.response.HotKeywordResponse;
@@ -27,8 +26,7 @@ public class RankingControllerRestDocsTest extends RestDocsBase {
 
 	// 핫딜 조회
 	@Test
-	@DisplayName("핫딜 TOP6 상품 조회 API를 Rest Docs 로 문서화한다")
-	void documentGetHotDeals() throws Exception {
+	void getHotDeals_정상적인상황_핫딜조회성공() throws Exception {
 		List<HotDealResponse> responses = List.of(
 			createResponse(1, 1L, "맥북 프로", "https://example.com/images/macbook.jpg"),
 			createResponse(2, 2L, "아이폰 15", "https://example.com/images/iphone.jpg"),
@@ -61,8 +59,7 @@ public class RankingControllerRestDocsTest extends RestDocsBase {
 
 	//핫키워드 조회
 	@Test
-	@DisplayName("핫 키워드 TOP10 조회 API를 Rest Docs 로 문서화한다")
-	void documentGetHotKeywords() throws Exception {
+	void getHotKeywords_정상적인상황_핫키워드조회성공() throws Exception {
 		List<HotKeywordResponse> responses = List.of(
 			new HotKeywordResponse("유영관", 1),
 			new HotKeywordResponse("정직한", 2),
