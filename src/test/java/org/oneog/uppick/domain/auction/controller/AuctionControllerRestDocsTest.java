@@ -33,7 +33,7 @@ class AuctionControllerRestDocsTest extends RestDocsBase {
 
 	@Test
 	@DisplayName("경매 입찰 API를 Rest Docs로 문서화한다")
-	void documentAuctionBid() throws Exception {
+	void auctionBid_정상적인입력_입찰성공() throws Exception {
 		// given
 		Long biddingPrice = 120000L;
 		AuctionBidRequest request = new AuctionBidRequest(biddingPrice);

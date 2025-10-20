@@ -29,7 +29,7 @@ public class AuctionExternalServiceTest {
 	private AuctionExternalService auctionExternalService;
 
 	@Test
-	void registerAuction실행시_Auction에_저장됨() {
+	void registerAuction_정상적인요청_Auction에_저장됨() {
 
 		// given 상품에서 받아올 정보들
 		Long productId = 1L;

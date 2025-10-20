@@ -26,7 +26,7 @@ class CategoryControllerRestDocsTest extends RestDocsBase {
 
 	@Test
 	@DisplayName("전체 카테고리 조회 API를 Rest Docs로 문서화한다")
-	void documentGetAllCategories() throws Exception {
+	void GetAllCategories_정상적인조회_조회성공() throws Exception {
 		// given
 		// Mocking 데이터 생성: CategoryResponse 리스트
 		List<CategoryResponse> mockCategories = List.of(
