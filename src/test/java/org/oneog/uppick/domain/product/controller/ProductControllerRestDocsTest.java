@@ -1,28 +1,29 @@
 package org.oneog.uppick.domain.product.controller;
 
 import static org.mockito.BDDMockito.*;
+import static org.springframework.restdocs.headers.HeaderDocumentation.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
-import static org.springframework.restdocs.snippet.Attributes.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.time.LocalDateTime;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.oneog.uppick.common.auth.JwtAuthenticationToken;
-import org.oneog.uppick.common.dto.AuthMember;
-import org.oneog.uppick.domain.product.dto.response.ProductInfoResponse;
+import org.oneog.uppick.domain.product.dto.request.ProductRegisterRequest;
 import org.oneog.uppick.domain.product.service.ProductInternalService;
 import org.oneog.uppick.support.RestDocsBase;
+import org.oneog.uppick.support.auth.WithMockAuthMember;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebMvcTest(ProductController.class)
 class ProductControllerRestDocsTest extends RestDocsBase {
@@ -30,61 +31,54 @@ class ProductControllerRestDocsTest extends RestDocsBase {
 	@MockitoBean
 	private ProductInternalService productInternalService;
 
+	@Autowired
+	private ObjectMapper objectMapper;
+
 	@Test
-	@DisplayName("상품 상세 조회 API를 Rest Docs 로 문서화한다")
-	void documentGetProductInfo() throws Exception {
-		Long productId = 1L;
-		Long memberId = 1L;
-		LocalDateTime now = LocalDateTime.of(2024, 1, 1, 10, 0, 0);
+	@WithMockAuthMember(memberId = 10L, memberNickname = "tester")
+	void registerProduct_정상적인입력_상품등록성공() throws Exception {
+		ProductRegisterRequest request = ProductRegisterRequest.builder()
+			.name("테스트 상품")
+			.description("상품 설명")
+			.categoryId(1L)
+			.startBid(1000L)
+			.endAt(LocalDateTime.now().plusDays(7))
+			.build();
 
-		ProductInfoResponse response = new ProductInfoResponse(
-			productId,
-			"게이밍 키보드",
-			"기계식 키보드 입니다.",
-			42L,
-			now,
-			"https://example.com/products/1",
-			"컴퓨터/키보드",
-			100000L,
-			150000L,
-			now.plusDays(7),
-			"닉네임");
+		MockMultipartFile productPart = new MockMultipartFile(
+			"product", "product", "application/json",
+			objectMapper.writeValueAsBytes(request));
 
-		given(productInternalService.getProductInfoById(productId, memberId)).willReturn(response);
+		MockMultipartFile imagePart = new MockMultipartFile(
+			"image", "image.jpg", "image/jpeg",
+			"dummy-image-content".getBytes());
 
-		AuthMember authMember = new AuthMember(1L, "닉네임");
-		Authentication authentication = new JwtAuthenticationToken(authMember);
-		SecurityContextHolder.getContext().setAuthentication(authentication);
+		willDoNothing().given(productInternalService)
+			.registerProduct(any(ProductRegisterRequest.class), any(MultipartFile.class), eq(10L));
 
-		mockMvc.perform(
-				get("/api/v1/products/{productId}", productId)
-					.accept(MediaType.APPLICATION_JSON))
+		this.mockMvc.perform(multipart("/api/v1/products")
+			.file(productPart)
+			.file(imagePart)
+			.header("Authorization", "Bearer token")
+			.contentType(MediaType.MULTIPART_FORM_DATA)
+			.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("success").value(true))
-			.andExpect(jsonPath("message").value("요청에 성공했습니다."))
-			.andExpect(jsonPath("data.id").value(productId))
-			.andDo(
-				document(
-					"product-get",
-					pathParameters(
-						parameterWithName("productId").description("조회할 상품 ID")),
-					responseFields(
-						fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
-						fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-						fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("상품 ID"),
-						fieldWithPath("data.name").type(JsonFieldType.STRING).description("상품 이름"),
-						fieldWithPath("data.description").type(JsonFieldType.STRING).description("상품 설명"),
-						fieldWithPath("data.viewCount").type(JsonFieldType.NUMBER).description("상품 조회수"),
-						fieldWithPath("data.registeredAt").type(JsonFieldType.STRING).description("상품 등록 일시")
-							.attributes(key("format").value("yyyy-MM-dd")),
-						fieldWithPath("data.image").type(JsonFieldType.STRING).description("상품 이미지 URL"),
-						fieldWithPath("data.categoryName").type(JsonFieldType.STRING).description("카테고리 이름"),
-						fieldWithPath("data.minPrice").type(JsonFieldType.NUMBER).description("최소 입찰가")
-							.attributes(key("example").value("100000")),
-						fieldWithPath("data.currentBid").type(JsonFieldType.NUMBER).description("현재 입찰가")
-							.attributes(key("example").value("150000")),
-						fieldWithPath("data.endAt").type(JsonFieldType.STRING).description("경매 종료 예정 날짜")
-							.attributes(key("format").value("yyyy-MM-dd")),
-						fieldWithPath("data.sellerName").type(JsonFieldType.STRING).description("판매자 닉네임"))));
+			.andDo(document("product-register-product",
+				requestHeaders(
+					headerWithName("Authorization").description("JWT 액세스 토큰 (Bearer {token})")),
+				requestParts(
+					partWithName("product").description("상품 등록 요청 JSON"),
+					partWithName("image").description("상품 대표 이미지 파일")),
+				requestPartFields("product",
+					fieldWithPath("name").type(JsonFieldType.STRING).description("상품 이름"),
+					fieldWithPath("description").type(JsonFieldType.STRING).description("상품 설명"),
+					fieldWithPath("categoryId").type(JsonFieldType.NUMBER).description("카테고리 ID"),
+					fieldWithPath("startBid").type(JsonFieldType.NUMBER).description("시작 입찰가"),
+					fieldWithPath("endAt").type(JsonFieldType.STRING).description("마감 일시 (ISO-8601)")),
+				responseFields(
+					fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
+					fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+					fieldWithPath("data").type(JsonFieldType.NULL).description("응답 데이터 (여기서는 null)"))));
+
 	}
 }
