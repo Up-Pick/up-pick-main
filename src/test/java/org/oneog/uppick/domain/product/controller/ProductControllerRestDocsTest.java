@@ -18,11 +18,15 @@ import org.oneog.uppick.domain.product.dto.request.ProductRegisterRequest;
 import org.oneog.uppick.domain.product.dto.response.ProductBiddingInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductSimpleInfoResponse;
+import org.oneog.uppick.domain.product.dto.response.ProductPurchasedInfoResponse;
 import org.oneog.uppick.domain.product.service.ProductInternalService;
 import org.oneog.uppick.support.RestDocsBase;
 import org.oneog.uppick.support.auth.WithMockAuthMember;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -30,9 +34,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 
 @WebMvcTest(ProductController.class)
 class ProductControllerRestDocsTest extends RestDocsBase {
@@ -184,5 +185,37 @@ class ProductControllerRestDocsTest extends RestDocsBase {
 					fieldWithPath("contents[].endAt").type(JsonFieldType.STRING).description("마감 일시 (ISO-8601)"),
 					fieldWithPath("contents[].currentBid").type(JsonFieldType.NUMBER).description("현재 입찰가"),
 					fieldWithPath("contents[].bidPrice").type(JsonFieldType.NUMBER).description("입찰 가격"))));
+	}
+
+	@Test
+	@WithMockAuthMember(memberId = 10L, memberNickname = "tester")
+	void getPurchasedProducts_정상적인상황_구매완료상품내역조회성공() throws Exception {
+		List<ProductPurchasedInfoResponse> contents = List.of(
+			new ProductPurchasedInfoResponse(1L, "테스트 상품1", "image1.jpg", 1000L, LocalDateTime.now()),
+			new ProductPurchasedInfoResponse(2L, "테스트 상품2", "image2.jpg", 2000L, LocalDateTime.now()));
+		Page<ProductPurchasedInfoResponse> page = new PageImpl<>(contents, Pageable.ofSize(20), 2);
+
+		given(productInternalService.getPurchasedProductInfoByMemberId(eq(10L), any(Pageable.class)))
+			.willReturn(page);
+
+		this.mockMvc.perform(get("/api/v1/products/purchased/me")
+			.header("Authorization", "Bearer token")
+			.accept(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andDo(document("product-get-purchased-products",
+				requestHeaders(
+					headerWithName("Authorization").description("JWT 액세스 토큰 (Bearer {token})")),
+				responseFields(
+					fieldWithPath("page").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
+					fieldWithPath("size").type(JsonFieldType.NUMBER).description("페이지 크기"),
+					fieldWithPath("totalPages").type(JsonFieldType.NUMBER).description("총 페이지 수"),
+					fieldWithPath("totalElements").type(JsonFieldType.NUMBER).description("총 요소 수"),
+					fieldWithPath("contents[]").type(JsonFieldType.ARRAY).description("구매 완료 상품 목록"),
+					fieldWithPath("contents[].id").type(JsonFieldType.NUMBER).description("상품 ID"),
+					fieldWithPath("contents[].name").type(JsonFieldType.STRING).description("상품 이름"),
+					fieldWithPath("contents[].image").type(JsonFieldType.STRING).description("상품 이미지 URL"),
+					fieldWithPath("contents[].finalPrice").type(JsonFieldType.NUMBER).description("최종 구매 가격"),
+					fieldWithPath("contents[].buyAt").type(JsonFieldType.STRING).description("구매 일시 (ISO-8601)"))));
+
 	}
 }
