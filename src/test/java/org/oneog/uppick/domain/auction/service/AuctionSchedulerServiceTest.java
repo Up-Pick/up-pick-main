@@ -20,7 +20,6 @@ import org.oneog.uppick.domain.auction.repository.AuctionRepository;
 import org.oneog.uppick.domain.auction.repository.BiddingDetailRepository;
 import org.oneog.uppick.domain.member.service.MemberExternalServiceApi;
 import org.oneog.uppick.domain.notification.service.NotificationExternalServiceApi;
-import org.oneog.uppick.domain.product.service.ProductExternalServiceApi;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,8 +33,6 @@ class AuctionSchedulerServiceTest {
 	private AuctionQueryRepository auctionQueryRepository;
 	@Mock
 	private MemberExternalServiceApi memberExternalServiceApi;
-	@Mock
-	private ProductExternalServiceApi productExternalServiceApi;
 	@Mock
 	private NotificationExternalServiceApi notificationExternalServiceApi;
 
@@ -86,8 +83,7 @@ class AuctionSchedulerServiceTest {
 			eq(buyerId),
 			any(),
 			contains("낙찰"),
-			contains("아이폰 15")
-		);
+			contains("아이폰 15"));
 
 		//  경매 상태 저장 (판매 완료)
 		then(auctionRepository).should().save(auction);
