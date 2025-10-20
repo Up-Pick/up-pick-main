@@ -7,7 +7,7 @@ import lombok.Getter;
 @Builder
 public class HotDealResponse {
 
-	private final Integer rank;
+	private final Integer rankNo;
 	private final Long productId;
 	private final String productName;
 	private final String productImage;

@@ -14,7 +14,7 @@ public class RankingMapper {
 	// === 핫딜 ===
 	public HotDealResponse toResponse(HotDeal hotDeal) {
 		return HotDealResponse.builder()
-			.rank(hotDeal.getRankNo())
+			.rankNo(hotDeal.getRankNo())
 			.productId(hotDeal.getProductId())
 			.productName(hotDeal.getProductName())
 			.productImage(hotDeal.getProductImage())
