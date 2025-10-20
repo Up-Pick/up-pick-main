@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.oneog.uppick.common.config.JpaAuditingConfig;
 import org.oneog.uppick.common.config.QueryDSLConfig;
@@ -63,8 +62,7 @@ class RankingQueryRepositoryTest {
 	// === 주간 핫딜 조회 ===
 
 	@Test
-	@DisplayName("지난 24시간 입찰 많은 상품 Top 6을 조회한다")
-	void findTop6HotDealsByBidCount_기본조회() {
+	void findTop6HotDealsByBidCount_기본조회_24시간동안입찰많은상품조회() {
 		// given
 		Product product1 = createProduct("맥북 프로", "macbook.jpg");
 		Product product2 = createProduct("아이폰 15", "iphone.jpg");
@@ -100,8 +98,7 @@ class RankingQueryRepositoryTest {
 	}
 
 	@Test
-	@DisplayName("입찰이 없는 상품은 조회되지 않는다")
-	void findTop6HotDealsByBidCount_입찰없음() {
+	void findTop6HotDealsByBidCount_입찰없음_조회안됨() {
 		// given
 		Product product = createProduct("입찰없는상품", "no-bid.jpg");
 		createAuction(product.getId());
@@ -117,8 +114,7 @@ class RankingQueryRepositoryTest {
 	}
 
 	@Test
-	@DisplayName("경매가 없는 상품은 조회되지 않는다")
-	void findTop6HotDealsByBidCount_경매없음() {
+	void findTop6HotDealsByBidCount_경매없음_조회안됨() {
 		// given
 		createProduct("경매없는상품", "no-auction.jpg");
 
@@ -133,8 +129,7 @@ class RankingQueryRepositoryTest {
 	}
 
 	@Test
-	@DisplayName("6개를 초과하면 입찰 많은 순으로 6개만 반환한다")
-	void findTop6HotDealsByBidCount_6개초과() {
+	void findTop6HotDealsByBidCount_6개초과_상위6개만반환() {
 		// given
 		for (int i = 1; i <= 10; i++) {
 			Product product = createProduct("상품" + i, "image" + i + ".jpg");
@@ -159,8 +154,7 @@ class RankingQueryRepositoryTest {
 	}
 
 	@Test
-	@DisplayName("24시간 이내 입찰만 카운트한다")
-	void findTop6HotDealsByBidCount_24시간필터() throws Exception {
+	void findTop6HotDealsByBidCount_24시간이내입찰_카운트됨() throws Exception {
 		// given
 		Product product = createProduct("테스트상품", "test.jpg");
 		Product product2 = createProduct("테스트상품2", "test.jpg");
@@ -200,8 +194,7 @@ class RankingQueryRepositoryTest {
 	}
 
 	@Test
-	@DisplayName("여러 상품의 입찰을 정확히 집계한다")
-	void findTop6HotDealsByBidCount_복잡한시나리오() {
+	void findTop6HotDealsByBidCount_여러상품입찰_정확히집계됨() {
 		// given
 		Product p1 = createProduct("인기상품", "hot.jpg");
 		Product p2 = createProduct("보통상품", "normal.jpg");
@@ -248,8 +241,7 @@ class RankingQueryRepositoryTest {
 	}
 
 	@Test
-	@DisplayName("현재 진행중인 입찰만 집계한다")
-	void findHotDealsByAuctionStatus() {
+	void findTop6HotDealsByBidCount_진행중인경매만_집계됨() {
 		// given
 		Product product = createProduct("테스트상품", "test.jpg");
 		Product product2 = createProduct("테스트상품2", "test.jpg");
@@ -277,8 +269,7 @@ class RankingQueryRepositoryTest {
 	// === 주간 키워드 조회 ===
 
 	@Test
-	@DisplayName("지난 7일간 검색 많은 키워드 Top 10을 조회한다")
-	void findTop10HotKeywordsByCount_기본조회() {
+	void findTop10HotKeywordsByCount_기본조회_상위10개반환() {
 		// given
 		// 키워드별 검색 횟수
 		createSearchHistory("맥북");    // 5회
@@ -311,8 +302,7 @@ class RankingQueryRepositoryTest {
 	}
 
 	@Test
-	@DisplayName("10개를 초과하면 상위 10개만 반환한다")
-	void findTop10HotKeywordsByCount_10개초과() {
+	void findTop10HotKeywordsByCount_10개초과_상위10개만반환() {
 		// given
 		for (int i = 1; i <= 15; i++) {
 			String keyword = "키워드" + i;
@@ -339,8 +329,7 @@ class RankingQueryRepositoryTest {
 	}
 
 	@Test
-	@DisplayName("검색 기록이 없으면 빈 리스트를 반환한다")
-	void findTop10HotKeywordsByCount_검색없음() {
+	void findTop10HotKeywordsByCount_검색기록없음_빈리스트반환() {
 		// given - 검색 기록 없음
 
 		// when
@@ -351,8 +340,7 @@ class RankingQueryRepositoryTest {
 	}
 
 	@Test
-	@DisplayName("7일 이전 검색은 제외된다")
-	void findTop10HotKeywordsByCount_7일이전제외() throws Exception {
+	void findTop10HotKeywordsByCount_7일이전검색_제외됨() throws Exception {
 		// given
 		// 7일 이내 검색 3개
 		createSearchHistory("최신키워드");
@@ -392,8 +380,7 @@ class RankingQueryRepositoryTest {
 	}
 
 	@Test
-	@DisplayName("대소문자가 다르면 다른 키워드로 집계된다")
-	void findTop10HotKeywordsByCount_대소문자구분() {
+	void findTop10HotKeywordsByCount_대소문자다름_다른키워드로집계됨() {
 		// given
 		createSearchHistory("Apple");
 		createSearchHistory("Apple");
