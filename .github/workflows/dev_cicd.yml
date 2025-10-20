@@ -19,6 +19,10 @@ permissions:
 
 jobs:
   build-and-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
     # 이 작업을 실행할 가상 머신의 종류를 지정합니다. 최신 Ubuntu 버전을 사용합니다.
     runs-on: ubuntu-latest
     
@@ -52,7 +56,7 @@ jobs:
       # 6. GitHub Pages에 배포
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v2
+        uses: actions/deploy-pages@v4
 
       # 7. AWS 자격 증명 설정
       - name: Configure AWS credentials
