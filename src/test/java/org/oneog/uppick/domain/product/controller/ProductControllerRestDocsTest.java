@@ -10,10 +10,12 @@ import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.oneog.uppick.common.dto.AuthMember;
 import org.oneog.uppick.domain.product.dto.request.ProductRegisterRequest;
+import org.oneog.uppick.domain.product.dto.response.ProductBiddingInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductSimpleInfoResponse;
 import org.oneog.uppick.domain.product.service.ProductInternalService;
@@ -28,6 +30,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 @WebMvcTest(ProductController.class)
 class ProductControllerRestDocsTest extends RestDocsBase {
@@ -147,5 +152,37 @@ class ProductControllerRestDocsTest extends RestDocsBase {
 					fieldWithPath("data.minBidPrice").type(JsonFieldType.NUMBER).description("최소 입찰가"),
 					fieldWithPath("data.currentBidPrice").type(JsonFieldType.NUMBER).description("현재 입찰가")
 						.attributes(key("optional").value(true)))));
+	}
+
+	@Test
+	@WithMockAuthMember(memberId = 10L, memberNickname = "tester")
+	void getBiddingProducts_정상적인상황_입찰중인상품목록조회성공() throws Exception {
+		List<ProductBiddingInfoResponse> contents = List.of(
+			new ProductBiddingInfoResponse(1L, "상품1", "image1.jpg", LocalDateTime.now().plusDays(1), 1000L, 1100L),
+			new ProductBiddingInfoResponse(2L, "상품2", "image2.jpg", LocalDateTime.now().plusDays(2), 2000L, 2100L));
+		Page<ProductBiddingInfoResponse> page = new PageImpl<>(contents, Pageable.ofSize(10), 2);
+
+		given(productInternalService.getBiddingProductInfoByMemberId(eq(10L), any(Pageable.class)))
+			.willReturn(page);
+
+		this.mockMvc.perform(get("/api/v1/products/bidding/me")
+			.header("Authorization", "Bearer token")
+			.accept(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andDo(document("product-get-bidding-products",
+				requestHeaders(
+					headerWithName("Authorization").description("JWT 액세스 토큰 (Bearer {token})")),
+				responseFields(
+					fieldWithPath("page").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
+					fieldWithPath("size").type(JsonFieldType.NUMBER).description("페이지 크기"),
+					fieldWithPath("totalPages").type(JsonFieldType.NUMBER).description("총 페이지 수"),
+					fieldWithPath("totalElements").type(JsonFieldType.NUMBER).description("총 요소 수"),
+					fieldWithPath("contents[]").type(JsonFieldType.ARRAY).description("상품 목록"),
+					fieldWithPath("contents[].id").type(JsonFieldType.NUMBER).description("상품 ID"),
+					fieldWithPath("contents[].name").type(JsonFieldType.STRING).description("상품 이름"),
+					fieldWithPath("contents[].image").type(JsonFieldType.STRING).description("상품 이미지 URL"),
+					fieldWithPath("contents[].endAt").type(JsonFieldType.STRING).description("마감 일시 (ISO-8601)"),
+					fieldWithPath("contents[].currentBid").type(JsonFieldType.NUMBER).description("현재 입찰가"),
+					fieldWithPath("contents[].bidPrice").type(JsonFieldType.NUMBER).description("입찰 가격"))));
 	}
 }
