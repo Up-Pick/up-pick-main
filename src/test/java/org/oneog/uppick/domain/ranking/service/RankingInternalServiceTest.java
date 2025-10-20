@@ -69,13 +69,13 @@ class RankingInternalServiceTest {
 
 		// then
 		assertThat(result).hasSize(6);
-		assertThat(result.get(0).getRank()).isEqualTo(1);
+		assertThat(result.get(0).getRankNo()).isEqualTo(1);
 		assertThat(result.get(0).getProductName()).isEqualTo("맥북 프로");
-		assertThat(result.get(1).getRank()).isEqualTo(2);
-		assertThat(result.get(2).getRank()).isEqualTo(3);
-		assertThat(result.get(3).getRank()).isEqualTo(4);
-		assertThat(result.get(4).getRank()).isEqualTo(5);
-		assertThat(result.get(5).getRank()).isEqualTo(6);
+		assertThat(result.get(1).getRankNo()).isEqualTo(2);
+		assertThat(result.get(2).getRankNo()).isEqualTo(3);
+		assertThat(result.get(3).getRankNo()).isEqualTo(4);
+		assertThat(result.get(4).getRankNo()).isEqualTo(5);
+		assertThat(result.get(5).getRankNo()).isEqualTo(6);
 		assertThat(result.get(5).getProductName()).isEqualTo("다이슨 청소기");
 	}
 
@@ -98,7 +98,7 @@ class RankingInternalServiceTest {
 
 		// then
 		assertThat(result).hasSize(2);
-		assertThat(result).extracting("rank").containsExactly(1, 2);
+		assertThat(result).extracting("rankNo").containsExactly(1, 2);
 	}
 
 	// === 주간 키워드 조회 ===
@@ -162,7 +162,7 @@ class RankingInternalServiceTest {
 
 	private HotDealResponse createResponse(int rank, Long productId, String name, String image) {
 		return HotDealResponse.builder()
-			.rank(rank)
+			.rankNo(rank)
 			.productId(productId)
 			.productName(name)
 			.productImage(image)
