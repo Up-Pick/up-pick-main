@@ -43,7 +43,7 @@ class AuctionControllerRestDocsTest extends RestDocsBase {
 		// when & then
 		mockMvc.perform(
 				post("/api/v1/auctions/{auctionId}/bid", auctionId)
-					.header("Authorization", "Bearer MOCK_TOKEN")
+					.header("Authorization", "Bearer token")
 					.contentType(MediaType.APPLICATION_JSON)
 					.content(objectMapper.writeValueAsString(request)))
 			.andExpect(status().isOk())
