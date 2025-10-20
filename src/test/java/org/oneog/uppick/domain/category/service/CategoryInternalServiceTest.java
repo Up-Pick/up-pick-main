@@ -1,4 +1,4 @@
-package org.oneog.uppick.domain.category;
+package org.oneog.uppick.domain.category.service;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
@@ -13,7 +13,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.oneog.uppick.domain.category.dto.response.CategoryResponse;
 import org.oneog.uppick.domain.category.entity.Category;
 import org.oneog.uppick.domain.category.repository.CategoryRepository;
-import org.oneog.uppick.domain.category.service.CategoryInternalService;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
