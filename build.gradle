@@ -18,6 +18,8 @@ def querydslVersion = '5.1.0'
 
 def jjwtVersion = '0.13.0'
 
+def springCloudAwsVersion = '3.4.0'
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
@@ -29,6 +31,12 @@ configurations {
         extendsFrom annotationProcessor
     }
     asciidoctorExtensions
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:${springCloudAwsVersion}"
+    }
 }
 
 repositories {
@@ -63,7 +71,7 @@ dependencies {
     asciidoctorExtensions 'org.springframework.restdocs:spring-restdocs-asciidoctor'
 
     // AWS S3
-    implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3:3.0.0'
+    implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3'
 }
 
 // REST Docs 스니펫 디렉토리 설정

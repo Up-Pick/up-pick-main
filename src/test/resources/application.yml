@@ -13,14 +13,13 @@ spring:
   cloud:
     aws:
       credentials:
-        access-key: test-access-key  # ⭐ 가짜 키
+        access-key: test-access-key
         secret-key: test-secret-key
       region:
         static: ap-northeast-2
       s3:
+        enabled: false
         bucket: test-bucket
-      stack:
-        auto: false  # ⭐ 필수! AWS SDK 자동 설정 끄기
 jwt:
   secret:
     key: "VXBwaWNrUHJvamVjdFNlY3JldEtleUZvclRlc3RpbmdQdXJwb3NlczEyMzQ1Njc4OTA="
