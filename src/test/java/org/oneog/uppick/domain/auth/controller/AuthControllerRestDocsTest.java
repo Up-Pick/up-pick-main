@@ -33,8 +33,8 @@ class AuthControllerRestDocsTest extends RestDocsBase {
 	private AuthService authService;
 
 	@Test
-	@DisplayName("회원가입 API Rest Docs 문서화 (성공 케이스)")
-	void documentSignup() throws Exception {
+	@DisplayName("회원가입 API Rest Docs 문서화")
+	void signup_정상요청_성공응답반환() throws Exception {
 		// given
 		// SignupRequest DTO 생성 (Builder 사용)
 		SignupRequest request = SignupRequest.builder()
@@ -77,7 +77,7 @@ class AuthControllerRestDocsTest extends RestDocsBase {
 
 	@Test
 	@DisplayName("로그인 API Rest Docs 문서화")
-	void documentLogin() throws Exception {
+	void login_정상요청_성공응답및토큰반환() throws Exception {
 		// given
 		LoginRequest request = new LoginRequest("test@email.com", "Password123!");
 		LoginResponse response = new LoginResponse("Bearer eyJhbGciOiJIUzI1Ni...");
