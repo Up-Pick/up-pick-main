@@ -64,7 +64,6 @@ public class ProductController {
 	}
 
 	// 입찰 시 상품 간단 조회
-	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/{productId}/simple-info")
 	public GlobalApiResponse<ProductSimpleInfoResponse> getProductSimpleInfo(@PathVariable
 	Long productId) {

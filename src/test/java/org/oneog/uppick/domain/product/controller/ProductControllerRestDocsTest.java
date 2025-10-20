@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.oneog.uppick.common.dto.AuthMember;
 import org.oneog.uppick.domain.product.dto.request.ProductRegisterRequest;
 import org.oneog.uppick.domain.product.dto.response.ProductInfoResponse;
+import org.oneog.uppick.domain.product.dto.response.ProductSimpleInfoResponse;
 import org.oneog.uppick.domain.product.service.ProductInternalService;
 import org.oneog.uppick.support.RestDocsBase;
 import org.oneog.uppick.support.auth.WithMockAuthMember;
@@ -121,5 +122,30 @@ class ProductControllerRestDocsTest extends RestDocsBase {
 						.attributes(key("optional").value(true)),
 					fieldWithPath("data.endAt").type(JsonFieldType.STRING).description("마감 일시 (ISO-8601)"),
 					fieldWithPath("data.sellerName").type(JsonFieldType.STRING).description("판매자 이름"))));
+	}
+
+	@Test
+	void getProductSimpleInfo_정상적인상황_상품간단조회성공() throws Exception {
+		Long productId = 1L;
+		ProductSimpleInfoResponse response = new ProductSimpleInfoResponse(
+			"테스트 상품", "image.jpg", 1000L, 1500L);
+
+		given(productInternalService.getProductSimpleInfoById(eq(productId)))
+			.willReturn(response);
+
+		this.mockMvc.perform(get("/api/v1/products/{productId}/simple-info", productId)
+			.accept(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andDo(document("product-get-product-simple-info",
+				pathParameters(
+					parameterWithName("productId").description("상품 ID")),
+				responseFields(
+					fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
+					fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+					fieldWithPath("data.name").type(JsonFieldType.STRING).description("상품 이름"),
+					fieldWithPath("data.image").type(JsonFieldType.STRING).description("상품 이미지 URL"),
+					fieldWithPath("data.minBidPrice").type(JsonFieldType.NUMBER).description("최소 입찰가"),
+					fieldWithPath("data.currentBidPrice").type(JsonFieldType.NUMBER).description("현재 입찰가")
+						.attributes(key("optional").value(true)))));
 	}
 }
