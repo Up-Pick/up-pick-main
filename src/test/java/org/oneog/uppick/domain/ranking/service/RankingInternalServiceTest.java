@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -39,8 +38,7 @@ class RankingInternalServiceTest {
 	// === 주간 핫딜 조회 ===
 
 	@Test
-	@DisplayName("핫딜 Top 6을 랭킹 순서대로 조회한다")
-	void getHotDeals_성공() {
+	void getHotDeals_조회성공_랭킹순서대로조회된다() {
 		// given
 		HotDeal hotDeal1 = createHotDeal(1L, 1, "맥북 프로", "macbook.jpg");
 		HotDeal hotDeal2 = createHotDeal(2L, 2, "아이폰 15", "iphone.jpg");
@@ -80,8 +78,7 @@ class RankingInternalServiceTest {
 	}
 
 	@Test
-	@DisplayName("6개 미만의 핫딜도 정상 조회된다")
-	void getHotDeals_6개미만() {
+	void getHotDeals_핫딜이6개미만_정상조회된다() {
 		// given
 		HotDeal hotDeal1 = createHotDeal(1L, 1, "상품1", "img1.jpg");
 		HotDeal hotDeal2 = createHotDeal(2L, 2, "상품2", "img2.jpg");
@@ -103,8 +100,7 @@ class RankingInternalServiceTest {
 
 	// === 주간 키워드 조회 ===
 	@Test
-	@DisplayName("핫 키워드 TOP10을 순위 오름차순으로 조회한다")
-	void getHotKeywords_정상조회() {
+	void getHotKeywords_조회성공_순위오름차순으로조회된다() {
 		// given
 		HotKeyword keyword1 = createHotKeyword(1, "맥북");
 		HotKeyword keyword2 = createHotKeyword(2, "아이폰");
@@ -136,8 +132,7 @@ class RankingInternalServiceTest {
 	}
 
 	@Test
-	@DisplayName("핫 키워드가 없으면 빈 리스트를 반환한다")
-	void getHotKeywords_빈리스트() {
+	void getHotKeywords_키워드없음_빈리스트반환된다() {
 		// given
 		given(hotKeywordRepository.findAllByOrderByRankNoAsc()).willReturn(Collections.emptyList());
 
