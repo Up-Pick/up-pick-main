@@ -23,7 +23,7 @@ import org.oneog.uppick.domain.member.repository.MemberRepository;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
-public class MemberServiceTest {
+public class MemberInternalServiceTest {
 	@Mock
 	private MemberRepository memberRepository;
 
