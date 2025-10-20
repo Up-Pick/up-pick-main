@@ -40,29 +40,34 @@ public class ProductController {
 	@PreAuthorize("isAuthenticated()")
 	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public GlobalApiResponse<Void> registerProduct(
-		@Valid @RequestPart("product") ProductRegisterRequest request,
-		@RequestPart("image") MultipartFile image,
-		@AuthenticationPrincipal AuthMember authMember) {
+		@Valid @RequestPart("product")
+		ProductRegisterRequest request,
+		@RequestPart("image")
+		MultipartFile image,
+		@AuthenticationPrincipal
+		AuthMember authMember) {
 
 		productInternalService.registerProduct(request, image, authMember.getMemberId());
 		return GlobalApiResponse.ok(null);
 	}
 
 	// 상품 상세 조회
-	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/{productId}")
 	public GlobalApiResponse<ProductInfoResponse> getProductInfo(
-		@PathVariable Long productId,
-		@AuthenticationPrincipal AuthMember authMember) {
+		@PathVariable
+		Long productId,
+		@AuthenticationPrincipal
+		AuthMember authMember) {
 
-		ProductInfoResponse response = productInternalService.getProductInfoById(productId, authMember.getMemberId());
+		ProductInfoResponse response = productInternalService.getProductInfoById(productId, authMember);
 		return GlobalApiResponse.ok(response);
 	}
 
 	// 입찰 시 상품 간단 조회
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/{productId}/simple-info")
-	public GlobalApiResponse<ProductSimpleInfoResponse> getProductSimpleInfo(@PathVariable Long productId) {
+	public GlobalApiResponse<ProductSimpleInfoResponse> getProductSimpleInfo(@PathVariable
+	Long productId) {
 
 		ProductSimpleInfoResponse response = productInternalService.getProductSimpleInfoById(productId);
 		return GlobalApiResponse.ok(response);
@@ -72,8 +77,10 @@ public class ProductController {
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/sold/me")
 	public GlobalPageResponse<ProductSoldInfoResponse> getSoldProducts(
-		@AuthenticationPrincipal AuthMember authMember,
-		@PageableDefault(size = 20) Pageable pageable) {
+		@AuthenticationPrincipal
+		AuthMember authMember,
+		@PageableDefault(size = 20)
+		Pageable pageable) {
 
 		Page<ProductSoldInfoResponse> responses = productInternalService.getProductSoldInfoByMemberId(
 			authMember.getMemberId(), pageable);
@@ -84,8 +91,10 @@ public class ProductController {
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/purchased/me")
 	public GlobalPageResponse<ProductPurchasedInfoResponse> getPurchasedProducts(
-		@AuthenticationPrincipal AuthMember authMember,
-		@PageableDefault(size = 20) Pageable pageable) {
+		@AuthenticationPrincipal
+		AuthMember authMember,
+		@PageableDefault(size = 20)
+		Pageable pageable) {
 
 		Page<ProductPurchasedInfoResponse> responses = productInternalService.getPurchasedProductInfoByMemberId(
 			authMember.getMemberId(), pageable);
@@ -96,8 +105,10 @@ public class ProductController {
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/bidding/me")
 	public GlobalPageResponse<ProductBiddingInfoResponse> getBiddingProducts(
-		@AuthenticationPrincipal AuthMember authMember,
-		@PageableDefault Pageable pageable) {
+		@AuthenticationPrincipal
+		AuthMember authMember,
+		@PageableDefault
+		Pageable pageable) {
 
 		Page<ProductBiddingInfoResponse> responses = productInternalService.getBiddingProductInfoByMemberId(
 			authMember.getMemberId(), pageable);
@@ -108,8 +119,10 @@ public class ProductController {
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/selling/me")
 	public GlobalPageResponse<ProductSellingInfoResponse> getSellingProducts(
-		@AuthenticationPrincipal AuthMember authMember,
-		@PageableDefault Pageable pageable) {
+		@AuthenticationPrincipal
+		AuthMember authMember,
+		@PageableDefault
+		Pageable pageable) {
 
 		Page<ProductSellingInfoResponse> responses = productInternalService.getSellingProductInfoByMemberId(
 			authMember.getMemberId(), pageable);
@@ -120,8 +133,10 @@ public class ProductController {
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/recently-viewed/me")
 	public GlobalPageResponse<ProductRecentViewInfoResponse> getRecentlyViewedProducts(
-		@AuthenticationPrincipal AuthMember authMember,
-		@PageableDefault Pageable pageable) {
+		@AuthenticationPrincipal
+		AuthMember authMember,
+		@PageableDefault
+		Pageable pageable) {
 
 		Page<ProductRecentViewInfoResponse> responses = productInternalService.getRecentViewProductInfoByMemberId(
 			authMember.getMemberId(), pageable);
