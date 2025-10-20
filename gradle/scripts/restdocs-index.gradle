@@ -84,6 +84,46 @@ tasks.register('generateRestDocsIndex') {
                     }
                 }
 
+                // Multipart 요청 파트 (request-parts)
+                if (snippetExists(dir, 'request-parts')) {
+                    heading(lines, 3, '요청 파트')
+                    includeSnippet(lines, dir, 'request-parts')
+                    
+                    // request-part-{name}-fields 와 request-part-{name}-body 찾기
+                    def partFiles = dir.listFiles()?.findAll { 
+                        it.name.startsWith('request-part-') && it.name.endsWith('.adoc')
+                    } ?: []
+                    
+                    def partNames = partFiles.collect { file ->
+                        def name = file.name
+                        if (name.endsWith('-fields.adoc')) {
+                            name.replace('request-part-', '').replace('-fields.adoc', '')
+                        } else if (name.endsWith('-body.adoc')) {
+                            name.replace('request-part-', '').replace('-body.adoc', '')
+                        } else {
+                            null
+                        }
+                    }.findAll { it != null }.unique()
+                    
+                    partNames.each { partName ->
+                        def hasFields = snippetExists(dir, "request-part-${partName}-fields")
+                        def hasBody = snippetExists(dir, "request-part-${partName}-body")
+                        
+                        if (hasFields || hasBody) {
+                            heading(lines, 4, "${partName.toUpperCase()} 파트")
+                            if (hasFields) {
+                                heading(lines, 5, '필드 설명')
+                                includeSnippet(lines, dir, "request-part-${partName}-fields")
+                            }
+                            if (hasBody) {
+                                heading(lines, 5, '예시')
+                                includeSnippet(lines, dir, "request-part-${partName}-body")
+                            }
+                        }
+                    }
+                }
+
+                // 일반 요청 본문
                 if (snippetExists(dir, 'request-fields') || snippetExists(dir, 'request-body')) {
                     heading(lines, 3, '요청 본문')
                     if (snippetExists(dir, 'request-fields')) {
