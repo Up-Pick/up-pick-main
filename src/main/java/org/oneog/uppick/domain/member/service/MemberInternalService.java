@@ -7,7 +7,6 @@ import org.oneog.uppick.domain.member.dto.response.CreditChargeResponse;
 import org.oneog.uppick.domain.member.dto.response.CreditGetResponse;
 import org.oneog.uppick.domain.member.entity.Member;
 import org.oneog.uppick.domain.member.exception.MemberErrorCode;
-import org.oneog.uppick.domain.member.repository.MemberQueryRepository;
 import org.oneog.uppick.domain.member.repository.MemberRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class MemberInternalService {
 	private final MemberRepository memberRepository;
-	private final MemberQueryRepository memberQueryRepository;
 
 	@Transactional
 	public CreditChargeResponse chargeCredit(CreditChargeRequest creditChargeRequest, AuthMember authMember) {

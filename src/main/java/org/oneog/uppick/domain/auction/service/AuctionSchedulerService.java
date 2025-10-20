@@ -13,7 +13,6 @@ import org.oneog.uppick.domain.auction.repository.BiddingDetailRepository;
 import org.oneog.uppick.domain.member.service.MemberExternalServiceApi;
 import org.oneog.uppick.domain.notification.entity.NotificationType;
 import org.oneog.uppick.domain.notification.service.NotificationExternalServiceApi;
-import org.oneog.uppick.domain.product.service.ProductExternalServiceApi;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +32,6 @@ public class AuctionSchedulerService {
 
 	// ****** External Domain API ***** //
 	private final MemberExternalServiceApi memberExternalServiceApi; //구매내역, 판매내역에 저장
-	private final ProductExternalServiceApi productExternalServiceApi; //상품 상태 변경
 	private final NotificationExternalServiceApi notificationExternalServiceApi; // 경매 마감시 알람 쏘기
 
 	@Transactional
@@ -77,7 +75,6 @@ public class AuctionSchedulerService {
 
 	private void handleExpiredAuction(Auction auction) {
 		Long auctionId = auction.getId();
-		Long productId = auction.getProductId();
 
 		try {
 			auction.markAsExpired();
@@ -123,7 +120,6 @@ public class AuctionSchedulerService {
 	 *  구매 내역 등록
 	 */
 	private void createPurchaseHistory(Long auctionId, Long buyerId, Long productId, Long price) {
-		// TODO: 구매 도메인 팀의 ExternalServiceApi로 요청
 		memberExternalServiceApi.registerPurchaseDetail(auctionId, buyerId, productId, price);
 		log.info("구매내역 등록: 구매자={}, 상품={}, 금액={}", buyerId, productId, price);
 	}
@@ -132,8 +128,6 @@ public class AuctionSchedulerService {
 	 *  판매 내역 등록
 	 */
 	private void createSellHistory(Long auctionId, Long sellerId, Long productId, Long price) {
-
-		// TODO: 판매 도메인 팀의 ExternalServiceApi로 요청
 		memberExternalServiceApi.registerSellDetail(auctionId, sellerId, productId, price);
 		log.info("판매내역 등록: 판매자={}, 상품={}, 금액={}", sellerId, productId, price);
 	}
@@ -148,8 +142,7 @@ public class AuctionSchedulerService {
 			memberId,
 			NotificationType.TRADE,
 			"낙찰을 축하드립니다!",
-			"상품 '" + productName + "'을 " + price + "원에 낙찰받았습니다."
-		);
+			"상품 '" + productName + "'을 " + price + "원에 낙찰받았습니다.");
 
 		log.info("[Notification] 낙찰자 {}에게 알림 전송 완료", memberId);
 	}
