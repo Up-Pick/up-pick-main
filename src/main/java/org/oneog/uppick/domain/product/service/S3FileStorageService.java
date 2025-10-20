@@ -10,6 +10,7 @@ import java.util.UUID;
 import org.oneog.uppick.common.exception.BusinessException;
 import org.oneog.uppick.domain.product.exception.ProductErrorCode;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,11 +23,11 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class S3FileStorageService {
+@Profile({"dev", "prod"})
+public class S3FileStorageService implements S3FileManager {
 
 	private static final List<String> ALLOWED_EXTENSIONS = Arrays.asList(
-		"jpg", "jpeg", "png", "gif", "webp"
-	);
+		"jpg", "jpeg", "png", "gif", "webp");
 	private static final long MAX_FILE_SIZE = 10 * 1024 * 1024;
 	private final S3Client s3Client;
 	@Value("${spring.cloud.aws.s3.bucket}")
@@ -34,6 +35,7 @@ public class S3FileStorageService {
 	@Value("${spring.cloud.aws.region.static}")
 	private String region;
 
+	@Override
 	public String store(MultipartFile file) {
 		if (file == null || file.isEmpty()) {
 			throw new BusinessException(ProductErrorCode.EMPTY_FILE);
@@ -65,13 +67,11 @@ public class S3FileStorageService {
 
 			s3Client.putObject(
 				putObjectRequest,
-				RequestBody.fromInputStream(file.getInputStream(), file.getSize())
-			);
+				RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
 
 			String fileUrl = String.format(
 				"https://%s.s3.%s.amazonaws.com/%s",
-				bucketName, region, s3Key
-			);
+				bucketName, region, s3Key);
 
 			log.info("S3 업로드 성공: {}", fileUrl);
 			return fileUrl;

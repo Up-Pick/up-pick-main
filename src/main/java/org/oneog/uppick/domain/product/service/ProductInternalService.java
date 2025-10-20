@@ -38,7 +38,7 @@ public class ProductInternalService {
 	private final ProductMapper productMapper;
 
 	// ****** S3 ***** //
-	private final S3FileStorageService s3FileStorageService;
+	private final S3FileManager s3FileManager;
 
 	// ****** External Domain API ***** //
 	private final AuctionExternalServiceApi auctionExternalServiceApi;
@@ -53,7 +53,7 @@ public class ProductInternalService {
 		}
 
 		// 2. S3에 이미지 업로드
-		String imageUrl = s3FileStorageService.store(image);
+		String imageUrl = s3FileManager.store(image);
 
 		// 3. Product 엔티티 생성 (imageUrl 포함)
 		Product product = productMapper.registerToEntity(request, registerId, imageUrl);

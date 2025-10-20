@@ -35,7 +35,7 @@ public class ProductInternalServiceTest {
 	@Mock
 	AuctionExternalServiceApi auctionExternalServiceApi;
 	@Mock
-	S3FileStorageService s3FileStorageService;
+	S3FileManager s3FileManager;
 
 	@InjectMocks
 	ProductInternalService productInternalService;
@@ -50,7 +50,7 @@ public class ProductInternalServiceTest {
 			productViewHistoryRepository,
 
 			productMapper,
-			s3FileStorageService,
+			s3FileManager,
 			auctionExternalServiceApi);
 
 		product = Product.builder()
@@ -109,7 +109,7 @@ public class ProductInternalServiceTest {
 		MultipartFile image = mock(MultipartFile.class);
 		when(image.isEmpty()).thenReturn(false);
 		String imageUrl = "https://s3.amazonaws.com/test.jpg";
-		when(s3FileStorageService.store(image)).thenReturn(imageUrl);
+		when(s3FileManager.store(image)).thenReturn(imageUrl);
 
 		// when
 		productInternalService.registerProduct(request, image, registerId);
