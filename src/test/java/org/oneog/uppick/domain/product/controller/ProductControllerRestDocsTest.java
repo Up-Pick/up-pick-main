@@ -1,5 +1,7 @@
 package org.oneog.uppick.domain.product.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.restdocs.headers.HeaderDocumentation.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
@@ -19,6 +21,7 @@ import org.oneog.uppick.domain.product.dto.response.ProductBiddingInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductSimpleInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductPurchasedInfoResponse;
+import org.oneog.uppick.domain.product.dto.response.ProductRecentViewInfoResponse;
 import org.oneog.uppick.domain.product.service.ProductInternalService;
 import org.oneog.uppick.support.RestDocsBase;
 import org.oneog.uppick.support.auth.WithMockAuthMember;
@@ -216,6 +219,39 @@ class ProductControllerRestDocsTest extends RestDocsBase {
 					fieldWithPath("contents[].image").type(JsonFieldType.STRING).description("상품 이미지 URL"),
 					fieldWithPath("contents[].finalPrice").type(JsonFieldType.NUMBER).description("최종 구매 가격"),
 					fieldWithPath("contents[].buyAt").type(JsonFieldType.STRING).description("구매 일시 (ISO-8601)"))));
+	}
 
+	@Test
+	@WithMockAuthMember(memberId = 10L, memberNickname = "tester")
+	void getRecentlyViewedProducts_정상적인상황_최근본상품조회성공() throws Exception {
+		ProductRecentViewInfoResponse response1 = new ProductRecentViewInfoResponse(
+			1L, "테스트 상품1", "image1.jpg", 1500L, LocalDateTime.now().plusDays(7), LocalDateTime.now().minusHours(1));
+		ProductRecentViewInfoResponse response2 = new ProductRecentViewInfoResponse(
+			2L, "테스트 상품2", "image2.jpg", 2000L, LocalDateTime.now().plusDays(5), LocalDateTime.now().minusHours(2));
+
+		Page<ProductRecentViewInfoResponse> pageResponse = new PageImpl<>(List.of(response1, response2));
+
+		given(productInternalService.getRecentViewProductInfoByMemberId(eq(10L), any(Pageable.class)))
+			.willReturn(pageResponse);
+
+		this.mockMvc.perform(get("/api/v1/products/recently-viewed/me")
+			.header("Authorization", "Bearer token")
+			.accept(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andDo(document("product-get-recently-viewed-products",
+				requestHeaders(
+					headerWithName("Authorization").description("JWT 액세스 토큰 (Bearer {token})")),
+				responseFields(
+					fieldWithPath("page").type(JsonFieldType.NUMBER).description("현재 페이지 번호 (0부터 시작)"),
+					fieldWithPath("size").type(JsonFieldType.NUMBER).description("페이지 크기"),
+					fieldWithPath("totalPages").type(JsonFieldType.NUMBER).description("총 페이지 수"),
+					fieldWithPath("totalElements").type(JsonFieldType.NUMBER).description("총 요소 수"),
+					fieldWithPath("contents[].id").type(JsonFieldType.NUMBER).description("상품 ID"),
+					fieldWithPath("contents[].name").type(JsonFieldType.STRING).description("상품 이름"),
+					fieldWithPath("contents[].image").type(JsonFieldType.STRING).description("상품 이미지 URL"),
+					fieldWithPath("contents[].currentBid").type(JsonFieldType.NUMBER).description("현재 입찰가")
+						.attributes(key("optional").value(true)),
+					fieldWithPath("contents[].endAt").type(JsonFieldType.STRING).description("마감 일시 (ISO-8601)"),
+					fieldWithPath("contents[].viewedAt").type(JsonFieldType.STRING).description("조회 일시 (ISO-8601)"))));
 	}
 }
