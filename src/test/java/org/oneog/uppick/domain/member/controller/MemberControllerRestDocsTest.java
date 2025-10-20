@@ -12,6 +12,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.oneog.uppick.domain.member.dto.request.CreditChargeRequest;
 import org.oneog.uppick.domain.member.dto.response.CreditChargeResponse;
+import org.oneog.uppick.domain.member.dto.response.CreditGetResponse;
 import org.oneog.uppick.domain.member.service.MemberInternalService;
 import org.oneog.uppick.support.RestDocsBase;
 import org.oneog.uppick.support.auth.WithMockAuthMember;
@@ -65,6 +66,39 @@ class MemberControllerRestDocsTest extends RestDocsBase {
 						fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
 						fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
 						fieldWithPath("data.currentCredit").type(JsonFieldType.NUMBER).description("충전 후 현재 보유 크레딧")
+					)
+				)
+			);
+	}
+
+	@Test
+	@DisplayName("내 크레딧 조회 API Rest Docs 문서화 ")
+	@WithMockAuthMember
+	void documentGetCredit() throws Exception {
+		// given
+		CreditGetResponse response = new CreditGetResponse(20000L); // 예시: 현재 잔액 20000
+
+		given(memberInternalService.getCredit(any()))
+			.willReturn(response);
+
+		// when & then
+		mockMvc.perform(
+				get("/api/v1/members/me/credit")
+					.accept(MediaType.APPLICATION_JSON)
+
+			)
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.message").value("요청에 성공했습니다."))
+			.andExpect(jsonPath("$.data.currentCredit").value(response.getCurrentCredit()))
+			.andDo(
+				// 컨벤션: document("도메인-메서드명")
+				document("member-getCredit",
+
+					responseFields(
+						fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
+						fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+						fieldWithPath("data.currentCredit").type(JsonFieldType.NUMBER).description("현재 보유 크레딧")
 					)
 				)
 			);
