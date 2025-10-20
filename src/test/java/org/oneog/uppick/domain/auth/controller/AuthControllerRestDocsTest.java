@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.oneog.uppick.domain.auth.dto.request.LoginRequest;
+import org.oneog.uppick.domain.auth.dto.request.SignupRequest;
 import org.oneog.uppick.domain.auth.dto.response.LoginResponse;
 import org.oneog.uppick.domain.auth.service.AuthService;
 import org.oneog.uppick.support.RestDocsBase;
@@ -32,7 +33,50 @@ class AuthControllerRestDocsTest extends RestDocsBase {
 	private AuthService authService;
 
 	@Test
-	@DisplayName("로그인 API Rest Docs 문서화(성공)")
+	@DisplayName("회원가입 API Rest Docs 문서화 (성공 케이스)")
+	void documentSignup() throws Exception {
+		// given
+		// SignupRequest DTO 생성 (Builder 사용)
+		SignupRequest request = SignupRequest.builder()
+			.email("newuser@email.com")
+			.nickname("새로운유저")
+			.password("Password123!")
+			.build();
+
+		// authService.signup() 메소드는 void를 반환하므로 willDoNothing() 사용
+		willDoNothing().given(authService).signup(any(SignupRequest.class));
+
+		// when & then
+		mockMvc.perform(
+				post("/api/v1/members/signup") // 회원가입 엔드포인트
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(objectMapper.writeValueAsString(request))
+			)
+			.andExpect(status().isOk()) // 컨트롤러가 GlobalApiResponse.ok()를 반환하므로 200 OK
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.message").value("요청에 성공했습니다."))
+			.andDo(
+				// 컨벤션: document("도메인-메서드명")
+				document("auth-signup",
+					requestFields( // 요청 본문 필드 정의
+						fieldWithPath("email").type(JsonFieldType.STRING).description("가입할 이메일 주소")
+							.attributes(key("constraints").value("이메일 형식, NotBlank")),
+						fieldWithPath("nickname").type(JsonFieldType.STRING).description("사용할 닉네임")
+							.attributes(key("constraints").value("2~10자, 특수문자 금지, NotBlank")),
+						fieldWithPath("password").type(JsonFieldType.STRING).description("사용할 비밀번호")
+							.attributes(key("constraints").value("8~16자, 대/소문자, 숫자, 특수문자 각 1개 이상 포함, NotBlank"))
+					),
+					responseFields( // 응답 본문 필드 정의
+						fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
+						fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+						fieldWithPath("data").type(JsonFieldType.NULL).description("반환 데이터 (없음)") // Void 타입이므로 null
+					)
+				)
+			);
+	}
+
+	@Test
+	@DisplayName("로그인 API Rest Docs 문서화")
 	void documentLogin() throws Exception {
 		// given
 		LoginRequest request = new LoginRequest("test@email.com", "Password123!");
