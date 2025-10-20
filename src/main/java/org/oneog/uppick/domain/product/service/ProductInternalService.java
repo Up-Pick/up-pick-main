@@ -1,5 +1,6 @@
 package org.oneog.uppick.domain.product.service;
 
+import org.oneog.uppick.common.dto.AuthMember;
 import org.oneog.uppick.common.exception.BusinessException;
 import org.oneog.uppick.domain.auction.service.AuctionExternalServiceApi;
 import org.oneog.uppick.domain.product.dto.request.ProductRegisterRequest;
@@ -65,15 +66,17 @@ public class ProductInternalService {
 	}
 
 	@Transactional
-	public ProductInfoResponse getProductInfoById(Long productId, Long memberId) {
+	public ProductInfoResponse getProductInfoById(Long productId, AuthMember authMember) {
 
-		// 조회수 +1
-		Product product = findProductByIdOrElseThrow(productId);
-		product.increaseViewCount();
+		if (authMember != null) {
+			// 조회수 +1
+			Product product = findProductByIdOrElseThrow(productId);
+			product.increaseViewCount();
 
-		// 조회 내역 저장
-		ProductViewHistory productViewHistory = new ProductViewHistory(productId, memberId);
-		productViewHistoryRepository.save(productViewHistory);
+			// 조회 내역 저장
+			ProductViewHistory productViewHistory = new ProductViewHistory(productId, authMember.getMemberId());
+			productViewHistoryRepository.save(productViewHistory);
+		}
 
 		return productQueryRepository.getProductInfoById(productId).orElseThrow(
 			() -> new BusinessException(ProductErrorCode.CANNOT_READ_PRODUCT_INFO));

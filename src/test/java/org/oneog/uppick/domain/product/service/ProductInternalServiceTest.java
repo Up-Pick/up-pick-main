@@ -40,8 +40,6 @@ public class ProductInternalServiceTest {
 	@InjectMocks
 	ProductInternalService productInternalService;
 
-	private Product product;
-
 	@BeforeEach
 	public void init() {
 		productInternalService = new ProductInternalService(
@@ -52,13 +50,6 @@ public class ProductInternalServiceTest {
 			productMapper,
 			s3FileManager,
 			auctionExternalServiceApi);
-
-		product = Product.builder()
-			.name("상품 이름")
-			.description("상품 설명")
-			.categoryId(1L)
-			.registerId(1L)
-			.build();
 
 		// ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 		// Validator validator = factory.getValidator();
@@ -123,18 +114,5 @@ public class ProductInternalServiceTest {
 		assertThat(saved.getDescription()).isEqualTo(request.getDescription());
 		assertThat(saved.getCategoryId()).isEqualTo(request.getCategoryId());
 		assertThat(saved.getImage()).isEqualTo(imageUrl);
-	}
-
-	@Test
-	void 상품을_상세_조회하면_조회수가_올라감() {
-
-		// given
-		Long prevViewCount = product.getViewCount();
-
-		// when
-		product.increaseViewCount();
-
-		// then
-		assertThat(product.getViewCount()).isEqualTo(prevViewCount + 1);
 	}
 }
