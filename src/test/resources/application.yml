@@ -10,6 +10,13 @@ spring:
   h2:
     console:
       enabled: true
+  cloud:
+    aws:
+      region:
+        static: ap-northeast-2
+      s3:
+        enabled: false
+        bucket: test-bucket
 jwt:
   secret:
     key: "VXBwaWNrUHJvamVjdFNlY3JldEtleUZvclRlc3RpbmdQdXJwb3NlczEyMzQ1Njc4OTA="

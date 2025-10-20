@@ -15,14 +15,16 @@ import org.oneog.uppick.domain.product.service.ProductInternalService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -36,12 +38,13 @@ public class ProductController {
 
 	// 판매 상품 등록
 	@PreAuthorize("isAuthenticated()")
-	@PostMapping
+	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public GlobalApiResponse<Void> registerProduct(
-		@Valid @RequestBody ProductRegisterRequest request,
+		@Valid @RequestPart("product") ProductRegisterRequest request,
+		@RequestPart("image") MultipartFile image,
 		@AuthenticationPrincipal AuthMember authMember) {
 
-		productInternalService.registerProduct(request, authMember.getMemberId());
+		productInternalService.registerProduct(request, image, authMember.getMemberId());
 		return GlobalApiResponse.ok(null);
 	}
 

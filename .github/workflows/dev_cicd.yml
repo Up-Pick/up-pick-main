@@ -111,4 +111,6 @@ jobs:
               -e DB_USER=${{ secrets.DEV_DB_USER }} \
               -e DB_PASS=${{ secrets.DEV_DB_PASS }} \
               -e JWT_KEY=${{ secrets.DEV_JWT_KEY }} \
+              -e AWS_REGION=${{ secrets.DEV_AWS_REGION }} \
+              -e S3_BUCKET_NAME=${{ secrets.DEV_S3_BUCKET_NAME }} \
               ${{ steps.login-ecr.outputs.registry }}/${{ secrets.DEV_ECR_REPOSITORY_URI }}:latest
