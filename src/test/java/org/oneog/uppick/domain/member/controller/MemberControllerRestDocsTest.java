@@ -36,7 +36,7 @@ class MemberControllerRestDocsTest extends RestDocsBase {
 	@Test
 	@DisplayName("크레딧 충전 API Rest Docs 문서화")
 	@WithMockAuthMember
-	void documentCreditCharge() throws Exception {
+	void creditCharge_정상요청_성공응답반환() throws Exception {
 		// given
 		CreditChargeRequest request = new CreditChargeRequest(10000L);
 		CreditChargeResponse response = new CreditChargeResponse(20000L); // 10000 충전 후 잔액 20000
@@ -74,7 +74,7 @@ class MemberControllerRestDocsTest extends RestDocsBase {
 	@Test
 	@DisplayName("내 크레딧 조회 API Rest Docs 문서화 ")
 	@WithMockAuthMember
-	void documentGetCredit() throws Exception {
+	void getCredit_정상요청_성공응답반환() throws Exception {
 		// given
 		CreditGetResponse response = new CreditGetResponse(20000L); // 예시: 현재 잔액 20000
 
