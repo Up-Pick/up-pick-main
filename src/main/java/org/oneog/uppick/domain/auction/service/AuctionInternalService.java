@@ -51,7 +51,11 @@ public class AuctionInternalService {
 			Long biddingPrice = request.getBiddingPrice();
 			Long currentPrice = auction.getCurrentPrice();
 			Long minPrice = auction.getMinPrice();
-
+			//  포인트 잔액 확인
+			Long memberPoint = auctionQueryRepository.findPointByMemberId(memberId);
+			if (biddingPrice > memberPoint) {
+				throw new BusinessException(AuctionErrorCode.INSUFFICIENT_CREDIT);
+			}
 			boolean validBid =
 				(currentPrice == null && biddingPrice >= minPrice) ||
 					(currentPrice != null && biddingPrice > currentPrice);

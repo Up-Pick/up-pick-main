@@ -140,6 +140,35 @@ public class AuctionInternalServiceTest {
 	}
 
 	@Test
+	void bid_크레딧부족_예외() {
+		// given
+		long auctionId = 1L;
+		long memberId = 100L;
+		long newBidPrice = 2000L;
+
+		Auction auction = Auction.builder()
+			.productId(10L)
+			.minPrice(1000L)
+			.currentPrice(1500L)
+			.status(AuctionStatus.IN_PROGRESS)
+			.endAt(LocalDateTime.now().plusDays(1))
+			.build();
+
+		AuctionBidRequest request = new AuctionBidRequest(newBidPrice);
+
+		given(auctionRepository.findById(auctionId)).willReturn(Optional.of(auction));
+		given(auctionQueryRepository.findSellerIdByAuctionId(auctionId)).willReturn(200L);
+		given(auctionQueryRepository.findPointByMemberId(memberId)).willReturn(1000L);
+
+		// when & then
+		assertThatThrownBy(() -> auctionInternalService.bid(request, auctionId, memberId))
+			.isInstanceOf(BusinessException.class)
+			.hasMessageContaining("보유한 크레딧");
+
+		verify(biddingDetailRepository, never()).save(any());
+	}
+
+	@Test
 	void sendBidNotifications_입찰을한상황_알람내역데이터정상반환() {
 		// given
 		Auction auction = Auction.builder()
