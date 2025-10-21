@@ -17,7 +17,7 @@ import jakarta.validation.ConstraintViolationException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.multipart.MultipartException;
-
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 import org.oneog.uppick.common.dto.GlobalApiResponse;
 
 @Slf4j
@@ -113,6 +113,13 @@ public class GlobalExceptionHandler {
         log.warn("Multipart upload error: {}", e.getMessage(), e);
         GlobalApiResponse<Void> response = GlobalApiResponse.fail(null, "Multipart upload error: " + e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<GlobalApiResponse<Void>> handleNoResourceFoundException(NoResourceFoundException e) {
+        log.warn("Resource not found: {}", e.getMessage(), e);
+        GlobalApiResponse<Void> response = GlobalApiResponse.fail(null, "Resource not found");
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(Exception.class)
