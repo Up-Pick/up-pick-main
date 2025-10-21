@@ -1,0 +1,41 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.5.6'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+// 의존성 버전은 루트 프로젝트에서 관리합니다.
+dependencyManagement {
+    imports {
+        mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:${springCloudAwsVersion}"
+    }
+}
+
+dependencies {
+    // 공통 모듈 의존성 추가
+    implementation project(':uppick-common')
+
+    // member-service에만 필요한 의존성
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    runtimeOnly 'com.mysql:mysql-connector-j'
+
+    // 테스트
+    testImplementation 'org.springframework.security:spring-security-test'
+}
+
+// QueryDSL이 생성하는 소스 디렉터리를 main 소스셋에 추가
+sourceSets {
+    main {
+        java {
+            srcDirs += "$buildDir/generated/sources/annotationProcessor/java/main"
+        }
+    }
+}
+
+// Java 컴파일러의 APT 생성 경로를 명시적으로 설정
+tasks.withType(JavaCompile).configureEach { compileTask ->
+    def target = compileTask.name.toLowerCase().contains('test') ?
+            layout.buildDirectory.dir("generated/sources/annotationProcessor/java/test") :
+            layout.buildDirectory.dir("generated/sources/annotationProcessor/java/main")
+    compileTask.options.generatedSourceOutputDirectory.set(target)
+}

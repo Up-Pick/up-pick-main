@@ -1,1 +1,5 @@
 rootProject.name = 'uppick'
+
+include 'uppick-main'
+include 'uppick-member-service'
+include 'uppick-common'
