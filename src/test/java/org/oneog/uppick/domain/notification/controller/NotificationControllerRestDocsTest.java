@@ -46,7 +46,7 @@ public class NotificationControllerRestDocsTest extends RestDocsBase {
         mockMvc.perform(get("/api/v1/notifications/me")
             .header("Authorization", "Bearer valid-token"))
             .andExpect(status().isOk())
-            .andDo(document("notifications-get-unread",
+            .andDo(document("notifications-get-unread-notifications",
                 requestHeaders(
                     headerWithName("Authorization").description("JWT 인증 토큰 (Bearer 토큰)")),
                 responseFields(
