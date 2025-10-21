@@ -45,7 +45,7 @@ public class AuctionInternalService {
 		try {
 			Auction auction = findAuctionById(auctionId);
 
-			// 1️⃣ 판매자 본인 입찰 방지
+			// 판매자 본인 입찰 방지
 			if (auctionQueryRepository.findSellerIdByAuctionId(auctionId).equals(memberId)) {
 				throw new BusinessException(AuctionErrorCode.CANNOT_BID_OWN_AUCTION);
 			}
@@ -54,13 +54,13 @@ public class AuctionInternalService {
 			Long currentPrice = auction.getCurrentPrice();
 			Long minPrice = auction.getMinPrice();
 
-			// 2️⃣ 포인트 잔액 확인
+			// 포인트 잔액 확인
 			Long memberPoint = auctionQueryRepository.findPointByMemberId(memberId);
 			if (biddingPrice > memberPoint) {
 				throw new BusinessException(AuctionErrorCode.INSUFFICIENT_CREDIT);
 			}
 
-			// 3️⃣ 입찰 가능 여부 확인
+			// 입찰 가능 여부 확인
 			boolean validBid =
 				(currentPrice == null && biddingPrice >= minPrice) ||
 					(currentPrice != null && biddingPrice > currentPrice);
@@ -69,29 +69,29 @@ public class AuctionInternalService {
 				throw new BusinessException(AuctionErrorCode.WRONG_BIDDING_PRICE);
 			}
 
-			// 4️⃣ 이전 최고 입찰자 조회
+			// 이전 최고 입찰자 조회
 			Long previousBidderId = biddingDetailQueryRepository.findTopBidderIdByAuctionId(auctionId)
 				.orElse(null);
 			Long previousBidPrice = currentPrice;
 
-			// 5️⃣ 본인 재입찰 or 신규 입찰 처리
+			//  본인 재입찰 or 신규 입찰 처리
 			if (previousBidderId != null && previousBidderId.equals(memberId)) {
-				// ✅ 본인 재입찰: 차액만 차감
+				// 본인 재입찰: 차액만 차감
 				long additionalAmount = biddingPrice - previousBidPrice;
 				memberExternalServiceApi.updateMemberCredit(memberId, -additionalAmount);
 				log.info("기존 입찰자({}) 재입찰: 추가 차감 {}", memberId, additionalAmount);
 			} else {
-				// ✅ 새 입찰자: 전체 금액 차감
+				// 새 입찰자: 전체 금액 차감
 				memberExternalServiceApi.updateMemberCredit(memberId, -biddingPrice);
 
-				// ✅ 이전 최고 입찰자 환불
+				// 이전 최고 입찰자 환불
 				if (previousBidderId != null && previousBidPrice != null) {
 					memberExternalServiceApi.updateMemberCredit(previousBidderId, previousBidPrice);
 					log.info("이전 최고 입찰자({}) 환불: {}", previousBidderId, previousBidPrice);
 				}
 			}
 
-			// 6️⃣ 입찰가 갱신 및 기록 저장
+			// 입찰가 갱신 및 기록 저장
 			auction.updateCurrentPrice(biddingPrice);
 
 			BiddingDetail biddingDetail = auctionMapper.toEntity(
@@ -101,7 +101,7 @@ public class AuctionInternalService {
 			);
 			biddingDetailRepository.save(biddingDetail);
 
-			// 7️⃣ 알림 전송
+			// 알림 전송
 			log.info("알림 전송 시작");
 			sendBidNotifications(auction, memberId, biddingPrice);
 			log.info("알림 전송 완료");
