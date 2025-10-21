@@ -66,6 +66,7 @@ public class AuctionInternalServiceTest {
 
 		given(auctionRepository.findById(auctionId)).willReturn(Optional.of(auction));
 		given(auctionQueryRepository.findSellerIdByAuctionId(auctionId)).willReturn(sellerId);
+		given(auctionQueryRepository.findPointByMemberId(anyLong())).willReturn(999999L);
 
 		BiddingDetail biddingDetail = BiddingDetail.builder()
 			.auctionId(auctionId)
@@ -102,6 +103,7 @@ public class AuctionInternalServiceTest {
 		AuctionBidRequest request = new AuctionBidRequest(1500L); // 현재입찰가(2000)보다 낮음
 
 		given(auctionRepository.findById(auctionId)).willReturn(Optional.of(auction));
+		given(auctionQueryRepository.findPointByMemberId(anyLong())).willReturn(999999L);
 
 		// when/then
 		assertThatThrownBy(() -> auctionInternalService.bid(request, auctionId, memberId))
@@ -194,7 +196,7 @@ public class AuctionInternalServiceTest {
 		//해당 경매에 참여한 사용자 목록 반환 (본인 포함)
 		given(biddingDetailQueryRepository.findDistinctBidderIdsByAuctionId(anyLong()))
 			.willReturn(List.of(100L, 200L, 150L));
-
+		given(auctionQueryRepository.findPointByMemberId(anyLong())).willReturn(999999L);
 		// when
 		auctionInternalService.bid(new AuctionBidRequest(biddingPrice), auctionId, bidderId);
 
