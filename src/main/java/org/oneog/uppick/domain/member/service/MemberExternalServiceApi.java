@@ -32,4 +32,13 @@ public interface MemberExternalServiceApi {
 	void createUser(SignupRequest request, String encodedPassword);
 
 	Member findByEmail(String email);
+
+	/**
+	 * 특정 회원의 크레딧(포인트) 차감/추가
+	 * @param memberId 대상 회원 ID
+	 * @param amount   증감 금액
+	 */
+	default void updateMemberCredit(Long memberId, Long amount) {
+		return;
+	}
 }

@@ -23,6 +23,7 @@ import org.oneog.uppick.domain.auction.repository.AuctionQueryRepository;
 import org.oneog.uppick.domain.auction.repository.AuctionRepository;
 import org.oneog.uppick.domain.auction.repository.BiddingDetailQueryRepository;
 import org.oneog.uppick.domain.auction.repository.BiddingDetailRepository;
+import org.oneog.uppick.domain.member.service.MemberExternalServiceApi;
 import org.oneog.uppick.domain.notification.entity.NotificationType;
 import org.oneog.uppick.domain.notification.service.NotificationExternalServiceApi;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -42,7 +43,9 @@ public class AuctionInternalServiceTest {
 	private BiddingDetailQueryRepository biddingDetailQueryRepository;
 	@Mock
 	private NotificationExternalServiceApi notificationExternalServiceApi;
-
+	@Mock
+	private MemberExternalServiceApi memberExternalServiceApi;
+	
 	@InjectMocks
 	private AuctionInternalService auctionInternalService;
 
