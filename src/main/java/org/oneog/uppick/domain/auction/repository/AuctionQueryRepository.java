@@ -1,6 +1,7 @@
 package org.oneog.uppick.domain.auction.repository;
 
 import static org.oneog.uppick.domain.auction.entity.QAuction.*;
+import static org.oneog.uppick.domain.member.entity.QMember.*;
 import static org.oneog.uppick.domain.product.entity.QProduct.*;
 
 import org.springframework.stereotype.Repository;
@@ -32,6 +33,14 @@ public class AuctionQueryRepository {
 			.select(product.name)
 			.from(product)
 			.where(product.id.eq(productId))
+			.fetchOne();
+	}
+
+	public Long findPointByMemberId(Long memberId) {
+		return jpaQueryFactory
+			.select(member.credit)
+			.from(member)
+			.where(member.id.eq(memberId))
 			.fetchOne();
 	}
 }

@@ -66,6 +66,7 @@ public class AuctionInternalServiceTest {
 
 		given(auctionRepository.findById(auctionId)).willReturn(Optional.of(auction));
 		given(auctionQueryRepository.findSellerIdByAuctionId(auctionId)).willReturn(sellerId);
+		given(auctionQueryRepository.findPointByMemberId(anyLong())).willReturn(999999L);
 
 		BiddingDetail biddingDetail = BiddingDetail.builder()
 			.auctionId(auctionId)
@@ -102,6 +103,7 @@ public class AuctionInternalServiceTest {
 		AuctionBidRequest request = new AuctionBidRequest(1500L); // 현재입찰가(2000)보다 낮음
 
 		given(auctionRepository.findById(auctionId)).willReturn(Optional.of(auction));
+		given(auctionQueryRepository.findPointByMemberId(anyLong())).willReturn(999999L);
 
 		// when/then
 		assertThatThrownBy(() -> auctionInternalService.bid(request, auctionId, memberId))
@@ -140,6 +142,35 @@ public class AuctionInternalServiceTest {
 	}
 
 	@Test
+	void bid_크레딧부족_예외() {
+		// given
+		long auctionId = 1L;
+		long memberId = 100L;
+		long newBidPrice = 2000L;
+
+		Auction auction = Auction.builder()
+			.productId(10L)
+			.minPrice(1000L)
+			.currentPrice(1500L)
+			.status(AuctionStatus.IN_PROGRESS)
+			.endAt(LocalDateTime.now().plusDays(1))
+			.build();
+
+		AuctionBidRequest request = new AuctionBidRequest(newBidPrice);
+
+		given(auctionRepository.findById(auctionId)).willReturn(Optional.of(auction));
+		given(auctionQueryRepository.findSellerIdByAuctionId(auctionId)).willReturn(200L);
+		given(auctionQueryRepository.findPointByMemberId(memberId)).willReturn(1000L);
+
+		// when & then
+		assertThatThrownBy(() -> auctionInternalService.bid(request, auctionId, memberId))
+			.isInstanceOf(BusinessException.class)
+			.hasMessageContaining("보유한 크레딧");
+
+		verify(biddingDetailRepository, never()).save(any());
+	}
+
+	@Test
 	void sendBidNotifications_입찰을한상황_알람내역데이터정상반환() {
 		// given
 		Auction auction = Auction.builder()
@@ -165,7 +196,7 @@ public class AuctionInternalServiceTest {
 		//해당 경매에 참여한 사용자 목록 반환 (본인 포함)
 		given(biddingDetailQueryRepository.findDistinctBidderIdsByAuctionId(anyLong()))
 			.willReturn(List.of(100L, 200L, 150L));
-
+		given(auctionQueryRepository.findPointByMemberId(anyLong())).willReturn(999999L);
 		// when
 		auctionInternalService.bid(new AuctionBidRequest(biddingPrice), auctionId, bidderId);
 
