@@ -12,6 +12,7 @@ import org.oneog.uppick.domain.auction.repository.AuctionQueryRepository;
 import org.oneog.uppick.domain.auction.repository.AuctionRepository;
 import org.oneog.uppick.domain.auction.repository.BiddingDetailQueryRepository;
 import org.oneog.uppick.domain.auction.repository.BiddingDetailRepository;
+import org.oneog.uppick.domain.member.service.MemberExternalServiceApi;
 import org.oneog.uppick.domain.notification.entity.NotificationType;
 import org.oneog.uppick.domain.notification.service.NotificationExternalServiceApi;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,7 @@ public class AuctionInternalService {
 	private final BiddingDetailQueryRepository biddingDetailQueryRepository;
 	// ****** External Domain API ***** //
 	private final NotificationExternalServiceApi notificationExternalServiceApi;
+	private final MemberExternalServiceApi memberExternalServiceApi;
 
 	//특정 상품에 입찰 시도를 한다
 	@Transactional
@@ -51,32 +53,59 @@ public class AuctionInternalService {
 			Long biddingPrice = request.getBiddingPrice();
 			Long currentPrice = auction.getCurrentPrice();
 			Long minPrice = auction.getMinPrice();
-			//  포인트 잔액 확인
+
+			// 포인트 잔액 확인
 			Long memberPoint = auctionQueryRepository.findPointByMemberId(memberId);
 			if (biddingPrice > memberPoint) {
 				throw new BusinessException(AuctionErrorCode.INSUFFICIENT_CREDIT);
 			}
+
+			// 입찰 가능 여부 확인
 			boolean validBid =
 				(currentPrice == null && biddingPrice >= minPrice) ||
 					(currentPrice != null && biddingPrice > currentPrice);
 
-			if (validBid) {
-				auction.updateCurrentPrice(request.getBiddingPrice());
-
-				BiddingDetail biddingDetail = auctionMapper.toEntity(
-					auctionId,
-					memberId,
-					request.getBiddingPrice()
-				);
-				biddingDetailRepository.save(biddingDetail);
-
-				log.info("알림 전송 시작");
-				sendBidNotifications(auction, memberId, biddingPrice);
-				log.info("알림 전송 완료");
-
-			} else {
+			if (!validBid) {
 				throw new BusinessException(AuctionErrorCode.WRONG_BIDDING_PRICE);
 			}
+
+			// 이전 최고 입찰자 조회
+			Long previousBidderId = biddingDetailQueryRepository.findTopBidderIdByAuctionId(auctionId)
+				.orElse(null);
+			Long previousBidPrice = currentPrice;
+
+			//  본인 재입찰 or 신규 입찰 처리
+			if (previousBidderId != null && previousBidderId.equals(memberId)) {
+				// 본인 재입찰: 차액만 차감
+				long additionalAmount = biddingPrice - previousBidPrice;
+				memberExternalServiceApi.updateMemberCredit(memberId, -additionalAmount);
+				log.info("기존 입찰자({}) 재입찰: 추가 차감 {}", memberId, additionalAmount);
+			} else {
+				// 새 입찰자: 전체 금액 차감
+				memberExternalServiceApi.updateMemberCredit(memberId, -biddingPrice);
+
+				// 이전 최고 입찰자 환불
+				if (previousBidderId != null && previousBidPrice != null) {
+					memberExternalServiceApi.updateMemberCredit(previousBidderId, previousBidPrice);
+					log.info("이전 최고 입찰자({}) 환불: {}", previousBidderId, previousBidPrice);
+				}
+			}
+
+			// 입찰가 갱신 및 기록 저장
+			auction.updateCurrentPrice(biddingPrice);
+
+			BiddingDetail biddingDetail = auctionMapper.toEntity(
+				auctionId,
+				memberId,
+				biddingPrice
+			);
+			biddingDetailRepository.save(biddingDetail);
+
+			// 알림 전송
+			log.info("알림 전송 시작");
+			sendBidNotifications(auction, memberId, biddingPrice);
+			log.info("알림 전송 완료");
+
 		} catch (Exception e) {
 			log.error("입찰 처리 중 예외 발생", e);
 			throw e;

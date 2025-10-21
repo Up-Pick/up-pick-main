@@ -43,4 +43,11 @@ public class AuctionQueryRepository {
 			.where(member.id.eq(memberId))
 			.fetchOne();
 	}
+
+	public void updateMemberCredit(Long memberId, Long amountChange) {
+		jpaQueryFactory.update(member)
+			.set(member.credit, member.credit.add(amountChange))
+			.where(member.id.eq(memberId))
+			.execute();
+	}
 }

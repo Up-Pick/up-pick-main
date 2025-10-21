@@ -57,4 +57,8 @@ public class Member {
 		}
 		this.credit += amount;
 	}
+
+	public void updateCredit(Long newCredit) {
+		this.credit = newCredit;
+	}
 }

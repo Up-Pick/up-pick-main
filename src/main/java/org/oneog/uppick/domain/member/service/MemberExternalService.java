@@ -6,11 +6,13 @@ import org.oneog.uppick.domain.auth.exception.AuthErrorCode;
 import org.oneog.uppick.domain.member.entity.Member;
 import org.oneog.uppick.domain.member.entity.PurchaseDetail;
 import org.oneog.uppick.domain.member.entity.SellDetail;
+import org.oneog.uppick.domain.member.exception.MemberErrorCode;
 import org.oneog.uppick.domain.member.mapper.MemberMapper;
 import org.oneog.uppick.domain.member.repository.MemberRepository;
 import org.oneog.uppick.domain.member.repository.PurchaseDetailRepository;
 import org.oneog.uppick.domain.member.repository.SellDetailRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 
@@ -56,6 +58,19 @@ public class MemberExternalService implements MemberExternalServiceApi {
 	public Member findByEmail(String email) {
 		return memberRepository.findByEmail(email)
 			.orElseThrow(() -> new BusinessException(AuthErrorCode.USER_NOT_FOUND));
+	}
+
+	@Transactional
+	@Override
+	public void updateMemberCredit(Long memberId, Long amount) {
+		Member member = memberRepository.findMemberById(memberId);
+
+		long updatedCredit = member.getCredit() + amount;
+		if (updatedCredit < 0) {
+			throw new BusinessException(MemberErrorCode.INVALID_CHARGE_AMOUNT);
+		}
+
+		member.updateCredit(updatedCredit);
 	}
 }
 
