@@ -52,7 +52,7 @@ public class RankingSchedulerService {
 		log.info("[Scheduler] 핫딜 랭킹 업데이트 종료");
 	}
 
-	@Scheduled(cron = "0 0 0 * * MON")
+	@Scheduled(cron = "0 0 0 * * *") // 매일 자정 업데이트
 	@Transactional
 	public void updateWeeklyTop10HotKeywords() {
 
