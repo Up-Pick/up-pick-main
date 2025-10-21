@@ -61,6 +61,7 @@ public class MemberExternalService implements MemberExternalServiceApi {
 	}
 
 	@Transactional
+	@Override
 	public void updateMemberCredit(Long memberId, Long amount) {
 		Member member = memberRepository.findMemberById(memberId);
 

@@ -38,7 +38,5 @@ public interface MemberExternalServiceApi {
 	 * @param memberId 대상 회원 ID
 	 * @param amount   증감 금액
 	 */
-	default void updateMemberCredit(Long memberId, Long amount) {
-		return;
-	}
+	void updateMemberCredit(Long memberId, Long amount);
 }
