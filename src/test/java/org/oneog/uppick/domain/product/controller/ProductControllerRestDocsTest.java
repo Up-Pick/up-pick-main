@@ -20,6 +20,7 @@ import org.oneog.uppick.domain.product.dto.response.ProductBiddingInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductPurchasedInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductRecentViewInfoResponse;
+import org.oneog.uppick.domain.product.dto.response.ProductSellingInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductSimpleInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductSoldInfoResponse;
 import org.oneog.uppick.domain.product.service.ProductInternalService;
@@ -160,20 +161,20 @@ class ProductControllerRestDocsTest extends RestDocsBase {
 
 	@Test
 	@WithMockAuthMember(memberId = 10L, memberNickname = "tester")
-	void getBiddingProducts_정상적인상황_입찰중인상품목록조회성공() throws Exception {
-		List<ProductBiddingInfoResponse> contents = List.of(
-			new ProductBiddingInfoResponse(1L, "상품1", "image1.jpg", LocalDateTime.now().plusDays(1), 1000L, 1100L),
-			new ProductBiddingInfoResponse(2L, "상품2", "image2.jpg", LocalDateTime.now().plusDays(2), 2000L, 2100L));
-		Page<ProductBiddingInfoResponse> page = new PageImpl<>(contents, Pageable.ofSize(10), 2);
+	void getSoldProducts_정상적인상황_판매완료상품내역조회성공() throws Exception {
+		List<ProductSoldInfoResponse> contents = List.of(
+			new ProductSoldInfoResponse(1L, "상품1", "상품 설명1", "image1.jpg", 30_000L, LocalDateTime.now()),
+			new ProductSoldInfoResponse(2L, "상품2", "상품 설명2", "image2.jpg", 45_000L, LocalDateTime.now()));
+		Page<ProductSoldInfoResponse> page = new PageImpl<>(contents, Pageable.ofSize(20), 2);
 
-		given(productInternalService.getBiddingProductInfoByMemberId(eq(10L), any(Pageable.class)))
+		given(productInternalService.getProductSoldInfoByMemberId(eq(10L), any(Pageable.class)))
 			.willReturn(page);
 
-		this.mockMvc.perform(get("/api/v1/products/bidding/me")
+		this.mockMvc.perform(get("/api/v1/products/sold/me")
 				.header("Authorization", "Bearer token")
 				.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
-			.andDo(document("product-get-bidding-products",
+			.andDo(document("product-get-sold-products",
 				requestHeaders(
 					headerWithName("Authorization").description("JWT 액세스 토큰 (Bearer {token})")),
 				responseFields(
@@ -181,13 +182,13 @@ class ProductControllerRestDocsTest extends RestDocsBase {
 					fieldWithPath("size").type(JsonFieldType.NUMBER).description("페이지 크기"),
 					fieldWithPath("totalPages").type(JsonFieldType.NUMBER).description("총 페이지 수"),
 					fieldWithPath("totalElements").type(JsonFieldType.NUMBER).description("총 요소 수"),
-					fieldWithPath("contents[]").type(JsonFieldType.ARRAY).description("상품 목록"),
+					fieldWithPath("contents[]").type(JsonFieldType.ARRAY).description("판매 완료 상품 목록"),
 					fieldWithPath("contents[].id").type(JsonFieldType.NUMBER).description("상품 ID"),
 					fieldWithPath("contents[].name").type(JsonFieldType.STRING).description("상품 이름"),
+					fieldWithPath("contents[].description").type(JsonFieldType.STRING).description("상품 설명"),
 					fieldWithPath("contents[].image").type(JsonFieldType.STRING).description("상품 이미지 URL"),
-					fieldWithPath("contents[].endAt").type(JsonFieldType.STRING).description("마감 일시 (ISO-8601)"),
-					fieldWithPath("contents[].currentBid").type(JsonFieldType.NUMBER).description("현재 입찰가"),
-					fieldWithPath("contents[].bidPrice").type(JsonFieldType.NUMBER).description("입찰 가격"))));
+					fieldWithPath("contents[].finalPrice").type(JsonFieldType.NUMBER).description("최종 낙찰가 가격"),
+					fieldWithPath("contents[].soldAt").type(JsonFieldType.STRING).description("구매 일시 (ISO-8601)"))));
 	}
 
 	@Test
@@ -223,6 +224,70 @@ class ProductControllerRestDocsTest extends RestDocsBase {
 
 	@Test
 	@WithMockAuthMember(memberId = 10L, memberNickname = "tester")
+	void getBiddingProducts_정상적인상황_입찰중인상품목록조회성공() throws Exception {
+		List<ProductBiddingInfoResponse> contents = List.of(
+			new ProductBiddingInfoResponse(1L, "상품1", "image1.jpg", LocalDateTime.now().plusDays(1), 1000L, 1100L),
+			new ProductBiddingInfoResponse(2L, "상품2", "image2.jpg", LocalDateTime.now().plusDays(2), 2000L, 2100L));
+		Page<ProductBiddingInfoResponse> page = new PageImpl<>(contents, Pageable.ofSize(10), 2);
+
+		given(productInternalService.getBiddingProductInfoByMemberId(eq(10L), any(Pageable.class)))
+			.willReturn(page);
+
+		this.mockMvc.perform(get("/api/v1/products/bidding/me")
+				.header("Authorization", "Bearer token")
+				.accept(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andDo(document("product-get-bidding-products",
+				requestHeaders(
+					headerWithName("Authorization").description("JWT 액세스 토큰 (Bearer {token})")),
+				responseFields(
+					fieldWithPath("page").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
+					fieldWithPath("size").type(JsonFieldType.NUMBER).description("페이지 크기"),
+					fieldWithPath("totalPages").type(JsonFieldType.NUMBER).description("총 페이지 수"),
+					fieldWithPath("totalElements").type(JsonFieldType.NUMBER).description("총 요소 수"),
+					fieldWithPath("contents[]").type(JsonFieldType.ARRAY).description("상품 목록"),
+					fieldWithPath("contents[].id").type(JsonFieldType.NUMBER).description("상품 ID"),
+					fieldWithPath("contents[].name").type(JsonFieldType.STRING).description("상품 이름"),
+					fieldWithPath("contents[].image").type(JsonFieldType.STRING).description("상품 이미지 URL"),
+					fieldWithPath("contents[].endAt").type(JsonFieldType.STRING).description("마감 일시 (ISO-8601)"),
+					fieldWithPath("contents[].currentBid").type(JsonFieldType.NUMBER).description("현재 입찰가"),
+					fieldWithPath("contents[].bidPrice").type(JsonFieldType.NUMBER).description("입찰 가격"))));
+	}
+
+	@Test
+	@WithMockAuthMember(memberId = 10L, memberNickname = "tester")
+	void getSellingProducts_정상적인상황_경매중인상품목록조회성공() throws Exception {
+		List<ProductSellingInfoResponse> contents = List.of(
+			new ProductSellingInfoResponse(1L, "상품1", "image1.jpg", LocalDateTime.now().plusDays(1), 1000L, 1L),
+			new ProductSellingInfoResponse(2L, "상품2", "image2.jpg", LocalDateTime.now().plusDays(2), 2000L, 2L));
+		Page<ProductSellingInfoResponse> page = new PageImpl<>(contents, Pageable.ofSize(10), 2);
+
+		given(productInternalService.getSellingProductInfoByMemberId(eq(10L), any(Pageable.class)))
+			.willReturn(page);
+
+		this.mockMvc.perform(get("/api/v1/products/selling/me")
+				.header("Authorization", "Bearer token")
+				.accept(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andDo(document("product-get-bidding-products",
+				requestHeaders(
+					headerWithName("Authorization").description("JWT 액세스 토큰 (Bearer {token})")),
+				responseFields(
+					fieldWithPath("page").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
+					fieldWithPath("size").type(JsonFieldType.NUMBER).description("페이지 크기"),
+					fieldWithPath("totalPages").type(JsonFieldType.NUMBER).description("총 페이지 수"),
+					fieldWithPath("totalElements").type(JsonFieldType.NUMBER).description("총 요소 수"),
+					fieldWithPath("contents[]").type(JsonFieldType.ARRAY).description("상품 목록"),
+					fieldWithPath("contents[].id").type(JsonFieldType.NUMBER).description("상품 ID"),
+					fieldWithPath("contents[].name").type(JsonFieldType.STRING).description("상품 이름"),
+					fieldWithPath("contents[].image").type(JsonFieldType.STRING).description("상품 이미지 URL"),
+					fieldWithPath("contents[].endAt").type(JsonFieldType.STRING).description("마감 일시 (ISO-8601)"),
+					fieldWithPath("contents[].currentBid").type(JsonFieldType.NUMBER).description("현재 입찰가"),
+					fieldWithPath("contents[].auctionId").type(JsonFieldType.NUMBER).description("경매 ID"))));
+	}
+
+	@Test
+	@WithMockAuthMember(memberId = 10L, memberNickname = "tester")
 	void getRecentlyViewedProducts_정상적인상황_최근본상품조회성공() throws Exception {
 		ProductRecentViewInfoResponse response1 = new ProductRecentViewInfoResponse(
 			1L, "테스트 상품1", "image1.jpg", 1500L, LocalDateTime.now().plusDays(7), LocalDateTime.now().minusHours(1));
@@ -253,37 +318,5 @@ class ProductControllerRestDocsTest extends RestDocsBase {
 						.attributes(key("optional").value(true)),
 					fieldWithPath("contents[].endAt").type(JsonFieldType.STRING).description("마감 일시 (ISO-8601)"),
 					fieldWithPath("contents[].viewedAt").type(JsonFieldType.STRING).description("조회 일시 (ISO-8601)"))));
-	}
-
-	@Test
-	@WithMockAuthMember(memberId = 10L, memberNickname = "tester")
-	void getSoldProducts_정상적인상황_판매완료상품내역조회성공() throws Exception {
-		List<ProductSoldInfoResponse> contents = List.of(
-			new ProductSoldInfoResponse(1L, "상품1", "상품 설명1", "image1.jpg", 30_000L, LocalDateTime.now()),
-			new ProductSoldInfoResponse(2L, "상품2", "상품 설명2", "image2.jpg", 45_000L, LocalDateTime.now()));
-		Page<ProductSoldInfoResponse> page = new PageImpl<>(contents, Pageable.ofSize(20), 2);
-
-		given(productInternalService.getProductSoldInfoByMemberId(eq(10L), any(Pageable.class)))
-			.willReturn(page);
-
-		this.mockMvc.perform(get("/api/v1/products/sold/me")
-				.header("Authorization", "Bearer token")
-				.accept(MediaType.APPLICATION_JSON))
-			.andExpect(status().isOk())
-			.andDo(document("product-get-sold-products",
-				requestHeaders(
-					headerWithName("Authorization").description("JWT 액세스 토큰 (Bearer {token})")),
-				responseFields(
-					fieldWithPath("page").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
-					fieldWithPath("size").type(JsonFieldType.NUMBER).description("페이지 크기"),
-					fieldWithPath("totalPages").type(JsonFieldType.NUMBER).description("총 페이지 수"),
-					fieldWithPath("totalElements").type(JsonFieldType.NUMBER).description("총 요소 수"),
-					fieldWithPath("contents[]").type(JsonFieldType.ARRAY).description("판매 완료 상품 목록"),
-					fieldWithPath("contents[].id").type(JsonFieldType.NUMBER).description("상품 ID"),
-					fieldWithPath("contents[].name").type(JsonFieldType.STRING).description("상품 이름"),
-					fieldWithPath("contents[].description").type(JsonFieldType.STRING).description("상품 설명"),
-					fieldWithPath("contents[].image").type(JsonFieldType.STRING).description("상품 이미지 URL"),
-					fieldWithPath("contents[].finalPrice").type(JsonFieldType.NUMBER).description("최종 낙찰가 가격"),
-					fieldWithPath("contents[].soldAt").type(JsonFieldType.STRING).description("구매 일시 (ISO-8601)"))));
 	}
 }
