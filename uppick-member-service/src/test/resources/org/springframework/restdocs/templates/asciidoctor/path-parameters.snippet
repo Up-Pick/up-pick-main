@@ -1,0 +1,12 @@
+{{#title}}.{{title}}
+{{/title}}
+[cols="1,3",options="header"]
+|===
+|Path Parameter|Description
+
+{{#parameters}}
+|{{#tableCellContent}}`+{{name}}+`{{/tableCellContent}}
+|{{#tableCellContent}}{{description}}{{/tableCellContent}}
+
+{{/parameters}}
+|===

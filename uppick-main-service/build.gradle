@@ -5,14 +5,12 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.5.6'
     id 'io.spring.dependency-management' version '1.1.7'
-    id 'org.asciidoctor.jvm.convert' version '4.0.5' // spring rest docs (bumped for Gradle 8 compatibility)
+    id 'org.asciidoctor.jvm.convert' version '4.0.5'
 }
 
-// configuration for Asciidoctor extensions used by the asciidoctor task
 configurations {
     asciidoctorExtensions
 }
-
 
 dependencies {
     // 공통 모듈 의존성 추가
@@ -44,6 +42,7 @@ dependencies {
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
     asciidoctorExtensions 'org.springframework.restdocs:spring-restdocs-asciidoctor'
 
+
     // AWS S3
     implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3'
 }
@@ -53,7 +52,7 @@ ext {
     snippetsDir = file('build/generated-snippets')
 }
 
-// restdocs-index.gradle 스크립트 경로 수정
+// restdocs-index.gradle을 먼저 적용하여 generateRestDocsIndex task 생성
 apply from: rootProject.file('gradle/scripts/restdocs-index.gradle')
 
 tasks.named('test', Test) {
@@ -63,16 +62,14 @@ tasks.named('test', Test) {
 }
 
 tasks.named('asciidoctor', AsciidoctorTask) {
+    configurations 'asciidoctorExtensions'
     inputs.dir snippetsDir
-    configurations('asciidoctorExtensions')
-    dependsOn tasks.named('generateRestDocsIndex')
     baseDirFollowsSourceDir()
-    attributes('snippets': snippetsDir)
-}
-
-tasks.named('bootJar', BootJar) {
-    dependsOn tasks.named('asciidoctor')
-    from(layout.buildDirectory.dir('docs/asciidoc').map { it.asFile }) {
-        into 'static/docs'
+    attributes "snippets": snippetsDir
+    dependsOn tasks.named('generateRestDocsIndex')
+    
+    // snippets가 있을 때만 실행
+    onlyIf {
+        snippetsDir.exists()
     }
 }

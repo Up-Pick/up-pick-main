@@ -1,0 +1,14 @@
+{{#title}}.{{title}}
+{{/title}}
+[cols="1,1,3,2",options="header"]
+|===
+|Path|Type|Description|Notes
+
+{{#fields}}
+|{{#tableCellContent}}`+{{path}}+`{{/tableCellContent}}
+|{{#tableCellContent}}`+{{type}}+`{{/tableCellContent}}
+|{{#tableCellContent}}{{description}}{{/tableCellContent}}
+|{{#tableCellContent}}{{#optional}}Optional{{/optional}}{{^optional}}Required{{/optional}}{{#constraints}}; {{.}}{{/constraints}}{{#format}}; Format: {{.}}{{/format}}{{#example}}; Example: {{.}}{{/example}}{{/tableCellContent}}
+
+{{/fields}}
+|===

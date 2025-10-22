@@ -36,8 +36,14 @@ def heading = { StringBuilder lines, int level, String text ->
 
 tasks.register('generateRestDocsIndex') {
     dependsOn tasks.named('test')
-    inputs.dir snippetsDirRef
+    
     outputs.file(new File(snippetsDirRef, 'auto-index.adoc'))
+    
+    // test가 실행되지 않았으면 task를 건너뜀
+    onlyIf {
+        snippetsDirRef.exists()
+    }
+    
     doLast {
         File root = snippetsDirRef
         if (!root.exists()) {
@@ -48,14 +54,14 @@ tasks.register('generateRestDocsIndex') {
         def lines = new StringBuilder()
 
         if (operations.isEmpty()) {
-            heading(lines, 2, 'API 문서')
+            heading(lines, 3, 'API 문서')
             lines.append('생성된 스니펫이 없습니다.\n')
         } else {
             operations.each { dir ->
-                heading(lines, 2, toTitle(dir.name))
+                heading(lines, 3, toTitle(dir.name))
 
                 if (['curl-request', 'http-request'].any { snippetExists(dir, it) }) {
-                    heading(lines, 3, '요청 예시')
+                    heading(lines, 4, '요청 예시')
                     ['curl-request', 'http-request'].each { name ->
                         if (snippetExists(dir, name)) {
                             includeSnippet(lines, dir, name)
@@ -64,7 +70,7 @@ tasks.register('generateRestDocsIndex') {
                 }
 
                 if (snippetExists(dir, 'request-headers')) {
-                    heading(lines, 3, '요청 헤더')
+                    heading(lines, 4, '요청 헤더')
                     includeSnippet(lines, dir, 'request-headers')
                 }
 
@@ -75,10 +81,10 @@ tasks.register('generateRestDocsIndex') {
                 ]
 
                 if (parameterSnippets.keySet().any { snippetExists(dir, it) }) {
-                    heading(lines, 3, '요청 파라미터')
+                    heading(lines, 4, '요청 파라미터')
                     parameterSnippets.each { key, label ->
                         if (snippetExists(dir, key)) {
-                            heading(lines, 4, label)
+                            heading(lines, 5, label)
                             includeSnippet(lines, dir, key)
                         }
                     }
@@ -86,7 +92,7 @@ tasks.register('generateRestDocsIndex') {
 
                 // Multipart 요청 파트 (request-parts)
                 if (snippetExists(dir, 'request-parts')) {
-                    heading(lines, 3, '요청 파트')
+                    heading(lines, 4, '요청 파트')
                     includeSnippet(lines, dir, 'request-parts')
                     
                     // request-part-{name}-fields 와 request-part-{name}-body 찾기
@@ -110,13 +116,13 @@ tasks.register('generateRestDocsIndex') {
                         def hasBody = snippetExists(dir, "request-part-${partName}-body")
                         
                         if (hasFields || hasBody) {
-                            heading(lines, 4, "${partName.toUpperCase()} 파트")
+                            heading(lines, 5, "${partName.toUpperCase()} 파트")
                             if (hasFields) {
-                                heading(lines, 5, '필드 설명')
+                                heading(lines, 6, '필드 설명')
                                 includeSnippet(lines, dir, "request-part-${partName}-fields")
                             }
                             if (hasBody) {
-                                heading(lines, 5, '예시')
+                                heading(lines, 6, '예시')
                                 includeSnippet(lines, dir, "request-part-${partName}-body")
                             }
                         }
@@ -125,13 +131,13 @@ tasks.register('generateRestDocsIndex') {
 
                 // 일반 요청 본문
                 if (snippetExists(dir, 'request-fields') || snippetExists(dir, 'request-body')) {
-                    heading(lines, 3, '요청 본문')
+                    heading(lines, 4, '요청 본문')
                     if (snippetExists(dir, 'request-fields')) {
-                        heading(lines, 4, '필드 설명')
+                        heading(lines, 5, '필드 설명')
                         includeSnippet(lines, dir, 'request-fields')
                     }
                     if (snippetExists(dir, 'request-body')) {
-                        heading(lines, 4, '예시')
+                        heading(lines, 5, '예시')
                         includeSnippet(lines, dir, 'request-body')
                     }
                 }
@@ -144,17 +150,17 @@ tasks.register('generateRestDocsIndex') {
                 ]
 
                 if (responseSnippets.keySet().any { snippetExists(dir, it) }) {
-                    heading(lines, 3, '응답')
+                    heading(lines, 4, '응답')
                     responseSnippets.each { key, label ->
                         if (snippetExists(dir, key)) {
-                            heading(lines, 4, label)
+                            heading(lines, 5, label)
                             includeSnippet(lines, dir, key)
                         }
                     }
                 }
 
                 if (snippetExists(dir, 'links')) {
-                    heading(lines, 3, '관련 링크')
+                    heading(lines, 4, '관련 링크')
                     includeSnippet(lines, dir, 'links')
                 }
             }

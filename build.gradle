@@ -3,7 +3,8 @@
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.5.6' apply false
-    id 'io.spring.dependency-management' version '1.1.7' apply false
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'org.asciidoctor.jvm.convert' version '4.0.5'
 }
 
 // 모든 하위 프로젝트에 적용될 공통 설정 (그룹, 버전, 저장소)
@@ -21,6 +22,21 @@ ext {
     querydslVersion = '5.1.0'
     jjwtVersion = '0.13.0'
     springCloudAwsVersion = '3.4.0'
+    snippetsDir = file("$buildDir/generated-snippets")
+}
+
+configurations {
+    asciidoctorExtensions
+}
+
+dependencies {
+    asciidoctorExtensions 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.boot:spring-boot-dependencies:3.5.6"
+    }
 }
 
 // 모든 하위 프로젝트에 적용될 공통 플러그인, 자바 설정, 의존성 관리
@@ -65,4 +81,138 @@ subprojects {
             mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:${springCloudAwsVersion}"
         }
     }
+}
+
+// 각 서비스의 RestDocs 스니펫을 루트로 복사
+task copySnippets {
+    // test가 실행되지 않으면 건너뜀
+    onlyIf {
+        subprojects.any { subproject ->
+            new File(subproject.buildDir, 'generated-snippets').exists()
+        }
+    }
+    
+    doLast {
+        def targetDir = file("$buildDir/generated-snippets")
+        targetDir.mkdirs()
+        
+        subprojects.each { subproject ->
+            def snippetsDir = new File(subproject.buildDir, 'generated-snippets')
+            if (snippetsDir.exists() && snippetsDir.list()?.length > 0) {
+                println "Copying snippets from ${subproject.name}"
+                copy {
+                    from snippetsDir
+                    into "$targetDir/${subproject.name}"
+                }
+            }
+        }
+    }
+}
+
+// 통합 index.adoc 생성
+task generateUnifiedIndex {
+    dependsOn copySnippets
+    
+    def outputFile = file("$buildDir/docs/asciidoc/index.adoc")
+    outputs.file(outputFile)
+    
+    // copySnippets가 실행되었을 때만 실행
+    onlyIf {
+        file("$buildDir/generated-snippets").exists()
+    }
+    
+    doLast {
+        def content = new StringBuilder()
+        content.append("= Up-Pick 통합 API 문서\n")
+        content.append(":toc: left\n")
+        content.append(":toclevels: 3\n")
+        content.append(":sectnums:\n")
+        content.append(":sectanchors:\n")
+        content.append(":source-highlighter: highlightjs\n")
+        content.append(":highlightjs-theme: github\n")
+        content.append(":icons: font\n")
+        content.append(":sectlinks:\n\n")
+        
+        def hasContent = false
+        
+        // snippets가 실제로 있는 서비스만 포함
+        subprojects.each { subproject ->
+            def snippetsDir = new File(buildDir, "generated-snippets/${subproject.name}")
+            
+            if (snippetsDir.exists() && snippetsDir.list()?.length > 0) {
+                hasContent = true
+                def serviceName = subproject.name.replace('uppick-', '').replace('-service', '')
+                content.append("== ${serviceName.capitalize()} Service\n\n")
+                
+                // auto-index를 직접 include (상대 경로)
+                def autoIndexFile = new File(snippetsDir, 'auto-index.adoc')
+                if (autoIndexFile.exists()) {
+                    // auto-index.adoc의 내용을 읽어서 snippet 경로를 조정하여 직접 포함
+                    def autoIndexContent = autoIndexFile.text
+                    // {snippets}를 실제 상대 경로로 변경
+                    def relativeSnippetsPath = "../../generated-snippets/${subproject.name}"
+                    def adjustedContent = autoIndexContent.replaceAll(/\{snippets\}/, relativeSnippetsPath)
+                    content.append(adjustedContent)
+                    content.append("\n\n")
+                }
+            }
+        }
+        
+        if (!hasContent) {
+            content.append("== 문서 없음\n\n")
+            content.append("생성된 API 문서가 없습니다.\n")
+        }
+        
+        outputFile.parentFile.mkdirs()
+        outputFile.text = content.toString()
+        println "Generated unified index at: ${outputFile.absolutePath}"
+    }
+}
+
+asciidoctor {
+    configurations 'asciidoctorExtensions'
+    sourceDir file("$buildDir/docs/asciidoc")
+    
+    dependsOn generateUnifiedIndex
+    
+    // 통합 문서가 생성되었을 때만 실행
+    onlyIf {
+        file("$buildDir/docs/asciidoc/index.adoc").exists()
+    }
+    
+    attributes "snippets": file("$buildDir/generated-snippets")
+    baseDirFollowsSourceDir()
+}
+
+apply from: "$rootDir/gradle/scripts/restdocs-index.gradle"
+
+// test 실행 시 통합 문서 자동 생성
+tasks.register('unifiedDocs') {
+    group = 'documentation'
+    description = '모든 서비스의 RestDocs를 통합하여 생성합니다'
+    
+    dependsOn copySnippets, generateUnifiedIndex, asciidoctor
+    
+    // snippets가 있을 때만 실행
+    onlyIf {
+        subprojects.any { subproject ->
+            new File(subproject.buildDir, 'generated-snippets').exists()
+        }
+    }
+    
+    // 실행 순서 보장
+    copySnippets.mustRunAfter subprojects.collect { it.tasks.withType(Test) }
+    generateUnifiedIndex.mustRunAfter copySnippets
+    asciidoctor.mustRunAfter generateUnifiedIndex
+}
+
+// 각 서브프로젝트의 test 완료 후 통합 문서 생성
+subprojects {
+    tasks.withType(Test).configureEach {
+        finalizedBy rootProject.tasks.named('unifiedDocs')
+    }
+}
+
+tasks.named("build") {
+    dependsOn asciidoctor
 }

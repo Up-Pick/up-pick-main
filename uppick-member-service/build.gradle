@@ -1,7 +1,15 @@
+import org.asciidoctor.gradle.jvm.AsciidoctorTask
+import org.springframework.boot.gradle.tasks.bundling.BootJar
+
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.5.6'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'org.asciidoctor.jvm.convert' version '4.0.5'
+}
+
+configurations {
+    asciidoctorExtensions
 }
 
 dependencies {
@@ -24,9 +32,35 @@ dependencies {
     implementation "com.querydsl:querydsl-jpa:${querydslVersion}:jakarta"
     annotationProcessor "com.querydsl:querydsl-apt:${querydslVersion}:jakarta"
     annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
+    //Rest Docs
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+    asciidoctorExtensions 'org.springframework.restdocs:spring-restdocs-asciidoctor'
 }
 
-// test
-tasks.named('test') {
+// REST Docs 스니펫 디렉토리 설정
+ext {
+    snippetsDir = file('build/generated-snippets')
+}
+
+// restdocs-index.gradle을 먼저 적용하여 generateRestDocsIndex task 생성
+apply from: rootProject.file('gradle/scripts/restdocs-index.gradle')
+
+tasks.named('test', Test) {
+    outputs.dir snippetsDir
     useJUnitPlatform()
+    finalizedBy 'asciidoctor'
+}
+
+tasks.named('asciidoctor', AsciidoctorTask) {
+    configurations 'asciidoctorExtensions'
+    inputs.dir snippetsDir
+    baseDirFollowsSourceDir()
+    attributes "snippets": snippetsDir
+    dependsOn tasks.named('generateRestDocsIndex')
+    
+    // snippets가 있을 때만 실행
+    onlyIf {
+        snippetsDir.exists()
+    }
 }

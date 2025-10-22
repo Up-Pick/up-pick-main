@@ -17,7 +17,7 @@ COPY uppick-member-service ./uppick-member-service
 
 # Build the application
 WORKDIR /app
-RUN ./gradlew :uppick-member-service:build -x test
+RUN ./gradlew :uppick-member-service:build -x test -x asciidoctor -x generateRestDocsIndex
 
 # Runtime stage
 FROM openjdk:21-jdk-slim
