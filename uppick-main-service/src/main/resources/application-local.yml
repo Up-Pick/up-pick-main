@@ -14,12 +14,6 @@ spring:
   threads:
     virtual:
       enabled: true
-  cloud:
-    aws:
-      region:
-        static: test
-      s3:
-        bucket: test
 server:
   port: 8080
 jwt:

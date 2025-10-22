@@ -85,6 +85,15 @@ subprojects {
 
 // 각 서비스의 RestDocs 스니펫을 루트로 복사
 task copySnippets {
+    // 각 서브프로젝트의 generateRestDocsIndex가 완료된 후 실행
+    dependsOn {
+        subprojects.findAll { 
+            it.tasks.findByName('generateRestDocsIndex') != null 
+        }.collect { 
+            it.tasks.named('generateRestDocsIndex') 
+        }
+    }
+    
     // test가 실행되지 않으면 건너뜀
     onlyIf {
         subprojects.any { subproject ->
@@ -103,6 +112,7 @@ task copySnippets {
                 copy {
                     from snippetsDir
                     into "$targetDir/${subproject.name}"
+                    include '**/*'
                 }
             }
         }
