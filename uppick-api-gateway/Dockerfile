@@ -13,15 +13,15 @@ COPY build.gradle ./
 COPY uppick-common ./uppick-common
 
 # Copy api-gateway module
-COPY api-gateway ./api-gateway
+COPY uppick-api-gateway ./uppick-api-gateway
 
 # Build the application
 WORKDIR /app
-RUN ./gradlew :api-gateway:build -x test
+RUN ./gradlew :uppick-api-gateway:build -x test
 
 # Runtime stage
 FROM openjdk:21-jdk-slim
 WORKDIR /app
-COPY --from=build /app/api-gateway/build/libs/*.jar app.jar
+COPY --from=build /app/uppick-api-gateway/build/libs/*.jar app.jar
 EXPOSE 8000
 ENTRYPOINT ["java", "-jar", "app.jar"]
