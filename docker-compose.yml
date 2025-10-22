@@ -20,10 +20,10 @@ services:
 
   uppick-member-service:
     build:
-      context: ./uppick-member-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: uppick-member-service/Dockerfile
     environment:
-      SPRING_PROFILES_ACTIVE: dev
+      SPRING_PROFILES_ACTIVE: local
       DB_URL: jdbc:mysql://mysql:3306/uppick_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       DB_USER: user
       DB_PASS: password
@@ -36,16 +36,13 @@ services:
 
   uppick-main:
     build:
-      context: ./uppick-main
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: uppick-main/Dockerfile
     environment:
-      SPRING_PROFILES_ACTIVE: dev
+      SPRING_PROFILES_ACTIVE: local
       DB_URL: jdbc:mysql://mysql:3306/uppick_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       DB_USER: user
       DB_PASS: password
-      AWS_REGION: ap-northeast-2
-      S3_BUCKET_NAME: my-dev-bucket
-      JWT_KEY: dev-secret-key
     ports:
       - "8080:8080"
     depends_on:
