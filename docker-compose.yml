@@ -18,13 +18,29 @@ services:
       timeout: 5s
       retries: 5
 
+  api-gateway:
+    build:
+      context: .
+      dockerfile: uppick-api-gateway/Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      JWT_KEY: ${JWT_KEY}
+      MEMBER_SERVICE_URL: http://uppick-member-service:8080
+      MAIN_SERVICE_URL: http://uppick-main:8080
+    ports:
+      - "8000:8000"
+    depends_on:
+      - uppick-main
+      - uppick-member-service
+    restart: on-failure
+
   uppick-member-service:
     build:
       context: .
       dockerfile: uppick-member-service/Dockerfile
     environment:
       SPRING_PROFILES_ACTIVE: local
-      DB_URL: jdbc:mysql://mysql:3306/uppick_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      DB_URL: jdbc:mysql://mysql:3306/uppick_db
       DB_USER: user
       DB_PASS: password
     ports:
@@ -37,10 +53,10 @@ services:
   uppick-main:
     build:
       context: .
-      dockerfile: uppick-main/Dockerfile
+      dockerfile: uppick-main-service/Dockerfile
     environment:
       SPRING_PROFILES_ACTIVE: local
-      DB_URL: jdbc:mysql://mysql:3306/uppick_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      DB_URL: jdbc:mysql://mysql:3306/uppick_db
       DB_USER: user
       DB_PASS: password
     ports:
