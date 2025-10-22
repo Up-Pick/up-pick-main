@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.oneog.uppick.domain.ranking.dto.response.HotDealResponse;
 import org.oneog.uppick.domain.ranking.dto.response.HotKeywordResponse;
 import org.oneog.uppick.domain.ranking.service.RankingInternalService;
-import org.oneog.uppick.support.RestDocsBase;
+import org.oneog.uppick.support.restdocs.RestDocsBase;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -38,8 +38,8 @@ public class RankingControllerRestDocsTest extends RestDocsBase {
 		given(rankingInternalService.getHotDeals()).willReturn(responses);
 
 		mockMvc.perform(
-				get("/api/v1/rankings/hot-deals")
-					.accept(MediaType.APPLICATION_JSON))
+			get("/api/v1/rankings/hot-deals")
+				.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("success").value(true))
 			.andExpect(jsonPath("message").value("요청에 성공했습니다."))
@@ -70,14 +70,13 @@ public class RankingControllerRestDocsTest extends RestDocsBase {
 			new HotKeywordResponse("박성규", 7),
 			new HotKeywordResponse("안형욱", 8),
 			new HotKeywordResponse("현석훈", 9),
-			new HotKeywordResponse("최원빈", 10)
-		);
+			new HotKeywordResponse("최원빈", 10));
 
 		given(rankingInternalService.getHotKeywords()).willReturn(responses);
 
 		mockMvc.perform(
-				get("/api/v1/rankings/search-keywords")
-					.accept(MediaType.APPLICATION_JSON))
+			get("/api/v1/rankings/search-keywords")
+				.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("success").value(true))
 			.andExpect(jsonPath("message").value("요청에 성공했습니다."))
@@ -104,4 +103,3 @@ public class RankingControllerRestDocsTest extends RestDocsBase {
 			.build();
 	}
 }
-

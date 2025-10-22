@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.oneog.uppick.domain.searching.dto.request.SearchProductRequest;
 import org.oneog.uppick.domain.searching.dto.response.SearchProductInfoResponse;
 import org.oneog.uppick.domain.searching.service.SearchingInternalService;
-import org.oneog.uppick.support.RestDocsBase;
+import org.oneog.uppick.support.restdocs.RestDocsBase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;

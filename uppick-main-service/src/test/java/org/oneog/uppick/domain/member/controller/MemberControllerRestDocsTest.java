@@ -14,8 +14,8 @@ import org.oneog.uppick.domain.member.dto.request.CreditChargeRequest;
 import org.oneog.uppick.domain.member.dto.response.CreditChargeResponse;
 import org.oneog.uppick.domain.member.dto.response.CreditGetResponse;
 import org.oneog.uppick.domain.member.service.MemberInternalService;
-import org.oneog.uppick.support.RestDocsBase;
 import org.oneog.uppick.support.auth.WithMockAuthMember;
+import org.oneog.uppick.support.restdocs.RestDocsBase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
@@ -46,11 +46,11 @@ class MemberControllerRestDocsTest extends RestDocsBase {
 
 		// when & then
 		mockMvc.perform(
-				post("/api/v1/members/me/credit/charge")
-					.contentType(MediaType.APPLICATION_JSON)
-					.content(objectMapper.writeValueAsString(request))
+			post("/api/v1/members/me/credit/charge")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request))
 
-			)
+		)
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.success").value(true))
 			.andExpect(jsonPath("$.message").value("요청에 성공했습니다."))
@@ -60,15 +60,11 @@ class MemberControllerRestDocsTest extends RestDocsBase {
 				document("member-chargeCredit",
 					requestFields(
 						fieldWithPath("amount").type(JsonFieldType.NUMBER).description("충전할 크레딧 금액")
-							.attributes(key("constraints").value("0보다 커야 함 (양수), NotNull"))
-					),
+							.attributes(key("constraints").value("0보다 커야 함 (양수), NotNull"))),
 					responseFields(
 						fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
 						fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-						fieldWithPath("data.currentCredit").type(JsonFieldType.NUMBER).description("충전 후 현재 보유 크레딧")
-					)
-				)
-			);
+						fieldWithPath("data.currentCredit").type(JsonFieldType.NUMBER).description("충전 후 현재 보유 크레딧"))));
 	}
 
 	@Test
@@ -83,10 +79,10 @@ class MemberControllerRestDocsTest extends RestDocsBase {
 
 		// when & then
 		mockMvc.perform(
-				get("/api/v1/members/me/credit")
-					.accept(MediaType.APPLICATION_JSON)
+			get("/api/v1/members/me/credit")
+				.accept(MediaType.APPLICATION_JSON)
 
-			)
+		)
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.success").value(true))
 			.andExpect(jsonPath("$.message").value("요청에 성공했습니다."))
@@ -98,9 +94,6 @@ class MemberControllerRestDocsTest extends RestDocsBase {
 					responseFields(
 						fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
 						fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-						fieldWithPath("data.currentCredit").type(JsonFieldType.NUMBER).description("현재 보유 크레딧")
-					)
-				)
-			);
+						fieldWithPath("data.currentCredit").type(JsonFieldType.NUMBER).description("현재 보유 크레딧"))));
 	}
 }

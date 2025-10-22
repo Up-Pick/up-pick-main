@@ -12,8 +12,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.oneog.uppick.domain.auction.dto.request.AuctionBidRequest;
 import org.oneog.uppick.domain.auction.service.AuctionInternalService;
-import org.oneog.uppick.support.RestDocsBase;
 import org.oneog.uppick.support.auth.WithMockAuthMember;
+import org.oneog.uppick.support.restdocs.RestDocsBase;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -42,10 +42,10 @@ class AuctionControllerRestDocsTest extends RestDocsBase {
 
 		// when & then
 		mockMvc.perform(
-				post("/api/v1/auctions/{auctionId}/bid", auctionId)
-					.header("Authorization", "Bearer token")
-					.contentType(MediaType.APPLICATION_JSON)
-					.content(objectMapper.writeValueAsString(request)))
+			post("/api/v1/auctions/{auctionId}/bid", auctionId)
+				.header("Authorization", "Bearer token")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("success").value(true))
 			.andExpect(jsonPath("message").value("요청에 성공했습니다."))
@@ -54,20 +54,14 @@ class AuctionControllerRestDocsTest extends RestDocsBase {
 				document(
 					"auction-bid", // 생성될 스니펫 디렉토리 이름
 					requestHeaders(
-						headerWithName("Authorization").description("JWT 액세스 토큰 (Bearer {token})")
-					),
+						headerWithName("Authorization").description("JWT 액세스 토큰 (Bearer {token})")),
 					pathParameters(
-						parameterWithName("auctionId").description("입찰할 경매 ID")
-					),
+						parameterWithName("auctionId").description("입찰할 경매 ID")),
 					requestFields(
-						fieldWithPath("biddingPrice").type(JsonFieldType.NUMBER).description("사용자가 제시하는 입찰 금액")
-					),
+						fieldWithPath("biddingPrice").type(JsonFieldType.NUMBER).description("사용자가 제시하는 입찰 금액")),
 					responseFields(
 						fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
 						fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-						fieldWithPath("data").type(JsonFieldType.NULL).description("응답 데이터 (없음)")
-					)
-				)
-			);
+						fieldWithPath("data").type(JsonFieldType.NULL).description("응답 데이터 (없음)"))));
 	}
 }

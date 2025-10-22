@@ -12,7 +12,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.oneog.uppick.domain.category.dto.response.CategoryResponse;
 import org.oneog.uppick.domain.category.service.CategoryInternalService;
-import org.oneog.uppick.support.RestDocsBase;
+import org.oneog.uppick.support.restdocs.RestDocsBase;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -33,16 +33,15 @@ class CategoryControllerRestDocsTest extends RestDocsBase {
 			new CategoryResponse(1L, "전자제품", "노트북"),
 			new CategoryResponse(2L, "전자제품", "태블릿"),
 			new CategoryResponse(3L, "패션", "여성 의류"),
-			new CategoryResponse(4L, "패션", "남성 의류")
-		);
+			new CategoryResponse(4L, "패션", "남성 의류"));
 
 		// Mocking: Service 호출 시 위 리스트 반환 설정
 		given(categoryInternalService.getAllcategories()).willReturn(mockCategories);
 
 		// when & then
 		mockMvc.perform(
-				get("/api/v1/categories")
-					.accept(MediaType.APPLICATION_JSON))
+			get("/api/v1/categories")
+				.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("success").value(true))
 			.andExpect(jsonPath("data.size()").value(mockCategories.size()))
@@ -55,9 +54,6 @@ class CategoryControllerRestDocsTest extends RestDocsBase {
 						fieldWithPath("data").type(JsonFieldType.ARRAY).description("전체 카테고리 목록"),
 						fieldWithPath("data[].categoryId").type(JsonFieldType.NUMBER).description("카테고리 ID"),
 						fieldWithPath("data[].bigCategory").type(JsonFieldType.STRING).description("대분류 카테고리 명"),
-						fieldWithPath("data[].smallCategory").type(JsonFieldType.STRING).description("소분류 카테고리 명")
-					)
-				)
-			);
+						fieldWithPath("data[].smallCategory").type(JsonFieldType.STRING).description("소분류 카테고리 명"))));
 	}
 }

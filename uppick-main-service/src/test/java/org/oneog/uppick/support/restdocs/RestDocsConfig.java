@@ -1,4 +1,4 @@
-package org.oneog.uppick.support;
+package org.oneog.uppick.support.restdocs;
 
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 
