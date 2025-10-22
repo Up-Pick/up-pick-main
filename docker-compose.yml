@@ -24,14 +24,10 @@ services:
       dockerfile: uppick-api-gateway/Dockerfile
     environment:
       SPRING_PROFILES_ACTIVE: local
-      JWT_KEY: ${JWT_KEY}
       MEMBER_SERVICE_URL: http://uppick-member-service:8080
       MAIN_SERVICE_URL: http://uppick-main:8080
     ports:
       - "8000:8000"
-    depends_on:
-      - uppick-main
-      - uppick-member-service
     restart: on-failure
 
   uppick-member-service:
