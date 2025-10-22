@@ -1,10 +1,10 @@
 package org.oneog.uppick.domain.auth.controller;
 
+import org.oneog.uppick.common.dto.GlobalApiResponse;
 import org.oneog.uppick.domain.auth.dto.request.LoginRequest;
 import org.oneog.uppick.domain.auth.dto.request.SignupRequest;
 import org.oneog.uppick.domain.auth.dto.response.LoginResponse;
 import org.oneog.uppick.domain.auth.service.AuthService;
-import org.oneog.uppickcommon.common.dto.GlobalApiResponse;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

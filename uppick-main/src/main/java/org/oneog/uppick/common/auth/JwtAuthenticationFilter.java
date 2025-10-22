@@ -2,8 +2,8 @@ package org.oneog.uppick.common.auth;
 
 import java.io.IOException;
 
-import org.oneog.uppickcommon.common.dto.AuthMember;
-import org.oneog.uppickcommon.common.dto.GlobalApiResponse;
+import org.oneog.uppick.common.dto.AuthMember;
+import org.oneog.uppick.common.dto.GlobalApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.Authentication;

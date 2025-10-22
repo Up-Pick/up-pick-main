@@ -2,7 +2,7 @@ package org.oneog.uppick.domain.searching.dto.request;
 
 import java.time.LocalDate;
 
-import org.oneog.uppickcommon.common.constants.FormatConstants;
+import org.oneog.uppick.common.constants.FormatConstants;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 

@@ -16,6 +16,13 @@ allprojects {
     }
 }
 
+// 전역으로 사용할 변수 설정
+ext {
+    querydslVersion = '5.1.0'
+    jjwtVersion = '0.13.0'
+    springCloudAwsVersion = '3.4.0'
+}
+
 // 모든 하위 프로젝트에 적용될 공통 플러그인, 자바 설정, 의존성 관리
 subprojects {
     apply plugin: 'java'
@@ -55,13 +62,7 @@ subprojects {
     dependencyManagement {
         imports {
             mavenBom "org.springframework.boot:spring-boot-dependencies:3.5.6"
+            mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:${springCloudAwsVersion}"
         }
     }
-}
-
-// 전역으로 사용할 변수 설정
-ext {
-    querydslVersion = '5.1.0'
-    jjwtVersion = '0.13.0'
-    springCloudAwsVersion = '3.4.0'
 }

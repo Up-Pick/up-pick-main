@@ -7,8 +7,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import org.oneog.uppick.common.exception.BusinessException;
 import org.oneog.uppick.domain.product.exception.ProductErrorCode;
-import org.oneog.uppickcommon.common.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,4 @@
-package org.oneog.uppickcommon;
+package org.oneog.uppick;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;

@@ -2,7 +2,7 @@ package org.oneog.uppick.common.auth;
 
 import java.util.List;
 
-import org.oneog.uppickcommon.common.dto.AuthMember;
+import org.oneog.uppick.common.dto.AuthMember;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 
 public class JwtAuthenticationToken extends AbstractAuthenticationToken {

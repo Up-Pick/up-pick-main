@@ -11,13 +11,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.oneog.uppick.common.auth.JwtUtil;
+import org.oneog.uppick.common.exception.BusinessException;
 import org.oneog.uppick.domain.auth.dto.request.LoginRequest;
 import org.oneog.uppick.domain.auth.dto.request.SignupRequest;
 import org.oneog.uppick.domain.auth.dto.response.LoginResponse;
 import org.oneog.uppick.domain.auth.exception.AuthErrorCode;
 import org.oneog.uppick.domain.member.entity.Member;
 import org.oneog.uppick.domain.member.service.MemberExternalService;
-import org.oneog.uppickcommon.common.exception.BusinessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 

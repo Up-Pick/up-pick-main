@@ -1,5 +1,7 @@
 package org.oneog.uppick.domain.product.service;
 
+import org.oneog.uppick.common.dto.AuthMember;
+import org.oneog.uppick.common.exception.BusinessException;
 import org.oneog.uppick.domain.auction.service.AuctionExternalServiceApi;
 import org.oneog.uppick.domain.product.dto.request.ProductRegisterRequest;
 import org.oneog.uppick.domain.product.dto.response.ProductBiddingInfoResponse;
@@ -16,8 +18,6 @@ import org.oneog.uppick.domain.product.mapper.ProductMapper;
 import org.oneog.uppick.domain.product.repository.ProductQueryRepository;
 import org.oneog.uppick.domain.product.repository.ProductRepository;
 import org.oneog.uppick.domain.product.repository.ProductViewHistoryRepository;
-import org.oneog.uppickcommon.common.dto.AuthMember;
-import org.oneog.uppickcommon.common.exception.BusinessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

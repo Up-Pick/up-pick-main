@@ -12,14 +12,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.oneog.uppick.common.dto.AuthMember;
+import org.oneog.uppick.common.exception.BusinessException;
 import org.oneog.uppick.domain.member.dto.request.CreditChargeRequest;
 import org.oneog.uppick.domain.member.dto.response.CreditChargeResponse;
 import org.oneog.uppick.domain.member.dto.response.CreditGetResponse;
 import org.oneog.uppick.domain.member.entity.Member;
 import org.oneog.uppick.domain.member.exception.MemberErrorCode;
 import org.oneog.uppick.domain.member.repository.MemberRepository;
-import org.oneog.uppickcommon.common.dto.AuthMember;
-import org.oneog.uppickcommon.common.exception.BusinessException;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)

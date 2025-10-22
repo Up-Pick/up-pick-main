@@ -2,8 +2,8 @@ package org.oneog.uppick.domain.member.entity;
 
 import java.time.LocalDateTime;
 
+import org.oneog.uppick.common.exception.BusinessException;
 import org.oneog.uppick.domain.member.exception.MemberErrorCode;
-import org.oneog.uppickcommon.common.exception.BusinessException;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 

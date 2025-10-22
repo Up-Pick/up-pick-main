@@ -1,5 +1,6 @@
 package org.oneog.uppick.domain.member.service;
 
+import org.oneog.uppick.common.exception.BusinessException;
 import org.oneog.uppick.domain.auth.dto.request.SignupRequest;
 import org.oneog.uppick.domain.auth.exception.AuthErrorCode;
 import org.oneog.uppick.domain.member.entity.Member;
@@ -10,7 +11,6 @@ import org.oneog.uppick.domain.member.mapper.MemberMapper;
 import org.oneog.uppick.domain.member.repository.MemberRepository;
 import org.oneog.uppick.domain.member.repository.PurchaseDetailRepository;
 import org.oneog.uppick.domain.member.repository.SellDetailRepository;
-import org.oneog.uppickcommon.common.exception.BusinessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

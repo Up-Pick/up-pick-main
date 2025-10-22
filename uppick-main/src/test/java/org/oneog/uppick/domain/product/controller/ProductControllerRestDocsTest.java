@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.oneog.uppickcommon.common.dto.AuthMember;
+import org.oneog.uppick.common.dto.AuthMember;
 import org.oneog.uppick.domain.product.dto.request.ProductRegisterRequest;
 import org.oneog.uppick.domain.product.dto.response.ProductBiddingInfoResponse;
 import org.oneog.uppick.domain.product.dto.response.ProductInfoResponse;

@@ -3,7 +3,7 @@ package org.oneog.uppick.common.auth;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
-import org.oneog.uppickcommon.common.dto.AuthMember;
+import org.oneog.uppick.common.dto.AuthMember;
 
 class JwtAuthenticationTokenTest {
 	//getPrincipal() → AuthMember 객체가 제대로 반환되는지

@@ -1,4 +1,4 @@
-package org.oneog.uppickcommon.common.exception;
+package org.oneog.uppick.common.exception;
 
 public class BusinessException extends RuntimeException {
     private final ErrorCode errorCode;

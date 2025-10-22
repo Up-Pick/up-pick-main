@@ -12,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.oneog.uppick.common.exception.BusinessException;
 import org.oneog.uppick.domain.auction.dto.request.AuctionBidRequest;
 import org.oneog.uppick.domain.auction.entity.Auction;
 import org.oneog.uppick.domain.auction.entity.BiddingDetail;
@@ -25,7 +26,6 @@ import org.oneog.uppick.domain.auction.repository.BiddingDetailRepository;
 import org.oneog.uppick.domain.member.service.MemberExternalServiceApi;
 import org.oneog.uppick.domain.notification.entity.NotificationType;
 import org.oneog.uppick.domain.notification.service.NotificationExternalServiceApi;
-import org.oneog.uppickcommon.common.exception.BusinessException;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)

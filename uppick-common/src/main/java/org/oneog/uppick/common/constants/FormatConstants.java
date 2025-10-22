@@ -1,4 +1,4 @@
-package org.oneog.uppickcommon.common.constants;
+package org.oneog.uppick.common.constants;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

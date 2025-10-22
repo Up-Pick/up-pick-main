@@ -1,7 +1,7 @@
 package org.oneog.uppick.support.auth;
 
 import org.oneog.uppick.common.auth.JwtAuthenticationToken;
-import org.oneog.uppickcommon.common.dto.AuthMember;
+import org.oneog.uppick.common.dto.AuthMember;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;

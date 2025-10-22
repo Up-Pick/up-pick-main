@@ -2,6 +2,7 @@ package org.oneog.uppick.domain.auction.service;
 
 import java.util.List;
 
+import org.oneog.uppick.common.exception.BusinessException;
 import org.oneog.uppick.domain.auction.dto.request.AuctionBidRequest;
 import org.oneog.uppick.domain.auction.entity.Auction;
 import org.oneog.uppick.domain.auction.entity.BiddingDetail;
@@ -14,7 +15,6 @@ import org.oneog.uppick.domain.auction.repository.BiddingDetailRepository;
 import org.oneog.uppick.domain.member.service.MemberExternalServiceApi;
 import org.oneog.uppick.domain.notification.entity.NotificationType;
 import org.oneog.uppick.domain.notification.service.NotificationExternalServiceApi;
-import org.oneog.uppickcommon.common.exception.BusinessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

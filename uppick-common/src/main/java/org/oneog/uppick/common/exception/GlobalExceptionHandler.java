@@ -1,4 +1,4 @@
-package org.oneog.uppickcommon.common.exception;
+package org.oneog.uppick.common.exception;
 
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.http.ResponseEntity;
-import org.oneog.uppickcommon.common.dto.GlobalApiResponse;
+import org.oneog.uppick.common.dto.GlobalApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;

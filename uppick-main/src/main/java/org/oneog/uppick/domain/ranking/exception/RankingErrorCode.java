@@ -1,6 +1,6 @@
 package org.oneog.uppick.domain.ranking.exception;
 
-import org.oneog.uppickcommon.common.exception.ErrorCode;
+import org.oneog.uppick.common.exception.ErrorCode;
 import org.springframework.http.HttpStatus;
 
 import lombok.AllArgsConstructor;

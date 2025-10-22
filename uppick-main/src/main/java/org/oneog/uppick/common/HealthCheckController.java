@@ -2,7 +2,7 @@ package org.oneog.uppick.common;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.oneog.uppickcommon.common.dto.GlobalApiResponse;
+import org.oneog.uppick.common.dto.GlobalApiResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController

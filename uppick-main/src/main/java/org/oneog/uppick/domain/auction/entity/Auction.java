@@ -2,9 +2,9 @@ package org.oneog.uppick.domain.auction.entity;
 
 import java.time.LocalDateTime;
 
+import org.oneog.uppick.common.exception.BusinessException;
 import org.oneog.uppick.domain.auction.enums.AuctionStatus;
 import org.oneog.uppick.domain.auction.exception.AuctionErrorCode;
-import org.oneog.uppickcommon.common.exception.BusinessException;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import jakarta.persistence.Column;

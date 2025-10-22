@@ -1,11 +1,11 @@
 package org.oneog.uppick.domain.member.controller;
 
+import org.oneog.uppick.common.dto.AuthMember;
+import org.oneog.uppick.common.dto.GlobalApiResponse;
 import org.oneog.uppick.domain.member.dto.request.CreditChargeRequest;
 import org.oneog.uppick.domain.member.dto.response.CreditChargeResponse;
 import org.oneog.uppick.domain.member.dto.response.CreditGetResponse;
 import org.oneog.uppick.domain.member.service.MemberInternalService;
-import org.oneog.uppickcommon.common.dto.AuthMember;
-import org.oneog.uppickcommon.common.dto.GlobalApiResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;

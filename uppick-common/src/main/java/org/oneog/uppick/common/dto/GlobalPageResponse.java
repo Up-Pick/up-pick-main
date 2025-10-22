@@ -1,4 +1,4 @@
-package org.oneog.uppickcommon.common.dto;
+package org.oneog.uppick.common.dto;
 
 import java.util.List;
 
