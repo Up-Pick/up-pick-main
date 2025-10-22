@@ -8,7 +8,7 @@ spring:
       server:
         webflux:
           routes:
-            - id: uppick-member-service
+            - id: uppick-product-service
               uri: ${MEMBER_SERVICE_URL}
               predicates:
                 - Path=/api/v1/members/**, /api/v1/auth/**

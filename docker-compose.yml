@@ -24,16 +24,16 @@ services:
       dockerfile: uppick-api-gateway/Dockerfile
     environment:
       SPRING_PROFILES_ACTIVE: local
-      MEMBER_SERVICE_URL: http://uppick-member-service:8080
+      MEMBER_SERVICE_URL: http://uppick-product-service:8080
       MAIN_SERVICE_URL: http://uppick-main:8080
     ports:
       - "8000:8000"
     restart: on-failure
 
-  uppick-member-service:
+  uppick-product-service:
     build:
       context: .
-      dockerfile: uppick-member-service/Dockerfile
+      dockerfile: uppick-product-service/Dockerfile
     environment:
       SPRING_PROFILES_ACTIVE: local
       DB_URL: jdbc:mysql://mysql:3306/uppick_db

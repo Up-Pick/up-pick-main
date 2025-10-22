@@ -1,6 +1,6 @@
 rootProject.name = 'uppick'
 
 include 'uppick-main-service'
-include 'uppick-member-service'
+include 'uppick-product-service'
 include 'uppick-common'
 include 'uppick-api-gateway'
