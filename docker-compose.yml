@@ -24,7 +24,7 @@ services:
       dockerfile: uppick-api-gateway/Dockerfile
     environment:
       SPRING_PROFILES_ACTIVE: local
-      MEMBER_SERVICE_URL: http://uppick-product-service:8080
+      PRODUCT_SERVICE_URL: http://uppick-product-service:8080
       MAIN_SERVICE_URL: http://uppick-main:8080
     ports:
       - "8000:8000"

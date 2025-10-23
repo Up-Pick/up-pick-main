@@ -9,13 +9,17 @@ spring:
         webflux:
           routes:
             - id: uppick-product-service
-              uri: ${MEMBER_SERVICE_URL}
+              uri: ${PRODUCT_SERVICE_URL}
               predicates:
-                - Path=/api/v1/members/**, /api/v1/auth/**
+                - Path=/product/**
+              filters:
+                - StripPrefix=1
             - id: uppick-main
               uri: ${MAIN_SERVICE_URL}
               predicates:
-                - Path=/api/v1/products/**, /api/v1/auctions/**, /api/v1/categories/**, /api/v1/searching/**, /api/v1/ranking/**, /api/v1/notifications/**
+                - Path=/main/**
+              filters:
+                - StripPrefix=1
 jwt:
   secret:
-    key: "VXBwaWNrUHJvamVjdFNlY3JldEtleUZvclRlc3RpbmdQdXJwb3NlczEyMzQ1Njc4OTA="
+    key: ${JWT_KEY}
