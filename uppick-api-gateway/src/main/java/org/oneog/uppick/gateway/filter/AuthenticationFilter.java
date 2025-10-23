@@ -31,7 +31,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
                 try {
                     Claims claims = jwtUtil.getUserInfoFromToken(token);
                     String memberId = claims.getSubject();
-                    String memberNickname = (String)claims.get("nickname");
+                    String memberNickname = (String)claims.get("memberNickname");
                     ServerHttpRequest newRequest = exchange.getRequest().mutate()
                         .header(AuthConstant.AUTH_MEMBER_ID, memberId)
                         .header(AuthConstant.AUTH_MEMBER_NICKNAME, memberNickname).build();
