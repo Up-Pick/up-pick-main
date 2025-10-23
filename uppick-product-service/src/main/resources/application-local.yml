@@ -26,6 +26,11 @@ grpc:
     main-service:
       address: ${MAIN_GRPC_SERVICE_URL}
       negotiation-type: PLAINTEXT
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
 server:
   port: 8080
 jwt:
