@@ -3,7 +3,10 @@ package org.oneog.uppick.common.security;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.oneog.uppick.common.auth.SimpleAuthenticationToken;
 import org.oneog.uppick.common.constants.AuthConstant;
+import org.oneog.uppick.common.dto.AuthMember;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -21,11 +24,17 @@ public class SimpleAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
         throws ServletException, IOException {
-        String memberId = request.getHeader(AuthConstant.AUTH_MEMBER_ID);
+        String memberIdStr = request.getHeader(AuthConstant.AUTH_MEMBER_ID);
         String memberNickname = request.getHeader(AuthConstant.AUTH_MEMBER_NICKNAME);
-        if (memberId != null && memberNickname != null) {
-            request.setAttribute(AuthConstant.AUTH_MEMBER_ID, memberId);
-            request.setAttribute(AuthConstant.AUTH_MEMBER_NICKNAME, memberNickname);
+        if (memberIdStr != null && memberNickname != null) {
+            try {
+                long memberId = Long.parseLong(memberIdStr);
+                AuthMember authMember = new AuthMember(memberId, memberNickname);
+                SimpleAuthenticationToken authentication = new SimpleAuthenticationToken(authMember);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            } catch (NumberFormatException e) {
+                log.warn("Invalid memberId format: {}", memberIdStr);
+            }
         } else {
             log.warn("Missing authentication headers");
         }
