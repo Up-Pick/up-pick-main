@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.oneog.uppick.common.auth.JwtUtil;
+import org.oneog.uppick.common.constants.AuthConstant;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
@@ -30,8 +31,10 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
                 try {
                     Claims claims = jwtUtil.getUserInfoFromToken(token);
                     String memberId = claims.getSubject();
+                    String memberNickname = (String)claims.get("nickname");
                     ServerHttpRequest newRequest = exchange.getRequest().mutate()
-                        .header("X-Authenticated-User-Id", memberId).build();
+                        .header(AuthConstant.AUTH_MEMBER_ID, memberId)
+                        .header(AuthConstant.AUTH_MEMBER_NICKNAME, memberNickname).build();
                     return chain.filter(exchange.mutate().request(newRequest).build());
                 } catch (Exception e) {
                     log.error("Invalid token", e);
