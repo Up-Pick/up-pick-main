@@ -26,7 +26,7 @@ services:
       SPRING_PROFILES_ACTIVE: local
       PRODUCT_SERVICE_URL: http://uppick-product-service:8080
       MAIN_SERVICE_URL: http://uppick-main-service:8080
-      MAIN_GRPC_SERVICE_URL: static://uppick-api-gateway:8080/grpc/main
+      MAIN_GRPC_SERVICE_URL: static://uppick-main-service:9090
     ports:
       - "8080:8080"
 
@@ -39,7 +39,7 @@ services:
       DB_URL: jdbc:mysql://mysql:3306/uppick_db
       DB_USER: user
       DB_PASS: password
-      MAIN_GRPC_SERVICE_URL: static://uppick-api-gateway:8080/grpc/main
+      MAIN_GRPC_SERVICE_URL: static://uppick-main-service:9090
     ports:
       - "8082:8080"
     depends_on:
