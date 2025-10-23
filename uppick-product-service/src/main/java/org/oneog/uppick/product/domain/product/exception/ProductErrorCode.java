@@ -12,6 +12,7 @@ public enum ProductErrorCode implements ErrorCode {
 	PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 상품이 존재하지 않습니다."),
 	CANNOT_READ_PRODUCT_INFO(HttpStatus.BAD_REQUEST, "해당 상품의 정보를 조회할 수 없습니다."),
 	CANNOT_READ_PRODUCT_SIMPLE_INFO(HttpStatus.BAD_REQUEST, "해당 상품의 낙찰 정보를 조회할 수 없습니다."),
+	AUCTION_REGISTRATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "경매 등록에 실패했습니다."),
 
 	//S3 이미지 파일
 	EMPTY_FILE(HttpStatus.BAD_REQUEST, "파일이 비어있습니다"),

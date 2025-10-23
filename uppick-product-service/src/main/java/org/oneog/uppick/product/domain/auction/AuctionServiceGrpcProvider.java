@@ -3,6 +3,8 @@ package org.oneog.uppick.product.domain.auction;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
+import org.oneog.uppick.common.exception.BusinessException;
+import org.oneog.uppick.product.domain.product.exception.ProductErrorCode;
 import org.oneog.uppick.proto.auction.AuctionServiceGrpc;
 import org.oneog.uppick.proto.auction.RegisterAuctionRequest;
 import org.springframework.context.annotation.Primary;
@@ -32,5 +34,10 @@ public class AuctionServiceGrpcProvider implements AuctionServiceApi {
             .setEndAt(Timestamp.newBuilder().setSeconds(endAt.toEpochSecond(ZoneOffset.UTC)).setNanos(endAt.getNano())
                 .build())
             .build();
+        try {
+            mainGrpcClient.registerAuction(request);
+        } catch (Exception e) {
+            throw new BusinessException(ProductErrorCode.AUCTION_REGISTRATION_FAILED);
+        }
     }
 }
