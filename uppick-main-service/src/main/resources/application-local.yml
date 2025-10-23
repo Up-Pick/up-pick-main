@@ -16,6 +16,9 @@ spring:
       enabled: true
 server:
   port: 8080
+grpc:
+  server:
+    port: 9090
 jwt:
   secret:
     key: "VXBwaWNrUHJvamVjdFNlY3JldEtleUZvclRlc3RpbmdQdXJwb3NlczEyMzQ1Njc4OTA="

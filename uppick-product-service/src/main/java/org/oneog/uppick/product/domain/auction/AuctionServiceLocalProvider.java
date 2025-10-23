@@ -2,10 +2,10 @@ package org.oneog.uppick.product.domain.auction;
 
 import java.time.LocalDateTime;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
-public class AuctionServiceLocalProvider implements AuctionExternalServiceApi {
+@Component
+public class AuctionServiceLocalProvider implements AuctionServiceApi {
 
     @Override
     public void registerAuction(Long id, Long startBid, LocalDateTime registeredAt,

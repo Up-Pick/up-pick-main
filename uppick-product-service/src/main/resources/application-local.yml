@@ -14,6 +14,17 @@ spring:
   threads:
     virtual:
       enabled: true
+  cloud:
+    aws:
+      region:
+        static: ap-northeast-2
+      s3:
+        enabled: false
+        bucket: test-bucket
+grpc:
+  client:
+    main-service:
+      address: ${MAIN_GRPC_SERVICE_URL}
 server:
   port: 8080
 jwt:

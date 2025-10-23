@@ -2,7 +2,7 @@ package org.oneog.uppick.product.domain.product.service;
 
 import org.oneog.uppick.common.dto.AuthMember;
 import org.oneog.uppick.common.exception.BusinessException;
-import org.oneog.uppick.product.domain.auction.AuctionExternalServiceApi;
+import org.oneog.uppick.product.domain.auction.AuctionServiceApi;
 import org.oneog.uppick.product.domain.product.dto.request.ProductRegisterRequest;
 import org.oneog.uppick.product.domain.product.dto.response.ProductBiddingInfoResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductInfoResponse;
@@ -42,7 +42,7 @@ public class ProductInternalService {
 	private final S3FileManager s3FileManager;
 
 	// ****** External Domain API ***** //
-	private final AuctionExternalServiceApi auctionExternalServiceApi;
+	private final AuctionServiceApi auctionExternalServiceApi;
 
 	// ***** Internal Service Method ***** //
 	@Transactional

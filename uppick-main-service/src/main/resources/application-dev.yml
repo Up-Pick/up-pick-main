@@ -14,9 +14,11 @@ spring:
   threads:
     virtual:
       enabled: true
-  
 server:
   port: 8080
+grpc:
+  server:
+    port: 9090
 jwt:
   secret:
     key: ${JWT_KEY}

@@ -20,6 +20,10 @@ spring:
         static: ${AWS_REGION}
       s3:
         bucket: ${S3_BUCKET_NAME}
+grpc:
+  client:
+    main-service:
+      address: ${MAIN_GRPC_SERVICE_URL}
 server:
   port: 8080
 jwt:

@@ -39,6 +39,16 @@ dependencies {
 
     // AWS S3
     implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3'
+
+    // gRPC
+    implementation "net.devh:grpc-spring-boot-starter:${grpcSpringBootStarterVersion}"
+
+    implementation "io.grpc:grpc-stub:${grpcVersion}"
+    implementation "io.grpc:grpc-protobuf:${grpcVersion}"
+    implementation "io.grpc:grpc-netty-shaded:${grpcVersion}"
+
+    implementation "com.google.protobuf:protobuf-java:${protobufVersion}"
+    implementation "com.google.protobuf:protobuf-java-util:${protobufVersion}"
 }
 
 // REST Docs 스니펫 디렉토리 설정

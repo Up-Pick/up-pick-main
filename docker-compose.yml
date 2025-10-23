@@ -26,8 +26,9 @@ services:
       SPRING_PROFILES_ACTIVE: local
       PRODUCT_SERVICE_URL: http://uppick-product-service:8080
       MAIN_SERVICE_URL: http://uppick-main-service:8080
+      MAIN_GRPC_SERVICE_URL: static://uppick-api-gateway:8080/grpc/main
     ports:
-      - "8000:8000"
+      - "8080:8080"
     restart: on-failure
 
   uppick-product-service:
@@ -39,8 +40,9 @@ services:
       DB_URL: jdbc:mysql://mysql:3306/uppick_db
       DB_USER: user
       DB_PASS: password
+      MAIN_GRPC_SERVICE_URL: static://uppick-api-gateway:8080/grpc/main
     ports:
-      - "8081:8080"
+      - "8082:8080"
     depends_on:
       mysql:
         condition: service_healthy
@@ -56,7 +58,8 @@ services:
       DB_USER: user
       DB_PASS: password
     ports:
-      - "8080:8080"
+      - "8081:8080"
+      - "9090:9090"
     depends_on:
       mysql:
         condition: service_healthy

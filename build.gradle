@@ -5,6 +5,7 @@ plugins {
     id 'org.springframework.boot' version '3.5.6' apply false
     id 'io.spring.dependency-management' version '1.1.7'
     id 'org.asciidoctor.jvm.convert' version '4.0.5'
+    id 'com.google.protobuf' version '0.9.5' apply false
 }
 
 // 모든 하위 프로젝트에 적용될 공통 설정 (그룹, 버전, 저장소)
@@ -23,6 +24,9 @@ ext {
     jjwtVersion = '0.13.0'
     springCloudAwsVersion = '3.4.0'
     snippetsDir = file("$buildDir/generated-snippets")
+    grpcSpringBootStarterVersion = '3.1.0.RELEASE'
+    grpcVersion = '1.76.0'
+    protobufVersion = '4.33.0'
 }
 
 configurations {
@@ -43,6 +47,7 @@ dependencyManagement {
 subprojects {
     apply plugin: 'java'
     apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'com.google.protobuf'
 
     java {
         toolchain {
@@ -62,6 +67,8 @@ subprojects {
             java {
                 // QueryDSL이 생성하는 Q-타입을 포함시킵니다.
                 srcDir("$buildDir/generated/querydsl")
+                srcDirs("$buildDir/generated/source/proto/main/grpc")
+                srcDirs("$buildDir/generated/source/proto/main/java")
             }
         }
     }
@@ -79,6 +86,23 @@ subprojects {
         imports {
             mavenBom "org.springframework.boot:spring-boot-dependencies:3.5.6"
             mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:${springCloudAwsVersion}"
+        }
+    }
+
+    // Protobuf 플러그인 설정
+    protobuf {
+        protoc {
+            artifact = "com.google.protobuf:protoc:${protobufVersion}"
+        }
+        plugins {
+            grpc {
+                artifact = "io.grpc:protoc-gen-grpc-java:${grpcVersion}"
+            }
+        }
+        generateProtoTasks {
+            all()*.plugins {
+                grpc {}
+            }
         }
     }
 }

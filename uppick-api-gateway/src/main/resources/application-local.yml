@@ -14,12 +14,21 @@ spring:
                 - Path=/product/**
               filters:
                 - StripPrefix=1
-            - id: uppick-main
+            - id: uppick-main-service
               uri: ${MAIN_SERVICE_URL}
               predicates:
                 - Path=/main/**
               filters:
                 - StripPrefix=1
+            - id: uppick-main-grpc-service
+              uri: ${MAIN_GRPC_SERVICE_URL}
+              predicates:
+                - Path=/grpc/main/** 
+              filters:
+                - StripPrefix=2
 jwt:
   secret:
-    key: ${JWT_KEY}
+    key: "VXBwaWNrUHJvamVjdFNlY3JldEtleUZvclRlc3RpbmdQdXJwb3NlczEyMzQ1Njc4OTA="
+server:
+  http2:
+    enabled: true

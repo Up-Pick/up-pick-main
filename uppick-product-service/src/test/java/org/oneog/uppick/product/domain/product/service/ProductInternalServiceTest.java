@@ -12,7 +12,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.oneog.uppick.product.domain.auction.AuctionExternalServiceApi;
+import org.oneog.uppick.product.domain.auction.AuctionServiceApi;
 import org.oneog.uppick.product.domain.product.dto.request.ProductRegisterRequest;
 import org.oneog.uppick.product.domain.product.entity.Product;
 import org.oneog.uppick.product.domain.product.mapper.ProductMapper;
@@ -33,7 +33,7 @@ public class ProductInternalServiceTest {
 	@Mock
 	ProductViewHistoryRepository productViewHistoryRepository;
 	@Mock
-	AuctionExternalServiceApi auctionExternalServiceApi;
+	AuctionServiceApi auctionExternalServiceApi;
 	@Mock
 	S3FileManager s3FileManager;
 
