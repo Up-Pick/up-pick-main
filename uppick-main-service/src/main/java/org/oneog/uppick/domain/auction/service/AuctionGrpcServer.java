@@ -7,15 +7,15 @@ import org.oneog.uppick.domain.auction.repository.AuctionRepository;
 import org.oneog.uppick.proto.auction.AuctionServiceGrpc;
 import org.oneog.uppick.proto.auction.RegisterAuctionRequest;
 import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.protobuf.Empty;
 
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
+import net.devh.boot.grpc.server.service.GrpcService;
 
-@Service
+@GrpcService
 @RequiredArgsConstructor
 @Profile({"dev", "local", "prod"})
 public class AuctionGrpcServer extends AuctionServiceGrpc.AuctionServiceImplBase {
