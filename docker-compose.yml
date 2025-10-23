@@ -18,7 +18,7 @@ services:
       timeout: 5s
       retries: 5
 
-  api-gateway:
+  uppick-api-gateway:
     build:
       context: .
       dockerfile: uppick-api-gateway/Dockerfile
@@ -46,7 +46,7 @@ services:
         condition: service_healthy
     restart: on-failure
 
-  uppick-main:
+  uppick-main-service:
     build:
       context: .
       dockerfile: uppick-main-service/Dockerfile
