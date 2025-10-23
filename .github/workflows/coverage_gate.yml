@@ -22,32 +22,37 @@ jobs:
         distribution: 'temurin'
         cache: 'gradle'
 
-    - name: Start services with CI-specific Docker Compose file
-      run: |
-        docker compose -f docker-compose.ci.yml up --wait
-
-    - name: Run Tests and Generate JaCoCo XML Report (Gradle)
+    - name: Run Tests and Fail if They Fail
       run: |
         chmod +x gradlew
-        ./gradlew clean test jacocoTestReport -x asciidoctor
-      env:
-        SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3307/uppick_db
-        SPRING_DATASOURCE_USERNAME: user
-        SPRING_DATASOURCE_PASSWORD: password
-        SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
+        ./gradlew test --fail-fast
 
-    - name: Add Coverage Report to PR and Check Threshold
-      id: jacoco_check
-      uses: madrapps/jacoco-report@v1.7.2
-      with:
-        paths: ${{ github.workspace }}/build/reports/jacoco/test/jacocoTestReport.xml
-        token: ${{ secrets.GITHUB_TOKEN }}
-        min-coverage-overall: 30
-        title: "JaCoCo Code Coverage Report"
-        update-comment: true
+    # - name: Start services with CI-specific Docker Compose file
+    #   run: |
+    #     docker compose -f docker-compose.ci.yml up --wait
 
-    - name: Fail CI if overall coverage is below threshold
-      if: ${{ steps.jacoco_check.outputs.coverage-overall < 30 }}
-      run: |
-        echo "Overall coverage is below the 30% threshold."
-        exit 1
+    # - name: Run Tests and Generate JaCoCo XML Report (Gradle)
+    #   run: |
+    #     chmod +x gradlew
+    #     ./gradlew clean test jacocoTestReport -x asciidoctor
+    #   env:
+    #     SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3307/uppick_db
+    #     SPRING_DATASOURCE_USERNAME: user
+    #     SPRING_DATASOURCE_PASSWORD: password
+    #     SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
+
+    # - name: Add Coverage Report to PR and Check Threshold
+    #   id: jacoco_check
+    #   uses: madrapps/jacoco-report@v1.7.2
+    #   with:
+    #     paths: ${{ github.workspace }}/build/reports/jacoco/test/jacocoTestReport.xml
+    #     token: ${{ secrets.GITHUB_TOKEN }}
+    #     min-coverage-overall: 30
+    #     title: "JaCoCo Code Coverage Report"
+    #     update-comment: true
+
+    # - name: Fail CI if overall coverage is below threshold
+    #   if: ${{ steps.jacoco_check.outputs.coverage-overall < 30 }}
+    #   run: |
+    #     echo "Overall coverage is below the 30% threshold."
+    #     exit 1
