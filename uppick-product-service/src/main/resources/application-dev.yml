@@ -24,6 +24,7 @@ grpc:
   client:
     main-service:
       address: ${MAIN_GRPC_SERVICE_URL}
+      negotiation-type: PLAINTEXT
 server:
   port: 8080
 jwt:
