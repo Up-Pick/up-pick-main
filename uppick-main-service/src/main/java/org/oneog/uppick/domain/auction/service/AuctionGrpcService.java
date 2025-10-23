@@ -19,7 +19,7 @@ import net.devh.boot.grpc.server.service.GrpcService;
 @GrpcService
 @RequiredArgsConstructor
 @Profile({"dev", "local", "prod"})
-public class AuctionGrpcServer extends AuctionServiceGrpc.AuctionServiceImplBase {
+public class AuctionGrpcService extends AuctionServiceGrpc.AuctionServiceImplBase {
 
 	private final AuctionRepository auctionRepository;
 
