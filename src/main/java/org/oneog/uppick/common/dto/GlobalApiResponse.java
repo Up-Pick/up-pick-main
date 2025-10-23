@@ -1,45 +1,28 @@
 package org.oneog.uppick.common.dto;
 
-import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class GlobalApiResponse<T> {
-    private boolean success;
-    private String message;
-    private T data;
+    private final boolean success;
+    private final String message;
+    private final T data;
 
     public static <T> GlobalApiResponse<T> ok(T data) {
-        GlobalApiResponse<T> response = new GlobalApiResponse<>();
-        response.success = true;
-        response.message = "요청에 성공했습니다.";
-        response.data = data;
-        return response;
+        return new GlobalApiResponse<>(true, "요청에 성공했습니다.", data);
     }
 
     public static <T> GlobalApiResponse<T> ok(T data, String message) {
-        GlobalApiResponse<T> response = new GlobalApiResponse<>();
-        response.success = true;
-        response.message = message;
-        response.data = data;
-        return response;
+        return new GlobalApiResponse<>(true, message, data);
     }
 
     public static <T> GlobalApiResponse<T> fail(T data) {
-        GlobalApiResponse<T> response = new GlobalApiResponse<>();
-        response.success = false;
-        response.message = "요청에 실패했습니다.";
-        response.data = data;
-        return response;
+        return new GlobalApiResponse<>(false, "요청에 실패했습니다.", data);
     }
 
     public static <T> GlobalApiResponse<T> fail(T data, String message) {
-        GlobalApiResponse<T> response = new GlobalApiResponse<>();
-        response.success = false;
-        response.message = message;
-        response.data = data;
-        return response;
+        return new GlobalApiResponse<>(false, message, data);
     }
 }

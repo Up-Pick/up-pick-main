@@ -1,0 +1,165 @@
+def snippetsDirRef = project.ext.snippetsDir as File
+
+def snippetExists = { File dir, String name ->
+    def file = new File(dir, "${name}.adoc")
+    if (!file.exists()) {
+        return false
+    }
+    def text = file.text.trim()
+    if (!text) {
+        return false
+    }
+    if (name in ['request-body', 'response-body']) {
+        def matcher = (text =~ /(?s)----\s*(.*?)\s*----/)
+        if (matcher.find()) {
+            return matcher.group(1).trim()
+        }
+    }
+    return true
+}
+
+def toTitle = { String dirName ->
+    def words = dirName.split('[-_]')
+    def title = words.findAll { !it.isBlank() }
+        .collect { w -> w.substring(0, 1).toUpperCase() + (w.length() > 1 ? w.substring(1) : '') }
+        .join(' ')
+    title ?: dirName
+}
+
+def includeSnippet = { StringBuilder lines, File dir, String name ->
+    lines.append("include::{snippets}/${dir.name}/${name}.adoc[]\n\n")
+}
+
+def heading = { StringBuilder lines, int level, String text ->
+    lines.append("${'=' * level} ${text}\n\n")
+}
+
+tasks.register('generateRestDocsIndex') {
+    dependsOn tasks.named('test')
+    inputs.dir snippetsDirRef
+    outputs.file(new File(snippetsDirRef, 'auto-index.adoc'))
+    doLast {
+        File root = snippetsDirRef
+        if (!root.exists()) {
+            root.mkdirs()
+        }
+
+        def operations = root.listFiles()?.findAll { it.isDirectory() }?.sort { it.name } ?: []
+        def lines = new StringBuilder()
+
+        if (operations.isEmpty()) {
+            heading(lines, 2, 'API 문서')
+            lines.append('생성된 스니펫이 없습니다.\n')
+        } else {
+            operations.each { dir ->
+                heading(lines, 2, toTitle(dir.name))
+
+                if (['curl-request', 'http-request'].any { snippetExists(dir, it) }) {
+                    heading(lines, 3, '요청 예시')
+                    ['curl-request', 'http-request'].each { name ->
+                        if (snippetExists(dir, name)) {
+                            includeSnippet(lines, dir, name)
+                        }
+                    }
+                }
+
+                if (snippetExists(dir, 'request-headers')) {
+                    heading(lines, 3, '요청 헤더')
+                    includeSnippet(lines, dir, 'request-headers')
+                }
+
+                def parameterSnippets = [
+                    'path-parameters': '경로 파라미터',
+                    'query-parameters': '쿼리 파라미터',
+                    'request-parameters': '요청 파라미터'
+                ]
+
+                if (parameterSnippets.keySet().any { snippetExists(dir, it) }) {
+                    heading(lines, 3, '요청 파라미터')
+                    parameterSnippets.each { key, label ->
+                        if (snippetExists(dir, key)) {
+                            heading(lines, 4, label)
+                            includeSnippet(lines, dir, key)
+                        }
+                    }
+                }
+
+                // Multipart 요청 파트 (request-parts)
+                if (snippetExists(dir, 'request-parts')) {
+                    heading(lines, 3, '요청 파트')
+                    includeSnippet(lines, dir, 'request-parts')
+                    
+                    // request-part-{name}-fields 와 request-part-{name}-body 찾기
+                    def partFiles = dir.listFiles()?.findAll { 
+                        it.name.startsWith('request-part-') && it.name.endsWith('.adoc')
+                    } ?: []
+                    
+                    def partNames = partFiles.collect { file ->
+                        def name = file.name
+                        if (name.endsWith('-fields.adoc')) {
+                            name.replace('request-part-', '').replace('-fields.adoc', '')
+                        } else if (name.endsWith('-body.adoc')) {
+                            name.replace('request-part-', '').replace('-body.adoc', '')
+                        } else {
+                            null
+                        }
+                    }.findAll { it != null }.unique()
+                    
+                    partNames.each { partName ->
+                        def hasFields = snippetExists(dir, "request-part-${partName}-fields")
+                        def hasBody = snippetExists(dir, "request-part-${partName}-body")
+                        
+                        if (hasFields || hasBody) {
+                            heading(lines, 4, "${partName.toUpperCase()} 파트")
+                            if (hasFields) {
+                                heading(lines, 5, '필드 설명')
+                                includeSnippet(lines, dir, "request-part-${partName}-fields")
+                            }
+                            if (hasBody) {
+                                heading(lines, 5, '예시')
+                                includeSnippet(lines, dir, "request-part-${partName}-body")
+                            }
+                        }
+                    }
+                }
+
+                // 일반 요청 본문
+                if (snippetExists(dir, 'request-fields') || snippetExists(dir, 'request-body')) {
+                    heading(lines, 3, '요청 본문')
+                    if (snippetExists(dir, 'request-fields')) {
+                        heading(lines, 4, '필드 설명')
+                        includeSnippet(lines, dir, 'request-fields')
+                    }
+                    if (snippetExists(dir, 'request-body')) {
+                        heading(lines, 4, '예시')
+                        includeSnippet(lines, dir, 'request-body')
+                    }
+                }
+
+                def responseSnippets = [
+                    'response-headers': '헤더',
+                    'response-fields': '필드 설명',
+                    'response-body': '본문 예시',
+                    'http-response': 'HTTP 응답'
+                ]
+
+                if (responseSnippets.keySet().any { snippetExists(dir, it) }) {
+                    heading(lines, 3, '응답')
+                    responseSnippets.each { key, label ->
+                        if (snippetExists(dir, key)) {
+                            heading(lines, 4, label)
+                            includeSnippet(lines, dir, key)
+                        }
+                    }
+                }
+
+                if (snippetExists(dir, 'links')) {
+                    heading(lines, 3, '관련 링크')
+                    includeSnippet(lines, dir, 'links')
+                }
+            }
+        }
+
+        new File(snippetsDirRef, 'auto-index.adoc').text = lines.toString()
+    }
+}
