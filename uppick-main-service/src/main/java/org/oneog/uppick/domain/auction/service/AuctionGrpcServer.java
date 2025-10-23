@@ -3,6 +3,7 @@ package org.oneog.uppick.domain.auction.service;
 import java.time.LocalDateTime;
 
 import org.oneog.uppick.domain.auction.entity.Auction;
+import org.oneog.uppick.domain.auction.enums.AuctionStatus;
 import org.oneog.uppick.domain.auction.repository.AuctionRepository;
 import org.oneog.uppick.proto.auction.AuctionServiceGrpc;
 import org.oneog.uppick.proto.auction.RegisterAuctionRequest;
@@ -38,6 +39,7 @@ public class AuctionGrpcServer extends AuctionServiceGrpc.AuctionServiceImplBase
 					request.getEndAt().getSeconds(),
 					request.getEndAt().getNanos()),
 				java.time.ZoneId.systemDefault()))
+			.status(AuctionStatus.IN_PROGRESS)
 			.build();
 		auctionRepository.save(auction);
 
