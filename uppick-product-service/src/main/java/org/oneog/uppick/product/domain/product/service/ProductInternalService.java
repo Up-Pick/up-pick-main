@@ -7,7 +7,6 @@ import org.oneog.uppick.product.domain.product.dto.request.ProductRegisterReques
 import org.oneog.uppick.product.domain.product.dto.response.ProductBiddingInfoResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductInfoResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductPurchasedInfoResponse;
-import org.oneog.uppick.product.domain.product.dto.response.ProductRecentViewInfoResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductSellingInfoResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductSimpleInfoResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductSoldInfoResponse;
@@ -94,10 +93,6 @@ public class ProductInternalService {
 
 	public Page<ProductSellingInfoResponse> getSellingProductInfoByMemberId(Long memberId, Pageable pageable) {
 		return productQueryRepository.getSellingProductInfoMyMemberId(memberId, pageable);
-	}
-
-	public Page<ProductRecentViewInfoResponse> getRecentViewProductInfoByMemberId(Long memberId, Pageable pageable) {
-		return productQueryRepository.getRecentViewProductInfoByMemberId(memberId, pageable);
 	}
 
 	// ***** Internal Private Method ***** //
