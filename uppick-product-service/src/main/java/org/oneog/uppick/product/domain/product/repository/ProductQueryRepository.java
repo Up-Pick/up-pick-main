@@ -3,9 +3,6 @@ package org.oneog.uppick.product.domain.product.repository;
 import static org.oneog.uppick.product.domain.auction.entity.QAuction.*;
 import static org.oneog.uppick.product.domain.auction.entity.QBiddingDetail.*;
 import static org.oneog.uppick.product.domain.category.entity.QCategory.*;
-import static org.oneog.uppick.product.domain.member.entity.QMember.*;
-import static org.oneog.uppick.product.domain.member.entity.QPurchaseDetail.*;
-import static org.oneog.uppick.product.domain.member.entity.QSellDetail.*;
 import static org.oneog.uppick.product.domain.product.entity.QProduct.*;
 
 import java.util.List;
@@ -14,12 +11,12 @@ import java.util.Optional;
 import org.oneog.uppick.product.domain.auction.entity.AuctionStatus;
 import org.oneog.uppick.product.domain.auction.entity.QAuction;
 import org.oneog.uppick.product.domain.auction.entity.QBiddingDetail;
+import org.oneog.uppick.product.domain.product.dto.request.ProductPurchaseInfoWithoutBuyerRequest;
+import org.oneog.uppick.product.domain.product.dto.request.ProductSoldInfoWithoutSellerRequest;
 import org.oneog.uppick.product.domain.product.dto.response.ProductBiddingInfoResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductInfoResponse;
-import org.oneog.uppick.product.domain.product.dto.response.ProductPurchasedInfoResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductSellingInfoResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductSimpleInfoResponse;
-import org.oneog.uppick.product.domain.product.dto.response.ProductSoldInfoResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -54,11 +51,10 @@ public class ProductQueryRepository {
 					auction.minPrice,
 					auction.currentPrice,
 					auction.endAt,
-					member.nickname))
+					auction.registerId))
 			.from(product)
 			.join(category).on(product.categoryId.eq(category.id))
-			.join(member).on(product.registerId.eq(member.id))
-			.leftJoin(sellDetail).on(product.id.eq(sellDetail.productId))
+			.join(auction).on(auction.productId.eq(product.id))
 			.where(productId != null ? product.id.eq(productId) : null)
 			.fetchOne();
 
@@ -82,22 +78,21 @@ public class ProductQueryRepository {
 				.fetchOne());
 	}
 
-	public Page<ProductSoldInfoResponse> getProductSoldInfoByMemberId(Long memberId, Pageable pageable) {
+	public Page<ProductSoldInfoWithoutSellerRequest> getProductSoldInfoByMemberId(Long memberId, Pageable pageable) {
 
-		List<ProductSoldInfoResponse> qResponseList = queryFactory
+		List<ProductSoldInfoWithoutSellerRequest> qResponseList = queryFactory
 			.select(
 				Projections.constructor(
-					ProductSoldInfoResponse.class,
+					ProductSoldInfoWithoutSellerRequest.class,
 					product.id,
 					product.name,
 					product.description,
-					product.image,
-					sellDetail.finalPrice,
-					sellDetail.sellAt))
+					product.image))
 			.from(product)
-			.join(sellDetail).on(product.id.eq(sellDetail.productId))
-			.where(memberId != null ? product.registerId.eq(memberId) : null)
-			.orderBy(sellDetail.sellAt.desc())
+			.join(auction).on(auction.productId.eq(product.id))
+			.where(memberId != null ? auction.registerId.eq(memberId)
+				.and(auction.status.eq(AuctionStatus.FINISHED)) : null)
+			.orderBy(auction.endAt.desc())
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
 			.fetch();
@@ -106,29 +101,31 @@ public class ProductQueryRepository {
 				queryFactory
 					.select(product.count())
 					.from(product)
-					.join(sellDetail).on(product.id.eq(sellDetail.productId))
-					.where(memberId != null ? product.registerId.eq(memberId) : null)
+					.join(auction).on(auction.productId.eq(product.id))
+					.where(memberId != null ? auction.registerId.eq(memberId)
+						.and(auction.status.eq(AuctionStatus.FINISHED)) : null)
 					.fetchOne())
 			.orElse(0L);
 
 		return new PageImpl<>(qResponseList, pageable, total);
 	}
 
-	public Page<ProductPurchasedInfoResponse> getPurchasedProductInfoByMemberId(Long memberId, Pageable pageable) {
+	public Page<ProductPurchaseInfoWithoutBuyerRequest> getPurchasedProductInfoByMemberId(Long memberId,
+		Pageable pageable) {
 
-		List<ProductPurchasedInfoResponse> qResponseList = queryFactory
+		List<ProductPurchaseInfoWithoutBuyerRequest> qResponseList = queryFactory
 			.select(
 				Projections.constructor(
-					ProductPurchasedInfoResponse.class,
+					ProductPurchaseInfoWithoutBuyerRequest.class,
 					product.id,
 					product.name,
-					product.image,
-					purchaseDetail.purchasePrice,
-					purchaseDetail.purchaseAt))
+					product.image
+				))
 			.from(product)
-			.join(purchaseDetail).on(purchaseDetail.productId.eq(product.id))
-			.where(memberId != null ? purchaseDetail.buyerId.eq(memberId) : null)
-			.orderBy(purchaseDetail.purchaseAt.desc())
+			.join(auction).on(auction.productId.eq(product.id))
+			.where(memberId != null ? auction.lastBidderId.eq(memberId)
+				.and(auction.status.eq(AuctionStatus.FINISHED)) : null)
+			.orderBy(auction.endAt.desc())
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
 			.fetch();
@@ -137,8 +134,9 @@ public class ProductQueryRepository {
 				queryFactory
 					.select(product.count())
 					.from(product)
-					.join(purchaseDetail).on(purchaseDetail.productId.eq(product.id))
-					.where(memberId != null ? purchaseDetail.buyerId.eq(memberId) : null)
+					.join(auction).on(auction.productId.eq(product.id))
+					.where(memberId != null ? auction.lastBidderId.eq(memberId)
+						.and(auction.status.eq(AuctionStatus.FINISHED)) : null)
 					.fetchOne())
 			.orElse(0L);
 

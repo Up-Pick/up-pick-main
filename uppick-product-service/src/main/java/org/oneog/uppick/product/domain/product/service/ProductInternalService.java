@@ -8,15 +8,20 @@ import org.oneog.uppick.common.exception.BusinessException;
 import org.oneog.uppick.product.domain.auction.service.AuctionExternalService;
 import org.oneog.uppick.product.domain.category.dto.response.CategoryInfoResponse;
 import org.oneog.uppick.product.domain.category.service.CategoryExternalServiceApi;
+import org.oneog.uppick.product.domain.member.service.GetUserNicknameUseCase;
+import org.oneog.uppick.product.domain.member.service.SetProductPurchaseInfoWithBuyer;
+import org.oneog.uppick.product.domain.member.service.SetProductSoldInfoWithSeller;
 import org.oneog.uppick.product.domain.product.dto.projection.SearchProductProjection;
+import org.oneog.uppick.product.domain.product.dto.request.ProductPurchaseInfoWithoutBuyerRequest;
 import org.oneog.uppick.product.domain.product.dto.request.ProductRegisterRequest;
+import org.oneog.uppick.product.domain.product.dto.request.ProductSoldInfoWithoutSellerRequest;
 import org.oneog.uppick.product.domain.product.dto.request.SearchProductRequest;
 import org.oneog.uppick.product.domain.product.dto.response.ProductBiddingInfoResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductInfoResponse;
-import org.oneog.uppick.product.domain.product.dto.response.ProductPurchasedInfoResponse;
+import org.oneog.uppick.product.domain.product.dto.response.ProductPurchaseInfoWithBuyerResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductSellingInfoResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductSimpleInfoResponse;
-import org.oneog.uppick.product.domain.product.dto.response.ProductSoldInfoResponse;
+import org.oneog.uppick.product.domain.product.dto.response.ProductSoldInfoWithSellerResponse;
 import org.oneog.uppick.product.domain.product.dto.response.SearchProductInfoResponse;
 import org.oneog.uppick.product.domain.product.entity.Product;
 import org.oneog.uppick.product.domain.product.exception.ProductErrorCode;
@@ -26,6 +31,7 @@ import org.oneog.uppick.product.domain.product.repository.ProductRepository;
 import org.oneog.uppick.product.domain.product.repository.SearchingQueryRepository;
 import org.oneog.uppick.product.domain.searching.service.SaveSearchHistoriesUseCase;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -45,6 +51,9 @@ public class ProductInternalService {
 	private static final boolean DEFAULT_ONLY_NOT_SOLD = false;
 	private static final int DEFAULT_SIZE = 20;
 	private final SaveSearchHistoriesUseCase saveSearchHistoriesUseCase;
+	private final GetUserNicknameUseCase getUserNicknameUseCase;
+	private final SetProductSoldInfoWithSeller setProductSoldInfoWithSeller;
+	private final SetProductPurchaseInfoWithBuyer setProductPurchaseInfoWithBuyer;
 	// ***** Product Domain ***** //
 	private final ProductRepository productRepository;
 	private final ProductQueryRepository productQueryRepository;
@@ -87,8 +96,11 @@ public class ProductInternalService {
 			product.increaseViewCount();
 		}
 
-		return productQueryRepository.getProductInfoById(productId).orElseThrow(
+		ProductInfoResponse response = productQueryRepository.getProductInfoById(productId).orElseThrow(
 			() -> new BusinessException(ProductErrorCode.CANNOT_READ_PRODUCT_INFO));
+		response.setSellerName(getUserNicknameUseCase.execute(response.getSellerId()));
+
+		return response;
 	}
 
 	public ProductSimpleInfoResponse getProductSimpleInfoById(Long productId) {
@@ -96,12 +108,25 @@ public class ProductInternalService {
 			() -> new BusinessException(ProductErrorCode.CANNOT_READ_PRODUCT_SIMPLE_INFO));
 	}
 
-	public Page<ProductSoldInfoResponse> getProductSoldInfoByMemberId(Long memberId, Pageable pageable) {
-		return productQueryRepository.getProductSoldInfoByMemberId(memberId, pageable);
+	public Page<ProductSoldInfoWithSellerResponse> getProductSoldInfoByMemberId(Long memberId, Pageable pageable) {
+
+		Page<ProductSoldInfoWithoutSellerRequest> requests = productQueryRepository.getProductSoldInfoByMemberId(
+			memberId, pageable);
+		List<ProductSoldInfoWithSellerResponse> responses = setProductSoldInfoWithSeller.execute(requests.getContent(),
+			memberId);
+
+		return new PageImpl<>(responses, requests.getPageable(), requests.getTotalElements());
 	}
 
-	public Page<ProductPurchasedInfoResponse> getPurchasedProductInfoByMemberId(Long memberId, Pageable pageable) {
-		return productQueryRepository.getPurchasedProductInfoByMemberId(memberId, pageable);
+	public Page<ProductPurchaseInfoWithBuyerResponse> getPurchasedProductInfoByMemberId(Long memberId,
+		Pageable pageable) {
+
+		Page<ProductPurchaseInfoWithoutBuyerRequest> requests = productQueryRepository.getPurchasedProductInfoByMemberId(
+			memberId, pageable);
+		List<ProductPurchaseInfoWithBuyerResponse> responses = setProductPurchaseInfoWithBuyer.execute(
+			requests.getContent(), memberId);
+
+		return new PageImpl<>(responses, requests.getPageable(), requests.getTotalElements());
 	}
 
 	public Page<ProductBiddingInfoResponse> getBiddingProductInfoByMemberId(Long memberId, Pageable pageable) {

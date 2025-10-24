@@ -1,13 +1,13 @@
-package org.oneog.uppick.product.domain.product.dto.response;
+package org.oneog.uppick.domain.member.dto.response;
 
 import java.time.LocalDateTime;
 
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
-public class ProductPurchasedInfoResponse {
+@Builder
+public class ProductPurchaseInfoWithBuyerResponse {
 	private final Long id;
 	private final String name;
 	private final String image;

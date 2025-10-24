@@ -7,10 +7,10 @@ import org.oneog.uppick.product.domain.product.dto.request.ProductRegisterReques
 import org.oneog.uppick.product.domain.product.dto.request.SearchProductRequest;
 import org.oneog.uppick.product.domain.product.dto.response.ProductBiddingInfoResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductInfoResponse;
-import org.oneog.uppick.product.domain.product.dto.response.ProductPurchasedInfoResponse;
+import org.oneog.uppick.product.domain.product.dto.response.ProductPurchaseInfoWithBuyerResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductSellingInfoResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductSimpleInfoResponse;
-import org.oneog.uppick.product.domain.product.dto.response.ProductSoldInfoResponse;
+import org.oneog.uppick.product.domain.product.dto.response.ProductSoldInfoWithSellerResponse;
 import org.oneog.uppick.product.domain.product.dto.response.SearchProductInfoResponse;
 import org.oneog.uppick.product.domain.product.service.ProductInternalService;
 import org.springframework.data.domain.Page;
@@ -77,13 +77,13 @@ public class ProductController {
 	// 판매 완료된 상품 내역 조회
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/sold/me")
-	public GlobalPageResponse<ProductSoldInfoResponse> getSoldProducts(
+	public GlobalPageResponse<ProductSoldInfoWithSellerResponse> getSoldProducts(
 		@AuthenticationPrincipal
 		AuthMember authMember,
 		@PageableDefault(size = 20)
 		Pageable pageable) {
 
-		Page<ProductSoldInfoResponse> responses = productInternalService.getProductSoldInfoByMemberId(
+		Page<ProductSoldInfoWithSellerResponse> responses = productInternalService.getProductSoldInfoByMemberId(
 			authMember.getMemberId(), pageable);
 		return GlobalPageResponse.of(responses);
 	}
@@ -91,13 +91,13 @@ public class ProductController {
 	// 구매 완료 상품 내역 조회
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/purchased/me")
-	public GlobalPageResponse<ProductPurchasedInfoResponse> getPurchasedProducts(
+	public GlobalPageResponse<ProductPurchaseInfoWithBuyerResponse> getPurchasedProducts(
 		@AuthenticationPrincipal
 		AuthMember authMember,
 		@PageableDefault(size = 20)
 		Pageable pageable) {
 
-		Page<ProductPurchasedInfoResponse> responses = productInternalService.getPurchasedProductInfoByMemberId(
+		Page<ProductPurchaseInfoWithBuyerResponse> responses = productInternalService.getPurchasedProductInfoByMemberId(
 			authMember.getMemberId(), pageable);
 		return GlobalPageResponse.of(responses);
 	}
