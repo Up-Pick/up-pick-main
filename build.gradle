@@ -27,6 +27,7 @@ ext {
     grpcSpringBootStarterVersion = '3.1.0.RELEASE'
     grpcVersion = '1.76.0'
     protobufVersion = '4.33.0'
+    springCloudVersion = '2025.0.0'
 }
 
 configurations {
@@ -86,6 +87,7 @@ subprojects {
         imports {
             mavenBom "org.springframework.boot:spring-boot-dependencies:3.5.6"
             mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:${springCloudAwsVersion}"
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
         }
     }
 

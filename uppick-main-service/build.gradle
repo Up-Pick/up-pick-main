@@ -52,6 +52,9 @@ dependencies {
     //Rest Docs
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
     asciidoctorExtensions 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+
+    // Open Feign
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 }
 
 // REST Docs 스니펫 디렉토리 설정

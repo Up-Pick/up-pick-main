@@ -33,8 +33,8 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
                     String memberId = claims.getSubject();
                     String memberNickname = (String)claims.get("memberNickname");
                     ServerHttpRequest newRequest = exchange.getRequest().mutate()
-                        .header(AuthConstant.AUTH_MEMBER_ID, memberId)
-                        .header(AuthConstant.AUTH_MEMBER_NICKNAME, memberNickname).build();
+                        .header(AuthConstant.AUTH_MEMBER_ID_HEADER, memberId)
+                        .header(AuthConstant.AUTH_MEMBER_NICKNAME_HEADER, memberNickname).build();
                     return chain.filter(exchange.mutate().request(newRequest).build());
                 } catch (Exception e) {
                     log.error("Invalid token", e);
