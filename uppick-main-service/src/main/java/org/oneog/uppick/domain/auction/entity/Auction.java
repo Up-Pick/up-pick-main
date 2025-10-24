@@ -33,6 +33,8 @@ public class Auction {
 
 	@Column(name = "product_id", nullable = false)
 	private Long productId;
+	@Column(name = "last_bidder_id", nullable = true)
+	private Long lastBidderId;
 
 	@Column(name = "current_price", nullable = true)
 	private Long currentPrice; //현재 입찰가
@@ -62,12 +64,13 @@ public class Auction {
 	}
 
 	// --- 도메인 메서드 ---
-	//입찰 성공시 현재 입찰가를 갱신하기 위함
-	public void updateCurrentPrice(Long biddingPrice) {
+	//입찰 성공시 현재 입찰가 및 마지막 입찰자 ID를 갱신하기 위함
+	public void updateCurrentPrice(Long biddingPrice, Long lastBidderId) {
 		if (biddingPrice == null || biddingPrice <= 0) {
 			throw new BusinessException(AuctionErrorCode.WRONG_BIDDING_PRICE);
 		}
 		this.currentPrice = biddingPrice;
+		this.lastBidderId = lastBidderId;
 	}
 
 	//경매마감시 상태변경(판매된거)

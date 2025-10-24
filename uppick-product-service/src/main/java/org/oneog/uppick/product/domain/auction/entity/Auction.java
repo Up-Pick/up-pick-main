@@ -32,6 +32,8 @@ public class Auction {
 
 	@Column(name = "product_id", nullable = false)
 	private Long productId;
+	@Column(name = "last_bidder_id", nullable = true)
+	private Long lastBidderId;
 
 	@Column(name = "current_price", nullable = true)
 	private Long currentPrice; //현재 입찰가
