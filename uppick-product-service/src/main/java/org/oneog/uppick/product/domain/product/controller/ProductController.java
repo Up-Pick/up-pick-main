@@ -4,12 +4,14 @@ import org.oneog.uppick.common.dto.AuthMember;
 import org.oneog.uppick.common.dto.GlobalApiResponse;
 import org.oneog.uppick.common.dto.GlobalPageResponse;
 import org.oneog.uppick.product.domain.product.dto.request.ProductRegisterRequest;
+import org.oneog.uppick.product.domain.product.dto.request.SearchProductRequest;
 import org.oneog.uppick.product.domain.product.dto.response.ProductBiddingInfoResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductInfoResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductPurchasedInfoResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductSellingInfoResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductSimpleInfoResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductSoldInfoResponse;
+import org.oneog.uppick.product.domain.product.dto.response.SearchProductInfoResponse;
 import org.oneog.uppick.product.domain.product.service.ProductInternalService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +22,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -125,5 +128,17 @@ public class ProductController {
 		Page<ProductSellingInfoResponse> responses = productInternalService.getSellingProductInfoByMemberId(
 			authMember.getMemberId(), pageable);
 		return GlobalPageResponse.of(responses);
+	}
+
+	@PostMapping("/search")
+	public GlobalApiResponse<GlobalPageResponse<SearchProductInfoResponse>> searchProduct(
+		@Valid @RequestBody(required = false)
+		SearchProductRequest searchProductRequest) {
+		if (searchProductRequest == null) {
+			searchProductRequest = SearchProductRequest.ofDefault();
+		}
+		System.out.println(searchProductRequest.getKeyword());
+		return GlobalApiResponse.ok(
+			GlobalPageResponse.of(productInternalService.searchProduct(searchProductRequest)));
 	}
 }

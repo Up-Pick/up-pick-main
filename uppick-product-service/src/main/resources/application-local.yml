@@ -36,3 +36,10 @@ server:
 jwt:
   secret:
     key: "VXBwaWNrUHJvamVjdFNlY3JldEtleUZvclRlc3RpbmdQdXJwb3NlczEyMzQ1Njc4OTA="
+
+gateway:
+  url: ${GATEWAY_URL}
+
+internal:
+  api:
+    secret: "jdklsfjksdfjksldfjklsdjfklsdfjsklfjskljafklwejflkjw"
