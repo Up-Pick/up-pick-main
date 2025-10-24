@@ -1,12 +1,12 @@
-package org.oneog.uppick.domain.searching.repository;
+package org.oneog.uppick.product.domain.product.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.oneog.uppick.domain.auction.entity.QAuction;
-import org.oneog.uppick.domain.auction.enums.AuctionStatus;
-import org.oneog.uppick.domain.product.entity.QProduct;
-import org.oneog.uppick.domain.searching.dto.projection.SearchProductProjection;
+import org.oneog.uppick.product.domain.auction.entity.AuctionStatus;
+import org.oneog.uppick.product.domain.auction.entity.QAuction;
+import org.oneog.uppick.product.domain.product.dto.projection.SearchProductProjection;
+import org.oneog.uppick.product.domain.product.entity.QProduct;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
