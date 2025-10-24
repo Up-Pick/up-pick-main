@@ -47,7 +47,7 @@ public class AuctionInternalService {
 			Auction auction = findAuctionById(auctionId);
 
 			// 판매자 본인 입찰 방지
-			if (auctionQueryRepository.findSellerIdByAuctionId(auctionId).equals(memberId)) {
+			if (auction.getRegisterId().equals(memberId)) {
 				throw new BusinessException(AuctionErrorCode.CANNOT_BID_OWN_AUCTION);
 			}
 
