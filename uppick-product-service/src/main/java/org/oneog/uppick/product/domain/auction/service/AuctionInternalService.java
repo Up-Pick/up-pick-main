@@ -47,7 +47,7 @@ public class AuctionInternalService {
 			Auction auction = findAuctionById(auctionId);
 
 			// 판매자 본인 입찰 방지
-			if (auctionQueryRepository.findSellerIdByAuctionId(auctionId).equals(memberId)) {
+			if (auction.getRegisterId().equals(memberId)) {
 				throw new BusinessException(AuctionErrorCode.CANNOT_BID_OWN_AUCTION);
 			}
 
@@ -70,8 +70,7 @@ public class AuctionInternalService {
 			}
 
 			// 이전 최고 입찰자 조회
-			Long previousBidderId = biddingDetailQueryRepository.findTopBidderIdByAuctionId(auctionId)
-				.orElse(null);
+			Long previousBidderId = auction.getLastBidderId();
 			Long previousBidPrice = currentPrice;
 
 			//  본인 재입찰 or 신규 입찰 처리
@@ -92,7 +91,7 @@ public class AuctionInternalService {
 			}
 
 			// 입찰가 갱신 및 기록 저장
-			auction.updateCurrentPrice(biddingPrice);
+			auction.updateCurrentPrice(biddingPrice, memberId);
 
 			BiddingDetail biddingDetail = auctionMapper.toEntity(
 				auctionId,

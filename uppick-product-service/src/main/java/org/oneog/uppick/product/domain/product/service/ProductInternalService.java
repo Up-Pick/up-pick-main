@@ -57,8 +57,8 @@ public class ProductInternalService {
 
 		// 상품 및 경매 등록
 		productRepository.save(product);
-		auctionExternalServiceApi.registerAuction(product.getId(), request.getStartBid(), product.getRegisteredAt(),
-			request.getEndAt());
+		auctionExternalServiceApi.registerAuction(product.getId(), registerId, request.getStartBid(),
+			product.getRegisteredAt(), request.getEndAt());
 	}
 
 	@Transactional

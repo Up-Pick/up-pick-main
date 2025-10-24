@@ -13,19 +13,20 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class AuctionServiceProvider implements AuctionExternalService {
-    private final AuctionRepository auctionRepository;
+	private final AuctionRepository auctionRepository;
 
-    @Override
-    @Transactional
-    public void registerAuction(Long id, Long startBid, LocalDateTime registeredAt,
-        LocalDateTime endAt) {
-        Auction auction = Auction.builder()
-            .productId(id)
-            .minPrice(startBid)
-            .startAt(registeredAt)
-            .endAt(endAt)
-            .status(AuctionStatus.IN_PROGRESS)
-            .build();
-        auctionRepository.save(auction);
-    }
+	@Override
+	@Transactional
+	public void registerAuction(Long id, Long registerId, Long startBid, LocalDateTime registeredAt,
+		LocalDateTime endAt) {
+		Auction auction = Auction.builder()
+			.productId(id)
+			.registerId(registerId)
+			.minPrice(startBid)
+			.startAt(registeredAt)
+			.endAt(endAt)
+			.status(AuctionStatus.IN_PROGRESS)
+			.build();
+		auctionRepository.save(auction);
+	}
 }

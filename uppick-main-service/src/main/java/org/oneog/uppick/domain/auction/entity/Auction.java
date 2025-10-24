@@ -35,6 +35,8 @@ public class Auction {
 	private Long productId;
 	@Column(name = "last_bidder_id", nullable = true)
 	private Long lastBidderId;
+	@Column(name = "register_id", nullable = false)
+	private Long registerId;
 
 	@Column(name = "current_price", nullable = true)
 	private Long currentPrice; //현재 입찰가
@@ -53,9 +55,10 @@ public class Auction {
 	private LocalDateTime endAt;
 
 	@Builder
-	private Auction(Long productId, Long currentPrice, Long minPrice, LocalDateTime startAt, AuctionStatus status,
-		LocalDateTime endAt) {
+	private Auction(Long productId, Long registerId, Long currentPrice, Long minPrice, LocalDateTime startAt,
+		AuctionStatus status, LocalDateTime endAt) {
 		this.productId = productId;
+		this.registerId = registerId;
 		this.currentPrice = currentPrice;
 		this.minPrice = minPrice;
 		this.startAt = startAt;

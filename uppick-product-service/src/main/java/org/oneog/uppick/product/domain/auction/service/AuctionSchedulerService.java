@@ -101,7 +101,7 @@ public class AuctionSchedulerService {
 		Long productId = auction.getProductId();
 		Long finalPrice = winner.getBidPrice();
 		Long auctionId = auction.getId();
-		Long sellerId = auctionQueryRepository.findSellerIdByAuctionId(auctionId); // 상품을 판매한사람
+		Long sellerId = auction.getRegisterId(); // 상품을 판매한사람
 
 		//  구매 내역 등록
 		createPurchaseHistory(auctionId, buyerId, productId, finalPrice);
