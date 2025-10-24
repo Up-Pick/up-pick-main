@@ -3,7 +3,6 @@ package org.oneog.uppick.domain.ranking.service;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -12,19 +11,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.oneog.uppick.domain.ranking.dto.response.HotDealResponse;
 import org.oneog.uppick.domain.ranking.dto.response.HotKeywordResponse;
-import org.oneog.uppick.domain.ranking.entity.HotDeal;
 import org.oneog.uppick.domain.ranking.entity.HotKeyword;
 import org.oneog.uppick.domain.ranking.mapper.RankingMapper;
-import org.oneog.uppick.domain.ranking.repository.HotDealRepository;
 import org.oneog.uppick.domain.ranking.repository.HotKeywordRepository;
 
 @ExtendWith(MockitoExtension.class)
 class RankingInternalServiceTest {
-
-	@Mock
-	private HotDealRepository hotDealRepository;
 
 	@Mock
 	private HotKeywordRepository hotKeywordRepository;
@@ -34,69 +27,6 @@ class RankingInternalServiceTest {
 
 	@InjectMocks
 	private RankingInternalService rankingInternalService;
-
-	// === 주간 핫딜 조회 ===
-
-	@Test
-	void getHotDeals_조회성공_랭킹순서대로조회된다() {
-		// given
-		HotDeal hotDeal1 = createHotDeal(1L, 1, "맥북 프로", "macbook.jpg");
-		HotDeal hotDeal2 = createHotDeal(2L, 2, "아이폰 15", "iphone.jpg");
-		HotDeal hotDeal3 = createHotDeal(3L, 3, "에어팟", "airpods.jpg");
-		HotDeal hotDeal4 = createHotDeal(4L, 4, "갤럭시 워치", "galaxy-watch.jpg");
-		HotDeal hotDeal5 = createHotDeal(5L, 5, "아이패드", "ipad.jpg");
-		HotDeal hotDeal6 = createHotDeal(6L, 6, "다이슨 청소기", "dyson.jpg");
-
-		List<HotDeal> hotDeals = Arrays.asList(hotDeal1, hotDeal2, hotDeal3, hotDeal4, hotDeal5, hotDeal6);
-
-		HotDealResponse response1 = createResponse(1, 1L, "맥북 프로", "macbook.jpg");
-		HotDealResponse response2 = createResponse(2, 2L, "아이폰 15", "iphone.jpg");
-		HotDealResponse response3 = createResponse(3, 3L, "에어팟", "airpods.jpg");
-		HotDealResponse response4 = createResponse(4, 4L, "갤럭시 워치", "galaxy-watch.jpg");
-		HotDealResponse response5 = createResponse(5, 5L, "아이패드", "ipad.jpg");
-		HotDealResponse response6 = createResponse(6, 6L, "다이슨 청소기", "dyson.jpg");
-
-		List<HotDealResponse> responses = Arrays.asList(response1, response2, response3, response4, response5,
-			response6);
-
-		given(hotDealRepository.findAllByOrderByRankNoAsc()).willReturn(hotDeals);
-		given(rankingMapper.toHotDealResponseList(hotDeals)).willReturn(responses);
-
-		// when
-		List<HotDealResponse> result = rankingInternalService.getHotDeals();
-
-		// then
-		assertThat(result).hasSize(6);
-		assertThat(result.get(0).getRankNo()).isEqualTo(1);
-		assertThat(result.get(0).getProductName()).isEqualTo("맥북 프로");
-		assertThat(result.get(1).getRankNo()).isEqualTo(2);
-		assertThat(result.get(2).getRankNo()).isEqualTo(3);
-		assertThat(result.get(3).getRankNo()).isEqualTo(4);
-		assertThat(result.get(4).getRankNo()).isEqualTo(5);
-		assertThat(result.get(5).getRankNo()).isEqualTo(6);
-		assertThat(result.get(5).getProductName()).isEqualTo("다이슨 청소기");
-	}
-
-	@Test
-	void getHotDeals_핫딜이6개미만_정상조회된다() {
-		// given
-		HotDeal hotDeal1 = createHotDeal(1L, 1, "상품1", "img1.jpg");
-		HotDeal hotDeal2 = createHotDeal(2L, 2, "상품2", "img2.jpg");
-
-		HotDealResponse response1 = createResponse(1, 1L, "상품1", "img1.jpg");
-		HotDealResponse response2 = createResponse(2, 2L, "상품2", "img2.jpg");
-
-		given(hotDealRepository.findAllByOrderByRankNoAsc()).willReturn(Arrays.asList(hotDeal1, hotDeal2));
-		given(rankingMapper.toHotDealResponseList(Arrays.asList(hotDeal1, hotDeal2))).willReturn(
-			Arrays.asList(response1, response2));
-
-		// when
-		List<HotDealResponse> result = rankingInternalService.getHotDeals();
-
-		// then
-		assertThat(result).hasSize(2);
-		assertThat(result).extracting("rankNo").containsExactly(1, 2);
-	}
 
 	// === 주간 키워드 조회 ===
 	@Test
@@ -145,24 +75,6 @@ class RankingInternalServiceTest {
 	}
 
 	// === Helper Methods ===
-
-	private HotDeal createHotDeal(Long productId, int rankNo, String name, String image) {
-		return HotDeal.builder()
-			.productId(productId)
-			.rankNo(rankNo)
-			.productName(name)
-			.productImage(image)
-			.build();
-	}
-
-	private HotDealResponse createResponse(int rank, Long productId, String name, String image) {
-		return HotDealResponse.builder()
-			.rankNo(rank)
-			.productId(productId)
-			.productName(name)
-			.productImage(image)
-			.build();
-	}
 
 	private HotKeyword createHotKeyword(int rankNo, String keyword) {
 		return new HotKeyword(keyword, rankNo);
