@@ -2,6 +2,8 @@ package org.oneog.uppick.product.domain.auction.entity;
 
 import java.time.LocalDateTime;
 
+import org.oneog.uppick.common.exception.BusinessException;
+import org.oneog.uppick.product.domain.auction.exception.AuctionErrorCode;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import jakarta.persistence.Column;
@@ -13,6 +15,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -45,4 +48,34 @@ public class Auction {
 
 	@Column(name = "end_at", nullable = false)
 	private LocalDateTime endAt;
+
+	@Builder
+	private Auction(Long productId, Long currentPrice, Long minPrice, LocalDateTime startAt, AuctionStatus status,
+		LocalDateTime endAt) {
+		this.productId = productId;
+		this.currentPrice = currentPrice;
+		this.minPrice = minPrice;
+		this.startAt = startAt;
+		this.status = status;
+		this.endAt = endAt;
+	}
+
+	// --- 도메인 메서드 ---
+	//입찰 성공시 현재 입찰가를 갱신하기 위함
+	public void updateCurrentPrice(Long biddingPrice) {
+		if (biddingPrice == null || biddingPrice <= 0) {
+			throw new BusinessException(AuctionErrorCode.WRONG_BIDDING_PRICE);
+		}
+		this.currentPrice = biddingPrice;
+	}
+
+	//경매마감시 상태변경(판매된거)
+	public void markAsSold() {
+		this.status = AuctionStatus.FINISHED;
+	}
+
+	//유찰되면 상태변경
+	public void markAsExpired() {
+		this.status = AuctionStatus.EXPIRED;
+	}
 }

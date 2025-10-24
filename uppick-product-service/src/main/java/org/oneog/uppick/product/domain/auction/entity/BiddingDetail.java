@@ -12,6 +12,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -38,4 +39,11 @@ public class BiddingDetail {
 	@CreatedDate
 	@Column(name = "bid_at", nullable = false, updatable = false)
 	private LocalDateTime bidAt; //입찰시각
+
+	@Builder
+	private BiddingDetail(Long auctionId, Long memberId, Long bidPrice) {
+		this.auctionId = auctionId;
+		this.memberId = memberId;
+		this.bidPrice = bidPrice;
+	}
 }

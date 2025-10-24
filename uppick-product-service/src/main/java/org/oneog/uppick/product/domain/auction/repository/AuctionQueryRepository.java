@@ -1,8 +1,8 @@
-package org.oneog.uppick.domain.auction.repository;
+package org.oneog.uppick.product.domain.auction.repository;
 
-import static org.oneog.uppick.domain.auction.entity.QAuction.*;
-import static org.oneog.uppick.domain.member.entity.QMember.*;
-import static org.oneog.uppick.domain.product.entity.QProduct.*;
+import static org.oneog.uppick.product.domain.auction.entity.QAuction.*;
+import static org.oneog.uppick.product.domain.member.entity.QMember.*;
+import static org.oneog.uppick.product.domain.product.entity.QProduct.*;
 
 import org.springframework.stereotype.Repository;
 
