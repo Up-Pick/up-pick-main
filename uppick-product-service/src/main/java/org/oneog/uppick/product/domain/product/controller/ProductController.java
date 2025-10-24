@@ -7,7 +7,6 @@ import org.oneog.uppick.product.domain.product.dto.request.ProductRegisterReques
 import org.oneog.uppick.product.domain.product.dto.response.ProductBiddingInfoResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductInfoResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductPurchasedInfoResponse;
-import org.oneog.uppick.product.domain.product.dto.response.ProductRecentViewInfoResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductSellingInfoResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductSimpleInfoResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductSoldInfoResponse;
@@ -124,20 +123,6 @@ public class ProductController {
 		Pageable pageable) {
 
 		Page<ProductSellingInfoResponse> responses = productInternalService.getSellingProductInfoByMemberId(
-			authMember.getMemberId(), pageable);
-		return GlobalPageResponse.of(responses);
-	}
-
-	// 최근 본 상품 조회
-	@PreAuthorize("isAuthenticated()")
-	@GetMapping("/recently-viewed/me")
-	public GlobalPageResponse<ProductRecentViewInfoResponse> getRecentlyViewedProducts(
-		@AuthenticationPrincipal
-		AuthMember authMember,
-		@PageableDefault
-		Pageable pageable) {
-
-		Page<ProductRecentViewInfoResponse> responses = productInternalService.getRecentViewProductInfoByMemberId(
 			authMember.getMemberId(), pageable);
 		return GlobalPageResponse.of(responses);
 	}

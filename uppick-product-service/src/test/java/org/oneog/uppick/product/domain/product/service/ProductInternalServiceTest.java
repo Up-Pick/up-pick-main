@@ -18,7 +18,6 @@ import org.oneog.uppick.product.domain.product.entity.Product;
 import org.oneog.uppick.product.domain.product.mapper.ProductMapper;
 import org.oneog.uppick.product.domain.product.repository.ProductQueryRepository;
 import org.oneog.uppick.product.domain.product.repository.ProductRepository;
-import org.oneog.uppick.product.domain.product.repository.ProductViewHistoryRepository;
 import org.springframework.web.multipart.MultipartFile;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,8 +29,6 @@ public class ProductInternalServiceTest {
 	ProductRepository productRepository;
 	@Mock
 	ProductQueryRepository productQueryRepository;
-	@Mock
-	ProductViewHistoryRepository productViewHistoryRepository;
 	@Mock
 	AuctionExternalService auctionExternalServiceApi;
 	@Mock
@@ -45,8 +42,6 @@ public class ProductInternalServiceTest {
 		productInternalService = new ProductInternalService(
 			productRepository,
 			productQueryRepository,
-			productViewHistoryRepository,
-
 			productMapper,
 			s3FileManager,
 			auctionExternalServiceApi);
