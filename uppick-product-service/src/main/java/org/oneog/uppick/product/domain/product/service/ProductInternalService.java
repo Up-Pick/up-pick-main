@@ -3,6 +3,8 @@ package org.oneog.uppick.product.domain.product.service;
 import org.oneog.uppick.common.dto.AuthMember;
 import org.oneog.uppick.common.exception.BusinessException;
 import org.oneog.uppick.product.domain.auction.service.AuctionExternalService;
+import org.oneog.uppick.product.domain.category.dto.response.CategoryInfoResponse;
+import org.oneog.uppick.product.domain.category.service.CategoryExternalServiceApi;
 import org.oneog.uppick.product.domain.product.dto.request.ProductRegisterRequest;
 import org.oneog.uppick.product.domain.product.dto.response.ProductBiddingInfoResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductInfoResponse;
@@ -39,6 +41,7 @@ public class ProductInternalService {
 
 	// ****** External Domain API ***** //
 	private final AuctionExternalService auctionExternalServiceApi;
+	private final CategoryExternalServiceApi categoryExternalServiceApi;
 
 	// ***** Internal Service Method ***** //
 	@Transactional
@@ -53,7 +56,8 @@ public class ProductInternalService {
 		String imageUrl = s3FileManager.store(image);
 
 		// 3. Product 엔티티 생성 (imageUrl 포함)
-		Product product = productMapper.registerToEntity(request, registerId, imageUrl);
+		CategoryInfoResponse category = categoryExternalServiceApi.getCategoriesByCategoryId(request.getCategoryId());
+		Product product = productMapper.registerToEntity(request, registerId, imageUrl, category);
 
 		// 상품 및 경매 등록
 		productRepository.save(product);

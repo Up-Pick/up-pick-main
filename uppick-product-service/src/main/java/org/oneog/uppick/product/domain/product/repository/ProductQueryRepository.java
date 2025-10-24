@@ -50,14 +50,13 @@ public class ProductQueryRepository {
 					product.viewCount,
 					product.registeredAt,
 					product.image,
-					Expressions.stringTemplate("CONCAT({0}, '/', {1})", category.big, category.small),
+					Expressions.stringTemplate("CONCAT({0}, '/', {1})", product.bigCategory, product.smallCategory),
 					auction.minPrice,
 					auction.currentPrice,
 					auction.endAt,
 					member.nickname))
 			.from(product)
 			.join(category).on(product.categoryId.eq(category.id))
-			.join(auction).on(product.id.eq(auction.productId))
 			.join(member).on(product.registerId.eq(member.id))
 			.leftJoin(sellDetail).on(product.id.eq(sellDetail.productId))
 			.where(productId != null ? product.id.eq(productId) : null)
@@ -104,12 +103,12 @@ public class ProductQueryRepository {
 			.fetch();
 
 		Long total = Optional.ofNullable(
-			queryFactory
-				.select(product.count())
-				.from(product)
-				.join(sellDetail).on(product.id.eq(sellDetail.productId))
-				.where(memberId != null ? product.registerId.eq(memberId) : null)
-				.fetchOne())
+				queryFactory
+					.select(product.count())
+					.from(product)
+					.join(sellDetail).on(product.id.eq(sellDetail.productId))
+					.where(memberId != null ? product.registerId.eq(memberId) : null)
+					.fetchOne())
 			.orElse(0L);
 
 		return new PageImpl<>(qResponseList, pageable, total);
@@ -135,12 +134,12 @@ public class ProductQueryRepository {
 			.fetch();
 
 		Long total = Optional.ofNullable(
-			queryFactory
-				.select(product.count())
-				.from(product)
-				.join(purchaseDetail).on(purchaseDetail.productId.eq(product.id))
-				.where(memberId != null ? purchaseDetail.buyerId.eq(memberId) : null)
-				.fetchOne())
+				queryFactory
+					.select(product.count())
+					.from(product)
+					.join(purchaseDetail).on(purchaseDetail.productId.eq(product.id))
+					.where(memberId != null ? purchaseDetail.buyerId.eq(memberId) : null)
+					.fetchOne())
 			.orElse(0L);
 
 		return new PageImpl<>(qResponseList, pageable, total);

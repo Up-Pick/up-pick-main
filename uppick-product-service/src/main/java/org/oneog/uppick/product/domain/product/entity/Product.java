@@ -45,13 +45,21 @@ public class Product {
 	@Column(name = "register_id", nullable = false)
 	private Long registerId;
 
+	@Column(name = "big_category", nullable = false)
+	private String bigCategory;
+	@Column(name = "small_category", nullable = false)
+	private String smallCategory;
+
 	@Builder
-	private Product(String name, String description, String image, Long categoryId, Long registerId) {
+	private Product(String name, String description, String image, Long categoryId, Long registerId, String bigCategory,
+		String smallCategory) {
 		this.name = name;
 		this.description = description;
 		this.image = image;
 		this.categoryId = categoryId;
 		this.registerId = registerId;
+		this.bigCategory = bigCategory;
+		this.smallCategory = smallCategory;
 	}
 
 	// ***** Method ***** //
