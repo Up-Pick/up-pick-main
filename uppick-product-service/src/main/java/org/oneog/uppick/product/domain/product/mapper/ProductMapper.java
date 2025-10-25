@@ -1,9 +1,15 @@
 package org.oneog.uppick.product.domain.product.mapper;
 
 import org.oneog.uppick.product.domain.category.dto.response.CategoryInfoResponse;
+import org.oneog.uppick.product.domain.product.dto.projection.PurchasedProductInfoProjection;
 import org.oneog.uppick.product.domain.product.dto.projection.SearchProductProjection;
+import org.oneog.uppick.product.domain.product.dto.projection.SoldProductInfoProjection;
 import org.oneog.uppick.product.domain.product.dto.request.ProductRegisterRequest;
+import org.oneog.uppick.product.domain.product.dto.response.ProductBuyAtResponse;
+import org.oneog.uppick.product.domain.product.dto.response.ProductSellAtResponse;
+import org.oneog.uppick.product.domain.product.dto.response.PurchasedProductInfoResponse;
 import org.oneog.uppick.product.domain.product.dto.response.SearchProductInfoResponse;
+import org.oneog.uppick.product.domain.product.dto.response.SoldProductInfoResponse;
 import org.oneog.uppick.product.domain.product.entity.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
@@ -37,5 +43,28 @@ public class ProductMapper {
 				.isSold(projection.isSold())
 				.build();
 		});
+	}
+
+	public SoldProductInfoResponse combineSoldProductInfoWithSeller(
+		SoldProductInfoProjection productInfo, ProductSellAtResponse sellerInfo) {
+		return SoldProductInfoResponse.builder()
+			.id(productInfo.getId())
+			.name(productInfo.getName())
+			.description(productInfo.getDescription())
+			.image(productInfo.getImage())
+			.finalPrice(productInfo.getFinalPrice())
+			.soldAt(sellerInfo.getBuyAt())
+			.build();
+	}
+
+	public PurchasedProductInfoResponse combinePurchasedInfoWithBuyer(
+		PurchasedProductInfoProjection productInfo, ProductBuyAtResponse buyerInfo) {
+		return PurchasedProductInfoResponse.builder()
+			.id(productInfo.getId())
+			.name(productInfo.getName())
+			.image(productInfo.getImage())
+			.finalPrice(productInfo.getFinalPrice())
+			.buyAt(buyerInfo.getBuyAt())
+			.build();
 	}
 }
