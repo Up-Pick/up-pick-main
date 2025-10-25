@@ -1,17 +1,20 @@
 package org.oneog.uppick.product.domain.member.service;
 
+import java.util.List;
+
 import org.oneog.uppick.product.domain.member.client.MemberClient;
+import org.oneog.uppick.product.domain.product.dto.response.ProductBuyAtResponse;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class GetUserNicknameUseCase {
+public class GetProductBuyAtUseCase {
 
 	private final MemberClient memberClient;
 
-	public String execute(Long memberId) {
-		return memberClient.getUserNickname(memberId);
+	public List<ProductBuyAtResponse> execute(List<Long> productIds) {
+		return memberClient.getPurchasedProductsBuyAt(productIds);
 	}
 }

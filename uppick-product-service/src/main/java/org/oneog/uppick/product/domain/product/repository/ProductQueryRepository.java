@@ -11,8 +11,8 @@ import java.util.Optional;
 import org.oneog.uppick.product.domain.auction.entity.AuctionStatus;
 import org.oneog.uppick.product.domain.auction.entity.QAuction;
 import org.oneog.uppick.product.domain.auction.entity.QBiddingDetail;
-import org.oneog.uppick.product.domain.product.dto.request.ProductPurchaseInfoWithoutBuyerRequest;
-import org.oneog.uppick.product.domain.product.dto.request.ProductSoldInfoWithoutSellerRequest;
+import org.oneog.uppick.product.domain.product.dto.projection.PurchasedProductInfoProjection;
+import org.oneog.uppick.product.domain.product.dto.projection.SoldProductInfoProjection;
 import org.oneog.uppick.product.domain.product.dto.response.ProductBiddingInfoResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductInfoResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductSellingInfoResponse;
@@ -78,16 +78,17 @@ public class ProductQueryRepository {
 				.fetchOne());
 	}
 
-	public Page<ProductSoldInfoWithoutSellerRequest> getProductSoldInfoByMemberId(Long memberId, Pageable pageable) {
+	public Page<SoldProductInfoProjection> getProductSoldInfoByMemberId(Long memberId, Pageable pageable) {
 
-		List<ProductSoldInfoWithoutSellerRequest> qResponseList = queryFactory
+		List<SoldProductInfoProjection> qResponseList = queryFactory
 			.select(
 				Projections.constructor(
-					ProductSoldInfoWithoutSellerRequest.class,
+					SoldProductInfoProjection.class,
 					product.id,
 					product.name,
 					product.description,
-					product.image))
+					product.image,
+					auction.currentPrice))
 			.from(product)
 			.join(auction).on(auction.productId.eq(product.id))
 			.where(memberId != null ? auction.registerId.eq(memberId)
@@ -110,16 +111,17 @@ public class ProductQueryRepository {
 		return new PageImpl<>(qResponseList, pageable, total);
 	}
 
-	public Page<ProductPurchaseInfoWithoutBuyerRequest> getPurchasedProductInfoByMemberId(Long memberId,
+	public Page<PurchasedProductInfoProjection> getPurchasedProductInfoByMemberId(Long memberId,
 		Pageable pageable) {
 
-		List<ProductPurchaseInfoWithoutBuyerRequest> qResponseList = queryFactory
+		List<PurchasedProductInfoProjection> qResponseList = queryFactory
 			.select(
 				Projections.constructor(
-					ProductPurchaseInfoWithoutBuyerRequest.class,
+					PurchasedProductInfoProjection.class,
 					product.id,
 					product.name,
-					product.image
+					product.image,
+					auction.currentPrice
 				))
 			.from(product)
 			.join(auction).on(auction.productId.eq(product.id))

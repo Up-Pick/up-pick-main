@@ -1,4 +1,4 @@
-package org.oneog.uppick.domain.member.dto.response;
+package org.oneog.uppick.product.domain.product.dto.response;
 
 import java.time.LocalDateTime;
 
@@ -7,10 +7,11 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class ProductPurchaseInfoWithBuyerResponse {
+public class SoldProductInfoResponse {
 	private final Long id;
 	private final String name;
+	private final String description;
 	private final String image;
 	private final Long finalPrice;
-	private final LocalDateTime buyAt;
+	private final LocalDateTime soldAt;
 }

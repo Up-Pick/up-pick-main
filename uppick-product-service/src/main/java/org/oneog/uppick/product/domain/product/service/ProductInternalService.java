@@ -2,27 +2,32 @@ package org.oneog.uppick.product.domain.product.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.oneog.uppick.common.dto.AuthMember;
 import org.oneog.uppick.common.exception.BusinessException;
 import org.oneog.uppick.product.domain.auction.service.AuctionExternalService;
 import org.oneog.uppick.product.domain.category.dto.response.CategoryInfoResponse;
 import org.oneog.uppick.product.domain.category.service.CategoryExternalServiceApi;
-import org.oneog.uppick.product.domain.member.service.GetUserNicknameUseCase;
-import org.oneog.uppick.product.domain.member.service.SetProductPurchaseInfoWithBuyer;
-import org.oneog.uppick.product.domain.member.service.SetProductSoldInfoWithSeller;
+import org.oneog.uppick.product.domain.member.service.GetMemberNicknameUseCase;
+import org.oneog.uppick.product.domain.member.service.GetProductBuyAtUseCase;
+import org.oneog.uppick.product.domain.member.service.GetProductSellAtUseCase;
+import org.oneog.uppick.product.domain.product.dto.projection.PurchasedProductInfoProjection;
 import org.oneog.uppick.product.domain.product.dto.projection.SearchProductProjection;
-import org.oneog.uppick.product.domain.product.dto.request.ProductPurchaseInfoWithoutBuyerRequest;
+import org.oneog.uppick.product.domain.product.dto.projection.SoldProductInfoProjection;
 import org.oneog.uppick.product.domain.product.dto.request.ProductRegisterRequest;
-import org.oneog.uppick.product.domain.product.dto.request.ProductSoldInfoWithoutSellerRequest;
 import org.oneog.uppick.product.domain.product.dto.request.SearchProductRequest;
 import org.oneog.uppick.product.domain.product.dto.response.ProductBiddingInfoResponse;
+import org.oneog.uppick.product.domain.product.dto.response.ProductBuyAtResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductInfoResponse;
-import org.oneog.uppick.product.domain.product.dto.response.ProductPurchaseInfoWithBuyerResponse;
+import org.oneog.uppick.product.domain.product.dto.response.ProductSellAtResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductSellingInfoResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductSimpleInfoResponse;
-import org.oneog.uppick.product.domain.product.dto.response.ProductSoldInfoWithSellerResponse;
+import org.oneog.uppick.product.domain.product.dto.response.PurchasedProductInfoResponse;
 import org.oneog.uppick.product.domain.product.dto.response.SearchProductInfoResponse;
+import org.oneog.uppick.product.domain.product.dto.response.SoldProductInfoResponse;
 import org.oneog.uppick.product.domain.product.entity.Product;
 import org.oneog.uppick.product.domain.product.exception.ProductErrorCode;
 import org.oneog.uppick.product.domain.product.mapper.ProductMapper;
@@ -51,9 +56,9 @@ public class ProductInternalService {
 	private static final boolean DEFAULT_ONLY_NOT_SOLD = false;
 	private static final int DEFAULT_SIZE = 20;
 	private final SaveSearchHistoriesUseCase saveSearchHistoriesUseCase;
-	private final GetUserNicknameUseCase getUserNicknameUseCase;
-	private final SetProductSoldInfoWithSeller setProductSoldInfoWithSeller;
-	private final SetProductPurchaseInfoWithBuyer setProductPurchaseInfoWithBuyer;
+	private final GetMemberNicknameUseCase getMemberNicknameUseCase;
+	private final GetProductSellAtUseCase getProductSellerInfos;
+	private final GetProductBuyAtUseCase getProductBuyAtUseCase;
 	// ***** Product Domain ***** //
 	private final ProductRepository productRepository;
 	private final ProductQueryRepository productQueryRepository;
@@ -98,7 +103,7 @@ public class ProductInternalService {
 
 		ProductInfoResponse response = productQueryRepository.getProductInfoById(productId).orElseThrow(
 			() -> new BusinessException(ProductErrorCode.CANNOT_READ_PRODUCT_INFO));
-		response.setSellerName(getUserNicknameUseCase.execute(response.getSellerId()));
+		response.setSellerName(getMemberNicknameUseCase.execute(response.getSellerId()));
 
 		return response;
 	}
@@ -108,25 +113,62 @@ public class ProductInternalService {
 			() -> new BusinessException(ProductErrorCode.CANNOT_READ_PRODUCT_SIMPLE_INFO));
 	}
 
-	public Page<ProductSoldInfoWithSellerResponse> getProductSoldInfoByMemberId(Long memberId, Pageable pageable) {
+	public Page<SoldProductInfoResponse> getSoldProductInfosByMemberId(Long memberId, Pageable pageable) {
 
-		Page<ProductSoldInfoWithoutSellerRequest> requests = productQueryRepository.getProductSoldInfoByMemberId(
+		// Product Page 조회
+		Page<SoldProductInfoProjection> productPageInfo = productQueryRepository.getProductSoldInfoByMemberId(
 			memberId, pageable);
-		List<ProductSoldInfoWithSellerResponse> responses = setProductSoldInfoWithSeller.execute(requests.getContent(),
-			memberId);
 
-		return new PageImpl<>(responses, requests.getPageable(), requests.getTotalElements());
+		// Product Ids만 추출한 List로 추출한 뒤, Member에 전달
+		List<Long> productIds = productPageInfo.getContent()
+			.stream()
+			.map(SoldProductInfoProjection::getId)
+			.toList();
+
+		// List<ProductId> -> List<ProductSellerInfoResponse> (각각의 id 값마다 seller Info 포함된 객체, 판매 시간 내림차순으로 반환받음)
+		List<ProductSellAtResponse> sellAtInfos = getProductSellerInfos.execute(productIds);
+
+		// ProductList를 Map<ProductId, 객체> 형태로 변환
+		Map<Long, SoldProductInfoProjection> productInfoMap = productPageInfo.getContent()
+			.stream()
+			.collect(Collectors.toMap(SoldProductInfoProjection::getId, Function.identity()));
+
+		// 정렬되었던 List<ProductId> 기준으로 ProductInfo와 결합한 뒤 반환
+		List<SoldProductInfoResponse> contents = sellAtInfos
+			.stream()
+			.map(sellAtInfo -> {
+				SoldProductInfoProjection productInfo = productInfoMap.get(sellAtInfo.getId());
+				return productMapper.combineSoldProductInfoWithSeller(productInfo, sellAtInfo);
+			}).toList();
+
+		return new PageImpl<>(contents, productPageInfo.getPageable(), productPageInfo.getTotalElements());
 	}
 
-	public Page<ProductPurchaseInfoWithBuyerResponse> getPurchasedProductInfoByMemberId(Long memberId,
+	public Page<PurchasedProductInfoResponse> getPurchasedProductInfoByMemberId(Long memberId,
 		Pageable pageable) {
 
-		Page<ProductPurchaseInfoWithoutBuyerRequest> requests = productQueryRepository.getPurchasedProductInfoByMemberId(
+		Page<PurchasedProductInfoProjection> productPageInfo = productQueryRepository.getPurchasedProductInfoByMemberId(
 			memberId, pageable);
-		List<ProductPurchaseInfoWithBuyerResponse> responses = setProductPurchaseInfoWithBuyer.execute(
-			requests.getContent(), memberId);
 
-		return new PageImpl<>(responses, requests.getPageable(), requests.getTotalElements());
+		List<Long> productIds = productPageInfo.getContent()
+			.stream()
+			.map(PurchasedProductInfoProjection::getId)
+			.toList();
+
+		List<ProductBuyAtResponse> buyAtInfos = getProductBuyAtUseCase.execute(productIds);
+
+		Map<Long, PurchasedProductInfoProjection> productInfoMap = productPageInfo.getContent()
+			.stream()
+			.collect(Collectors.toMap(PurchasedProductInfoProjection::getId, Function.identity()));
+
+		List<PurchasedProductInfoResponse> contents = buyAtInfos
+			.stream()
+			.map(buyAtInfo -> {
+				PurchasedProductInfoProjection productInfo = productInfoMap.get(buyAtInfo.getId());
+				return productMapper.combinePurchasedInfoWithBuyer(productInfo, buyAtInfo);
+			}).toList();
+
+		return new PageImpl<>(contents, productPageInfo.getPageable(), productPageInfo.getTotalElements());
 	}
 
 	public Page<ProductBiddingInfoResponse> getBiddingProductInfoByMemberId(Long memberId, Pageable pageable) {

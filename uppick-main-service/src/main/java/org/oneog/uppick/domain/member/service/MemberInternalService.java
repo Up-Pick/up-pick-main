@@ -5,17 +5,13 @@ import java.util.List;
 import org.oneog.uppick.common.dto.AuthMember;
 import org.oneog.uppick.common.exception.BusinessException;
 import org.oneog.uppick.domain.member.dto.request.CreditChargeRequest;
-import org.oneog.uppick.domain.member.dto.request.ProductPurchaseInfoWithoutBuyerRequest;
-import org.oneog.uppick.domain.member.dto.request.ProductSoldInfoWithoutSellerRequest;
 import org.oneog.uppick.domain.member.dto.response.CreditChargeResponse;
 import org.oneog.uppick.domain.member.dto.response.CreditGetResponse;
-import org.oneog.uppick.domain.member.dto.response.ProductPurchaseInfoWithBuyerResponse;
-import org.oneog.uppick.domain.member.dto.response.ProductSoldInfoWithSellerResponse;
+import org.oneog.uppick.domain.member.dto.response.PurchasedProductBuyAtResponse;
+import org.oneog.uppick.domain.member.dto.response.SoldProductSellAtResponse;
 import org.oneog.uppick.domain.member.entity.Member;
-import org.oneog.uppick.domain.member.entity.PurchaseDetail;
-import org.oneog.uppick.domain.member.entity.SellDetail;
 import org.oneog.uppick.domain.member.exception.MemberErrorCode;
-import org.oneog.uppick.domain.member.mapper.MemberMapper;
+import org.oneog.uppick.domain.member.repository.MemberQueryRepository;
 import org.oneog.uppick.domain.member.repository.MemberRepository;
 import org.oneog.uppick.domain.member.repository.PurchaseDetailRepository;
 import org.oneog.uppick.domain.member.repository.SellDetailRepository;
@@ -32,8 +28,7 @@ public class MemberInternalService {
 	private final MemberRepository memberRepository;
 	private final SellDetailRepository sellDetailRepository;
 	private final PurchaseDetailRepository purchaseDetailRepository;
-
-	private final MemberMapper memberMapper;
+	private final MemberQueryRepository memberQueryRepository;
 
 	@Transactional
 	public CreditChargeResponse chargeCredit(CreditChargeRequest creditChargeRequest, AuthMember authMember) {
@@ -56,7 +51,7 @@ public class MemberInternalService {
 		return new CreditGetResponse(member.getCredit());
 	}
 
-	public String getUserNicknameByMemberId(Long memberId) {
+	public String getMemberNicknameByMemberId(Long memberId) {
 
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new BusinessException(MemberErrorCode.MEMBER_NOT_FOUND));
@@ -64,25 +59,11 @@ public class MemberInternalService {
 		return member.getNickname();
 	}
 
-	public List<ProductSoldInfoWithSellerResponse> setSellerToProductSoldInfo(
-		List<ProductSoldInfoWithoutSellerRequest> requests, Long memberId) {
-
-		return requests.stream().map(request -> {
-			Long productId = request.getId();
-
-			SellDetail sellDetail = sellDetailRepository.findByAuctionIdAndSellerId(productId, memberId);
-			return memberMapper.toProductInfoWithSeller(request, sellDetail);
-		}).toList();
+	public List<SoldProductSellAtResponse> findSellAtByProductIds(List<Long> productIds) {
+		return memberQueryRepository.findSellAtByProductIds(productIds);
 	}
 
-	public List<ProductPurchaseInfoWithBuyerResponse> setBuyerToProductPurchaseInfo(
-		List<ProductPurchaseInfoWithoutBuyerRequest> requests, Long memberId) {
-
-		return requests.stream().map(request -> {
-			Long productId = request.getId();
-
-			PurchaseDetail purchaseDetail = purchaseDetailRepository.findByAuctionIdAndBuyerId(productId, memberId);
-			return memberMapper.toProductInfoWithBuyer(request, purchaseDetail);
-		}).toList();
+	public List<PurchasedProductBuyAtResponse> findBuyAtByProductIds(List<Long> productIds) {
+		return memberQueryRepository.findBuyAtByProductIds(productIds);
 	}
 }

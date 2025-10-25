@@ -1,10 +1,6 @@
 package org.oneog.uppick.domain.member.mapper;
 
 import org.oneog.uppick.domain.auth.dto.request.SignupRequest;
-import org.oneog.uppick.domain.member.dto.request.ProductPurchaseInfoWithoutBuyerRequest;
-import org.oneog.uppick.domain.member.dto.request.ProductSoldInfoWithoutSellerRequest;
-import org.oneog.uppick.domain.member.dto.response.ProductPurchaseInfoWithBuyerResponse;
-import org.oneog.uppick.domain.member.dto.response.ProductSoldInfoWithSellerResponse;
 import org.oneog.uppick.domain.member.entity.Member;
 import org.oneog.uppick.domain.member.entity.PurchaseDetail;
 import org.oneog.uppick.domain.member.entity.SellDetail;
@@ -35,29 +31,6 @@ public class MemberMapper {
 			.sellerId(sellerId)
 			.productId(productId)
 			.finalPrice(price)
-			.build();
-	}
-
-	public ProductSoldInfoWithSellerResponse toProductInfoWithSeller(ProductSoldInfoWithoutSellerRequest request,
-		SellDetail sellDetail) {
-		return ProductSoldInfoWithSellerResponse.builder()
-			.id(request.getId())
-			.name(request.getName())
-			.description(request.getDescription())
-			.image(request.getImage())
-			.finalPrice(sellDetail.getFinalPrice())
-			.soldAt(sellDetail.getSellAt())
-			.build();
-	}
-
-	public ProductPurchaseInfoWithBuyerResponse toProductInfoWithBuyer(ProductPurchaseInfoWithoutBuyerRequest request,
-		PurchaseDetail purchaseDetail) {
-		return ProductPurchaseInfoWithBuyerResponse.builder()
-			.id(request.getId())
-			.name(request.getName())
-			.image(request.getImage())
-			.finalPrice(purchaseDetail.getPurchasePrice())
-			.buyAt(purchaseDetail.getPurchaseAt())
 			.build();
 	}
 }
