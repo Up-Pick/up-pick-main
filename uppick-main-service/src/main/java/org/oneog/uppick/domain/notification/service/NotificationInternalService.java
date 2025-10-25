@@ -36,7 +36,7 @@ public class NotificationInternalService {
 			.memberId(request.getMemberId())
 			.type(request.getType())
 			.title(request.getString1())
-			.message(request.getString1())
+			.message(request.getString2())
 			.build();
 		notificationJpaRepository.save(notification);
 	}
