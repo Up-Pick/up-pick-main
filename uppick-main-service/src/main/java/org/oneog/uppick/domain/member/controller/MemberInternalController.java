@@ -2,6 +2,8 @@ package org.oneog.uppick.domain.member.controller;
 
 import java.util.List;
 
+import org.oneog.uppick.domain.member.dto.request.RegisterPurchaseDetailRequest;
+import org.oneog.uppick.domain.member.dto.request.RegisterSellDetailRequest;
 import org.oneog.uppick.domain.member.dto.request.UpdateMemberCreditRequest;
 import org.oneog.uppick.domain.member.dto.response.PurchasedProductBuyAtResponse;
 import org.oneog.uppick.domain.member.dto.response.SoldProductSellAtResponse;
@@ -49,4 +51,14 @@ public class MemberInternalController {
 		memberInternalService.updateMemberCredit(memberId, updateMemberCreditRequest.getAmount());
 	}
 
+	@PostMapping("/members/purchase-detail")
+	public void registerPurchaseDetail(@RequestParam RegisterPurchaseDetailRequest request) {
+		memberInternalService.registerPurchaseDetail(request);
+	}
+
+	@PostMapping("/members/sell-detail")
+	public void registerSellDetail(@RequestParam RegisterSellDetailRequest request) {
+		memberInternalService.registerSellDetail(request);
+
+	}
 }

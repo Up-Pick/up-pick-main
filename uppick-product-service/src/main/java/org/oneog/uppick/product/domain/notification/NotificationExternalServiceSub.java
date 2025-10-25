@@ -1,5 +1,6 @@
 package org.oneog.uppick.product.domain.notification;
 
+import org.oneog.uppick.product.domain.notification.enums.NotificationType;
 import org.springframework.stereotype.Service;
 
 @Service

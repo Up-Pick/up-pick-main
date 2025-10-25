@@ -10,9 +10,13 @@ import org.oneog.uppick.product.domain.auction.entity.BiddingDetail;
 import org.oneog.uppick.product.domain.auction.repository.AuctionQueryRepository;
 import org.oneog.uppick.product.domain.auction.repository.AuctionRepository;
 import org.oneog.uppick.product.domain.auction.repository.BiddingDetailRepository;
-import org.oneog.uppick.product.domain.member.service.MemberExternalService;
-import org.oneog.uppick.product.domain.notification.NotificationExternalService;
-import org.oneog.uppick.product.domain.notification.NotificationType;
+import org.oneog.uppick.product.domain.member.dto.request.RegisterPurchaseDetailRequest;
+import org.oneog.uppick.product.domain.member.dto.request.RegisterSellDetailRequest;
+import org.oneog.uppick.product.domain.member.service.RegisterPurchaseDetailUseCase;
+import org.oneog.uppick.product.domain.member.service.RegisterSellDetailUseCase;
+import org.oneog.uppick.product.domain.notification.dto.request.SendNotificationRequest;
+import org.oneog.uppick.product.domain.notification.enums.NotificationType;
+import org.oneog.uppick.product.domain.notification.service.SendNotificationUseCase;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,8 +35,9 @@ public class AuctionSchedulerService {
 	private final AuctionQueryRepository auctionQueryRepository;
 
 	// ****** External Domain API ***** //
-	private final MemberExternalService memberExternalService; //구매내역, 판매내역에 저장
-	private final NotificationExternalService notificationExternalService; // 경매 마감시 알람 쏘기
+	private final RegisterPurchaseDetailUseCase registerPurchaseDetailUseCase;
+	private final RegisterSellDetailUseCase registerSellDetailUseCase;
+	private final SendNotificationUseCase sendNotificationUseCase;
 
 	@Transactional
 	@Scheduled(cron = "0 0 * * * *") // 매 시 정각마다 실행
@@ -120,7 +125,8 @@ public class AuctionSchedulerService {
 	 *  구매 내역 등록
 	 */
 	private void createPurchaseHistory(Long auctionId, Long buyerId, Long productId, Long price) {
-		memberExternalService.registerPurchaseDetail(auctionId, buyerId, productId, price);
+		RegisterPurchaseDetailRequest request = new RegisterPurchaseDetailRequest(auctionId, buyerId, productId, price);
+		registerPurchaseDetailUseCase.execute(request);
 		log.info("구매내역 등록: 구매자={}, 상품={}, 금액={}", buyerId, productId, price);
 	}
 
@@ -128,7 +134,8 @@ public class AuctionSchedulerService {
 	 *  판매 내역 등록
 	 */
 	private void createSellHistory(Long auctionId, Long sellerId, Long productId, Long price) {
-		memberExternalService.registerPurchaseDetail(auctionId, sellerId, productId, price);
+		RegisterSellDetailRequest request = new RegisterSellDetailRequest(auctionId, sellerId, productId, price);
+		registerSellDetailUseCase.execute(request);
 		log.info("판매내역 등록: 판매자={}, 상품={}, 금액={}", sellerId, productId, price);
 	}
 
@@ -138,11 +145,14 @@ public class AuctionSchedulerService {
 	private void sendWinnerNotification(Long memberId, Long productId, Long price) {
 		String productName = auctionQueryRepository.findProductNameByProductId(productId);
 
-		notificationExternalService.sendNotification(
-			memberId,
-			NotificationType.TRADE,
-			"낙찰을 축하드립니다!",
-			"상품 '" + productName + "'을 " + price + "원에 낙찰받았습니다.");
+		SendNotificationRequest request = SendNotificationRequest.builder()
+			.memberId(memberId)
+			.type(NotificationType.TRADE)
+			.string1("낙찰을 축하드립니다!")
+			.string2("상품 '" + productName + "'을 " + price + "원에 낙찰받았습니다.")
+			.build();
+
+		sendNotificationUseCase.execute(request);
 
 		log.info("[Notification] 낙찰자 {}에게 알림 전송 완료", memberId);
 	}

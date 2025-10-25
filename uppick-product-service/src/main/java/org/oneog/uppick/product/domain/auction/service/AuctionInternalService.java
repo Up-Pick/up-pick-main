@@ -16,7 +16,7 @@ import org.oneog.uppick.product.domain.member.service.GetMemberCreditUseCase;
 import org.oneog.uppick.product.domain.member.service.MemberExternalService;
 import org.oneog.uppick.product.domain.member.service.UpdateMemberCreditUseCase;
 import org.oneog.uppick.product.domain.notification.NotificationExternalService;
-import org.oneog.uppick.product.domain.notification.NotificationType;
+import org.oneog.uppick.product.domain.notification.enums.NotificationType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -1,6 +1,8 @@
 package org.oneog.uppick.domain.member.mapper;
 
 import org.oneog.uppick.domain.auth.dto.request.SignupRequest;
+import org.oneog.uppick.domain.member.dto.request.RegisterPurchaseDetailRequest;
+import org.oneog.uppick.domain.member.dto.request.RegisterSellDetailRequest;
 import org.oneog.uppick.domain.member.entity.Member;
 import org.oneog.uppick.domain.member.entity.PurchaseDetail;
 import org.oneog.uppick.domain.member.entity.SellDetail;
@@ -16,21 +18,21 @@ public class MemberMapper {
 			.build();
 	}
 
-	public PurchaseDetail purchaseDetailToEntity(Long auctionId, Long buyerId, Long productId, Long price) {
+	public PurchaseDetail purchaseDetailToEntity(RegisterPurchaseDetailRequest request) {
 		return PurchaseDetail.builder()
-			.auctionId(auctionId)
-			.buyerId(buyerId)
-			.productId(productId)
-			.purchasePrice(price)
+			.auctionId(request.getAuctionId())
+			.buyerId(request.getBuyerId())
+			.productId(request.getProductId())
+			.purchasePrice(request.getPrice())
 			.build();
 	}
 
-	public SellDetail sellDetailToEntity(Long auctionId, Long sellerId, Long productId, Long price) {
+	public SellDetail sellDetailToEntity(RegisterSellDetailRequest request) {
 		return SellDetail.builder()
-			.auctionId(auctionId)
-			.sellerId(sellerId)
-			.productId(productId)
-			.finalPrice(price)
+			.auctionId(request.getAuctionId())
+			.sellerId(request.getSellerId())
+			.productId(request.getProductId())
+			.finalPrice(request.getPrice())
 			.build();
 	}
 }
