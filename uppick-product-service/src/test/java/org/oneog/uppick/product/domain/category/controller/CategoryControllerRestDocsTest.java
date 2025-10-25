@@ -1,4 +1,4 @@
-package org.oneog.uppick.domain.category.controller;
+package org.oneog.uppick.product.domain.category.controller;
 
 import static org.mockito.BDDMockito.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
@@ -10,9 +10,9 @@ import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.oneog.uppick.domain.category.dto.response.CategoryResponse;
-import org.oneog.uppick.domain.category.service.CategoryInternalService;
-import org.oneog.uppick.support.restdocs.RestDocsBase;
+import org.oneog.uppick.product.domain.category.dto.response.CategoryResponse;
+import org.oneog.uppick.product.domain.category.service.CategoryInternalService;
+import org.oneog.uppick.product.support.restdocs.RestDocsBase;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;

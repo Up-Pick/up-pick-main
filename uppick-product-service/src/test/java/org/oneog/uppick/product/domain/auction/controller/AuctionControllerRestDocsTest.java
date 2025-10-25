@@ -1,4 +1,4 @@
-package org.oneog.uppick.domain.auction.controller;
+package org.oneog.uppick.product.domain.auction.controller;
 
 import static org.mockito.BDDMockito.*;
 import static org.springframework.restdocs.headers.HeaderDocumentation.*;
@@ -10,10 +10,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.oneog.uppick.domain.auction.dto.request.AuctionBidRequest;
-import org.oneog.uppick.domain.auction.service.AuctionInternalService;
-import org.oneog.uppick.support.auth.WithMockAuthMember;
-import org.oneog.uppick.support.restdocs.RestDocsBase;
+import org.oneog.uppick.product.domain.auction.dto.request.AuctionBidRequest;
+import org.oneog.uppick.product.domain.auction.service.AuctionInternalService;
+import org.oneog.uppick.product.support.auth.WithMockAuthMember;
+import org.oneog.uppick.product.support.restdocs.RestDocsBase;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;

@@ -23,3 +23,10 @@ spring:
 jwt:
   secret:
     key: "VXBwaWNrUHJvamVjdFNlY3JldEtleUZvclRlc3RpbmdQdXJwb3NlczEyMzQ1Njc4OTA="
+
+gateway:
+  url: "test-gateway-url"
+
+internal:
+  api:
+    secret: "jdklsfjksdfjksldfjklsdjfklsdfjsklfjskljafklwejflkjw"
