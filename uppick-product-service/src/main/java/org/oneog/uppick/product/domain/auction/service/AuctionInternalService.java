@@ -14,6 +14,7 @@ import org.oneog.uppick.product.domain.auction.repository.BiddingDetailQueryRepo
 import org.oneog.uppick.product.domain.auction.repository.BiddingDetailRepository;
 import org.oneog.uppick.product.domain.member.service.GetMemberCreditUseCase;
 import org.oneog.uppick.product.domain.member.service.MemberExternalService;
+import org.oneog.uppick.product.domain.member.service.UpdateMemberCreditUseCase;
 import org.oneog.uppick.product.domain.notification.NotificationExternalService;
 import org.oneog.uppick.product.domain.notification.NotificationType;
 import org.springframework.stereotype.Service;
@@ -39,6 +40,7 @@ public class AuctionInternalService {
 	// ****** External Domain API ***** //
 	private final NotificationExternalService notificationExternalService;
 	private final MemberExternalService memberExternalService;
+	private final UpdateMemberCreditUseCase updateMemberCreditUseCase;
 
 	private final GetMemberCreditUseCase getMemberCreditUseCase;
 
@@ -79,15 +81,15 @@ public class AuctionInternalService {
 			if (previousBidderId != null && previousBidderId.equals(memberId)) {
 				// 본인 재입찰: 차액만 차감
 				long additionalAmount = biddingPrice - previousBidPrice;
-				memberExternalService.updateMemberCredit(memberId, -additionalAmount);
+				updateMemberCreditUseCase.execute(memberId, -additionalAmount);
 				log.info("기존 입찰자({}) 재입찰: 추가 차감 {}", memberId, additionalAmount);
 			} else {
 				// 새 입찰자: 전체 금액 차감
-				memberExternalService.updateMemberCredit(memberId, -biddingPrice);
+				updateMemberCreditUseCase.execute(memberId, -biddingPrice);
 
 				// 이전 최고 입찰자 환불
 				if (previousBidderId != null && previousBidPrice != null) {
-					memberExternalService.updateMemberCredit(previousBidderId, previousBidPrice);
+					updateMemberCreditUseCase.execute(previousBidderId, previousBidPrice);
 					log.info("이전 최고 입찰자({}) 환불: {}", previousBidderId, previousBidPrice);
 				}
 			}

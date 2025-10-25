@@ -2,11 +2,14 @@ package org.oneog.uppick.domain.member.controller;
 
 import java.util.List;
 
+import org.oneog.uppick.domain.member.dto.request.UpdateMemberCreditRequest;
 import org.oneog.uppick.domain.member.dto.response.PurchasedProductBuyAtResponse;
 import org.oneog.uppick.domain.member.dto.response.SoldProductSellAtResponse;
 import org.oneog.uppick.domain.member.service.MemberInternalService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,6 +41,12 @@ public class MemberInternalController {
 	@GetMapping("/members/{memberId}/credit")
 	public long getMemberCredit(@PathVariable long memberId) {
 		return memberInternalService.getMemberCreditByMemberId(memberId);
+	}
+
+	@PostMapping("/members/{memberId}/credit")
+	public void updateMemberCredit(@PathVariable long memberId,
+		@RequestBody UpdateMemberCreditRequest updateMemberCreditRequest) {
+		memberInternalService.updateMemberCredit(memberId, updateMemberCreditRequest.getAmount());
 	}
 
 }

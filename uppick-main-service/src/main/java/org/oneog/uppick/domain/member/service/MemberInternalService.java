@@ -69,4 +69,12 @@ public class MemberInternalService {
 
 		return member.getCredit();
 	}
+
+	@Transactional
+	public void updateMemberCredit(long memberId, long amount) {
+		Member member = memberRepository.findById(memberId)
+			.orElseThrow(() -> new BusinessException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+		member.calculateCredit(amount);
+	}
 }
