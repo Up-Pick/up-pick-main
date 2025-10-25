@@ -2,6 +2,7 @@ package org.oneog.uppick.product.domain.product.dto.response;
 
 import java.time.LocalDateTime;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
