@@ -13,10 +13,10 @@ import org.oneog.uppick.product.domain.auction.repository.AuctionRepository;
 import org.oneog.uppick.product.domain.auction.repository.BiddingDetailQueryRepository;
 import org.oneog.uppick.product.domain.auction.repository.BiddingDetailRepository;
 import org.oneog.uppick.product.domain.member.service.GetMemberCreditUseCase;
-import org.oneog.uppick.product.domain.member.service.MemberExternalService;
 import org.oneog.uppick.product.domain.member.service.UpdateMemberCreditUseCase;
-import org.oneog.uppick.product.domain.notification.NotificationExternalService;
+import org.oneog.uppick.product.domain.notification.dto.request.SendNotificationRequest;
 import org.oneog.uppick.product.domain.notification.enums.NotificationType;
+import org.oneog.uppick.product.domain.notification.service.SendNotificationUseCase;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,10 +38,8 @@ public class AuctionInternalService {
 	private final BiddingDetailRepository biddingDetailRepository;
 	private final BiddingDetailQueryRepository biddingDetailQueryRepository;
 	// ****** External Domain API ***** //
-	private final NotificationExternalService notificationExternalService;
-	private final MemberExternalService memberExternalService;
 	private final UpdateMemberCreditUseCase updateMemberCreditUseCase;
-
+	private final SendNotificationUseCase sendNotificationUseCase;
 	private final GetMemberCreditUseCase getMemberCreditUseCase;
 
 	//특정 상품에 입찰 시도를 한다
@@ -127,22 +125,30 @@ public class AuctionInternalService {
 			auction.getProductId()); //물품아이디를 통해 판매자 ID를 받아와야함
 
 		// 판매자에게 알림
-		notificationExternalService.sendNotification(
-			sellerId,
-			NotificationType.BID,
-			"새로운 입찰이 도착했습니다!",
-			"회원 " + bidderId + "님이 " + biddingPrice + "원으로 입찰했습니다.");
+		SendNotificationRequest requestToSeller = SendNotificationRequest.builder()
+			.memberId(sellerId)
+			.type(NotificationType.BID)
+			.string1("새로운 입찰이 도착했습니다!")
+			.string2("회원 " + bidderId + "님이 " + biddingPrice + "원으로 입찰했습니다.")
+			.build();
+
+		sendNotificationUseCase.execute(requestToSeller);
 
 		// 해당 경매의 다른 입찰자들에게 알림
 		//JPA메서드로 가져오려다가 자꾸 타입 불일치 문제가 나와서 변경
 		List<Long> participantIds = biddingDetailQueryRepository.findDistinctBidderIdsByAuctionId(auction.getId());
 		for (Long participantId : participantIds) {
-			if (!participantId.equals(bidderId)) { // 본인은 제외
-				notificationExternalService.sendNotification(
-					participantId,
-					NotificationType.BID,
-					"새로운 경쟁 입찰 발생",
-					"다른 사용자가 " + biddingPrice + "원으로 입찰했습니다. 다시 입찰해보세요!");
+			if (!participantId.equals(bidderId)) {
+
+				// 본인은 제외
+				SendNotificationRequest requestToParticipant = SendNotificationRequest.builder()
+					.memberId(participantId)
+					.type(NotificationType.BID)
+					.string1("새로운 경쟁 입찰 발생")
+					.string2("다른 사용자가 " + biddingPrice + "원으로 입찰했습니다. 다시 입찰해보세요!")
+					.build();
+
+				sendNotificationUseCase.execute(requestToParticipant);
 			}
 		}
 	}
