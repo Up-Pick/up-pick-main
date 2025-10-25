@@ -6,6 +6,7 @@ import org.oneog.uppick.domain.member.dto.response.PurchasedProductBuyAtResponse
 import org.oneog.uppick.domain.member.dto.response.SoldProductSellAtResponse;
 import org.oneog.uppick.domain.member.service.MemberInternalService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,4 +34,10 @@ public class MemberInternalController {
 	List<PurchasedProductBuyAtResponse> getPurchasedProductsBuyAt(@RequestParam List<Long> productIds) {
 		return memberInternalService.findBuyAtByProductIds(productIds);
 	}
+
+	@GetMapping("/members/{memberId}/credit")
+	public long getMemberCredit(@PathVariable long memberId) {
+		return memberInternalService.getMemberCreditByMemberId(memberId);
+	}
+
 }

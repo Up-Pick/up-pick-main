@@ -1,4 +1,4 @@
-package org.oneog.uppick.product.domain.member;
+package org.oneog.uppick.product.domain.member.service;
 
 import org.springframework.stereotype.Service;
 

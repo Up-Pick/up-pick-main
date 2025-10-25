@@ -12,7 +12,8 @@ import org.oneog.uppick.product.domain.auction.repository.AuctionQueryRepository
 import org.oneog.uppick.product.domain.auction.repository.AuctionRepository;
 import org.oneog.uppick.product.domain.auction.repository.BiddingDetailQueryRepository;
 import org.oneog.uppick.product.domain.auction.repository.BiddingDetailRepository;
-import org.oneog.uppick.product.domain.member.MemberExternalService;
+import org.oneog.uppick.product.domain.member.service.GetMemberCreditUseCase;
+import org.oneog.uppick.product.domain.member.service.MemberExternalService;
 import org.oneog.uppick.product.domain.notification.NotificationExternalService;
 import org.oneog.uppick.product.domain.notification.NotificationType;
 import org.springframework.stereotype.Service;
@@ -39,10 +40,11 @@ public class AuctionInternalService {
 	private final NotificationExternalService notificationExternalService;
 	private final MemberExternalService memberExternalService;
 
+	private final GetMemberCreditUseCase getMemberCreditUseCase;
+
 	//특정 상품에 입찰 시도를 한다
 	@Transactional
-	public void bid(@Valid
-	AuctionBidRequest request, long auctionId, long memberId) {
+	public void bid(@Valid AuctionBidRequest request, long auctionId, long memberId) {
 		try {
 			Auction auction = findAuctionById(auctionId);
 
@@ -56,8 +58,8 @@ public class AuctionInternalService {
 			Long minPrice = auction.getMinPrice();
 
 			// 포인트 잔액 확인
-			Long memberPoint = auctionQueryRepository.findPointByMemberId(memberId);
-			if (biddingPrice > memberPoint) {
+			Long memberCredit = getMemberCreditUseCase.execute(memberId);
+			if (biddingPrice > memberCredit) {
 				throw new BusinessException(AuctionErrorCode.INSUFFICIENT_CREDIT);
 			}
 
