@@ -103,11 +103,11 @@ public class AuctionSchedulerService {
 		Long auctionId = auction.getId();
 		Long sellerId = auctionQueryRepository.findSellerIdByAuctionId(auctionId); // 상품을 판매한사람
 
-		//  구매 내역 등록
-		createPurchaseHistory(auctionId, buyerId, productId, finalPrice);
-
-		// 판매 내역 등록
-		createSellHistory(auctionId, sellerId, productId, finalPrice);
+		// //  구매 내역 등록
+		// createPurchaseHistory(auctionId, buyerId, productId, finalPrice);
+		//
+		// // 판매 내역 등록
+		// createSellHistory(auctionId, sellerId, productId, finalPrice);
 
 		//  알림 발송
 		sendWinnerNotification(buyerId, productId, finalPrice);
@@ -116,21 +116,21 @@ public class AuctionSchedulerService {
 		updateAuctionStatus(auction);
 	}
 
-	/**
-	 *  구매 내역 등록
-	 */
-	private void createPurchaseHistory(Long auctionId, Long buyerId, Long productId, Long price) {
-		memberExternalServiceApi.registerPurchaseDetail(auctionId, buyerId, productId, price);
-		log.info("구매내역 등록: 구매자={}, 상품={}, 금액={}", buyerId, productId, price);
-	}
-
-	/**
-	 *  판매 내역 등록
-	 */
-	private void createSellHistory(Long auctionId, Long sellerId, Long productId, Long price) {
-		memberExternalServiceApi.registerSellDetail(auctionId, sellerId, productId, price);
-		log.info("판매내역 등록: 판매자={}, 상품={}, 금액={}", sellerId, productId, price);
-	}
+	// /**
+	//  *  구매 내역 등록
+	//  */
+	// private void createPurchaseHistory(Long auctionId, Long buyerId, Long productId, Long price) {
+	// 	memberExternalServiceApi.registerPurchaseDetail(auctionId, buyerId, productId, price);
+	// 	log.info("구매내역 등록: 구매자={}, 상품={}, 금액={}", buyerId, productId, price);
+	// }
+	//
+	// /**
+	//  *  판매 내역 등록
+	//  */
+	// private void createSellHistory(Long auctionId, Long sellerId, Long productId, Long price) {
+	// 	memberExternalServiceApi.registerSellDetail(auctionId, sellerId, productId, price);
+	// 	log.info("판매내역 등록: 판매자={}, 상품={}, 금액={}", sellerId, productId, price);
+	// }
 
 	/**
 	 *  낙찰자 알림 발송

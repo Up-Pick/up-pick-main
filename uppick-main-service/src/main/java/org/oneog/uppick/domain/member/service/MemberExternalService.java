@@ -4,8 +4,6 @@ import org.oneog.uppick.common.exception.BusinessException;
 import org.oneog.uppick.domain.auth.dto.request.SignupRequest;
 import org.oneog.uppick.domain.auth.exception.AuthErrorCode;
 import org.oneog.uppick.domain.member.entity.Member;
-import org.oneog.uppick.domain.member.entity.PurchaseDetail;
-import org.oneog.uppick.domain.member.entity.SellDetail;
 import org.oneog.uppick.domain.member.exception.MemberErrorCode;
 import org.oneog.uppick.domain.member.mapper.MemberMapper;
 import org.oneog.uppick.domain.member.repository.MemberRepository;
@@ -24,17 +22,17 @@ public class MemberExternalService implements MemberExternalServiceApi {
 	private final PurchaseDetailRepository purchaseDetailRepository;
 	private final SellDetailRepository sellDetailRepository;
 
-	@Override
-	public void registerPurchaseDetail(Long auctionId, Long buyerId, Long productId, Long price) {
-		PurchaseDetail purchaseDetail = memberMapper.purchaseDetailToEntity(auctionId, buyerId, productId, price);
-		purchaseDetailRepository.save(purchaseDetail);
-	}
-
-	@Override
-	public void registerSellDetail(Long auctionId, Long sellerId, Long productId, Long price) {
-		SellDetail sellDetail = memberMapper.sellDetailToEntity(auctionId, sellerId, productId, price);
-		sellDetailRepository.save(sellDetail);
-	}
+	// @Override
+	// public void registerPurchaseDetail(Long auctionId, Long buyerId, Long productId, Long price) {
+	// 	PurchaseDetail purchaseDetail = memberMapper.purchaseDetailToEntity(auctionId, buyerId, productId, price);
+	// 	purchaseDetailRepository.save(purchaseDetail);
+	// }
+	//
+	// @Override
+	// public void registerSellDetail(Long auctionId, Long sellerId, Long productId, Long price) {
+	// 	SellDetail sellDetail = memberMapper.sellDetailToEntity(auctionId, sellerId, productId, price);
+	// 	sellDetailRepository.save(sellDetail);
+	// }
 
 	@Override
 	public boolean existsByEmail(String email) {
