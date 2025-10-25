@@ -1,4 +1,4 @@
-package org.oneog.uppick.product.domain.member;
+package org.oneog.uppick.product.domain.member.service;
 
 public interface MemberExternalService {
     void updateMemberCredit(long memberId, long l);

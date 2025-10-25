@@ -36,11 +36,11 @@ public class AuctionQueryRepository {
 			.fetchOne();
 	}
 
-	public Long findPointByMemberId(Long memberId) {
-		return jpaQueryFactory
-			.select(member.credit)
-			.from(member)
-			.where(member.id.eq(memberId))
-			.fetchOne();
-	}
+	// public Long findPointByMemberId(Long memberId) {
+	// 	return jpaQueryFactory
+	// 		.select(member.credit)
+	// 		.from(member)
+	// 		.where(member.id.eq(memberId))
+	// 		.fetchOne();
+	// }
 }

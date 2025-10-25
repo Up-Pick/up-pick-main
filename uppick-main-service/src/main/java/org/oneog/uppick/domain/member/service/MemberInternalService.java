@@ -13,8 +13,6 @@ import org.oneog.uppick.domain.member.entity.Member;
 import org.oneog.uppick.domain.member.exception.MemberErrorCode;
 import org.oneog.uppick.domain.member.repository.MemberQueryRepository;
 import org.oneog.uppick.domain.member.repository.MemberRepository;
-import org.oneog.uppick.domain.member.repository.PurchaseDetailRepository;
-import org.oneog.uppick.domain.member.repository.SellDetailRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,8 +24,6 @@ import lombok.RequiredArgsConstructor;
 public class MemberInternalService {
 
 	private final MemberRepository memberRepository;
-	private final SellDetailRepository sellDetailRepository;
-	private final PurchaseDetailRepository purchaseDetailRepository;
 	private final MemberQueryRepository memberQueryRepository;
 
 	@Transactional
@@ -65,5 +61,12 @@ public class MemberInternalService {
 
 	public List<PurchasedProductBuyAtResponse> findBuyAtByProductIds(List<Long> productIds) {
 		return memberQueryRepository.findBuyAtByProductIds(productIds);
+	}
+
+	public long getMemberCreditByMemberId(long memberId) {
+		Member member = memberRepository.findById(memberId)
+			.orElseThrow(() -> new BusinessException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+		return member.getCredit();
 	}
 }

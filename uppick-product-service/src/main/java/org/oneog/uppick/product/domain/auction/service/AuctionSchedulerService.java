@@ -10,7 +10,7 @@ import org.oneog.uppick.product.domain.auction.entity.BiddingDetail;
 import org.oneog.uppick.product.domain.auction.repository.AuctionQueryRepository;
 import org.oneog.uppick.product.domain.auction.repository.AuctionRepository;
 import org.oneog.uppick.product.domain.auction.repository.BiddingDetailRepository;
-import org.oneog.uppick.product.domain.member.MemberExternalService;
+import org.oneog.uppick.product.domain.member.service.MemberExternalService;
 import org.oneog.uppick.product.domain.notification.NotificationExternalService;
 import org.oneog.uppick.product.domain.notification.NotificationType;
 import org.springframework.scheduling.annotation.Scheduled;
