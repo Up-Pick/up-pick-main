@@ -121,12 +121,10 @@ public class AuctionInternalService {
 	 * 입찰 발생 시 알림 전송
 	 */
 	private void sendBidNotifications(Auction auction, Long bidderId, Long biddingPrice) {
-		Long sellerId = auctionQueryRepository.findSellerIdByAuctionId(
-			auction.getProductId()); //물품아이디를 통해 판매자 ID를 받아와야함
 
 		// 판매자에게 알림
 		SendNotificationRequest requestToSeller = SendNotificationRequest.builder()
-			.memberId(sellerId)
+			.memberId(auction.getRegisterId())
 			.type(NotificationType.BID)
 			.string1("새로운 입찰이 도착했습니다!")
 			.string2("회원 " + bidderId + "님이 " + biddingPrice + "원으로 입찰했습니다.")
