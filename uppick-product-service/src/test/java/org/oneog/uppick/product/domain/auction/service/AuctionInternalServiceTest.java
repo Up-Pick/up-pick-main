@@ -11,10 +11,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.oneog.uppick.common.exception.BusinessException;
 import org.oneog.uppick.product.domain.auction.dto.request.AuctionBidRequest;
 import org.oneog.uppick.product.domain.auction.entity.Auction;
 import org.oneog.uppick.product.domain.auction.entity.AuctionStatus;
 import org.oneog.uppick.product.domain.auction.entity.BiddingDetail;
+import org.oneog.uppick.product.domain.auction.exception.AuctionErrorCode;
 import org.oneog.uppick.product.domain.auction.mapper.AuctionMapper;
 import org.oneog.uppick.product.domain.auction.repository.AuctionQueryRepository;
 import org.oneog.uppick.product.domain.auction.repository.AuctionRepository;
@@ -112,31 +114,32 @@ public class AuctionInternalServiceTest {
 		verify(sendNotificationUseCase, times(1)).execute(any(SendNotificationRequest.class));
 	}
 
-	// @Test
-	// void bid_잘못된입찰가_실패() {
-	// 	// given
-	// 	long auctionId = 1L;
-	// 	long memberId = 100L;
-	//
-	// 	Auction auction = Auction.builder()
-	// 		.productId(10L)
-	// 		.minPrice(1000L)
-	// 		.currentPrice(2000L)
-	// 		.status(AuctionStatus.IN_PROGRESS)
-	// 		.endAt(LocalDateTime.now().plusDays(1))
-	// 		.build();
-	//
-	// 	AuctionBidRequest request = new AuctionBidRequest(1500L); // 현재입찰가(2000)보다 낮음
-	//
-	// 	given(auctionRepository.findById(auctionId)).willReturn(Optional.of(auction));
-	// 	given(auctionQueryRepository.findPointByMemberId(anyLong())).willReturn(999999L);
-	//
-	// 	// when/then
-	// 	assertThatThrownBy(() -> auctionInternalService.bid(request, auctionId, memberId))
-	// 		.isInstanceOf(BusinessException.class)
-	// 		.hasMessage(AuctionErrorCode.WRONG_BIDDING_PRICE.getMessage());
-	//
-	// }
+	@Test
+	void bid_잘못된입찰가_실패() {
+		// given
+		long auctionId = 1L;
+		long memberId = 100L;
+
+		Auction auction = Auction.builder()
+			.productId(10L)
+			.minPrice(1000L)
+			.currentPrice(2000L)
+			.registerId(10L)
+			.status(AuctionStatus.IN_PROGRESS)
+			.endAt(LocalDateTime.now().plusDays(1))
+			.build();
+
+		AuctionBidRequest request = new AuctionBidRequest(1500L); // 현재입찰가(2000)보다 낮음
+
+		given(auctionRepository.findById(auctionId)).willReturn(Optional.of(auction));
+		given(getMemberCreditUseCase.execute(anyLong())).willReturn(999999L);
+
+		// when/then
+		assertThatThrownBy(() -> auctionInternalService.bid(request, auctionId, memberId))
+			.isInstanceOf(BusinessException.class)
+			.hasMessage(AuctionErrorCode.WRONG_BIDDING_PRICE.getMessage());
+
+	}
 	//
 	// @Test
 	// void bid_판매자_본인입찰_예외() {
