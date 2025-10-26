@@ -4,10 +4,13 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -25,6 +28,7 @@ import org.oneog.uppick.product.domain.auction.repository.BiddingDetailRepositor
 import org.oneog.uppick.product.domain.member.service.GetMemberCreditUseCase;
 import org.oneog.uppick.product.domain.member.service.UpdateMemberCreditUseCase;
 import org.oneog.uppick.product.domain.notification.dto.request.SendNotificationRequest;
+import org.oneog.uppick.product.domain.notification.enums.NotificationType;
 import org.oneog.uppick.product.domain.notification.service.SendNotificationUseCase;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -51,6 +55,9 @@ public class AuctionInternalServiceTest {
 
 	@InjectMocks
 	private AuctionInternalService auctionInternalService;
+
+	@Captor
+	private ArgumentCaptor<SendNotificationRequest> notificationCaptor;
 
 	@Test
 	void bid_입찰시도_성공() {
@@ -170,76 +177,101 @@ public class AuctionInternalServiceTest {
 		verify(updateMemberCreditUseCase, never()).execute(anyLong(), anyLong());
 
 	}
-	//
-	// @Test
-	// void bid_크레딧부족_예외() {
-	// 	// given
-	// 	long auctionId = 1L;
-	// 	long memberId = 100L;
-	// 	long newBidPrice = 2000L;
-	//
-	// 	Auction auction = Auction.builder()
-	// 		.productId(10L)
-	// 		.minPrice(1000L)
-	// 		.currentPrice(1500L)
-	// 		.status(AuctionStatus.IN_PROGRESS)
-	// 		.endAt(LocalDateTime.now().plusDays(1))
-	// 		.build();
-	//
-	// 	AuctionBidRequest request = new AuctionBidRequest(newBidPrice);
-	//
-	// 	given(auctionRepository.findById(auctionId)).willReturn(Optional.of(auction));
-	// 	given(auctionQueryRepository.findSellerIdByAuctionId(auctionId)).willReturn(200L);
-	// 	given(auctionQueryRepository.findPointByMemberId(memberId)).willReturn(1000L);
-	//
-	// 	// when & then
-	// 	assertThatThrownBy(() -> auctionInternalService.bid(request, auctionId, memberId))
-	// 		.isInstanceOf(BusinessException.class)
-	// 		.hasMessageContaining("보유한 크레딧");
-	//
-	// 	verify(biddingDetailRepository, never()).save(any());
-	// }
-	//
-	// @Test
-	// void sendBidNotifications_입찰을한상황_알람내역데이터정상반환() {
-	// 	// given
-	// 	Auction auction = Auction.builder()
-	// 		.productId(10L)
-	// 		.minPrice(1000L)
-	// 		.currentPrice(1500L)
-	// 		.status(AuctionStatus.IN_PROGRESS)
-	// 		.endAt(LocalDateTime.now().plusDays(1))
-	// 		.build();
-	//
-	// 	//  Auction ID 세팅
-	// 	ReflectionTestUtils.setField(auction, "id", 1L);
-	//
-	// 	long auctionId = 1L; // 테스트 중 사용할 경매 ID
-	// 	long bidderId = 200L; // 입찰자(요청자)
-	// 	long sellerId = 300L; // 판매자
-	// 	long biddingPrice = 2500L; // 새로 입찰한 금액
-	//
-	// 	// 경매 ID로 경매를 찾으면 위에서 만든 auction 객체를 반환하도록 지정
-	// 	given(auctionRepository.findById(anyLong())).willReturn(Optional.of(auction));
-	// 	//경매 ID로 판매자 ID 조회 시 300L을 반환하도록 지정
-	// 	given(auctionQueryRepository.findSellerIdByAuctionId(anyLong())).willReturn(sellerId);
-	// 	//해당 경매에 참여한 사용자 목록 반환 (본인 포함)
-	// 	given(biddingDetailQueryRepository.findDistinctBidderIdsByAuctionId(anyLong()))
-	// 		.willReturn(List.of(100L, 200L, 150L));
-	// 	given(auctionQueryRepository.findPointByMemberId(anyLong())).willReturn(999999L);
-	// 	// when
-	// 	auctionInternalService.bid(new AuctionBidRequest(biddingPrice), auctionId, bidderId);
-	//
-	// 	// then
-	// 	//판매자한테 갈 알림
-	// 	then(notificationExternalServiceApi).should()
-	// 		.sendNotification(
-	// 			eq(sellerId), eq(NotificationType.BID), anyString(), contains("입찰했습니다."));
-	//
-	// 	// 기존 참여자(본인 제외)에게 “경쟁 입찰” 알림이 2회 전송되었는지 확인
-	// 	then(notificationExternalServiceApi).should(times(2))
-	// 		.sendNotification(
-	// 			anyLong(), eq(NotificationType.BID), eq("새로운 경쟁 입찰 발생"), anyString());
-	// }
+
+	@Test
+	void bid_크레딧부족_예외() {
+		// given
+		long auctionId = 1L;
+		long memberId = 100L;
+		long newBidPrice = 2000L;
+
+		Auction auction = Auction.builder()
+			.productId(10L)
+			.minPrice(1000L)
+			.currentPrice(1500L)
+			.registerId(10L)
+			.status(AuctionStatus.IN_PROGRESS)
+			.endAt(LocalDateTime.now().plusDays(1))
+			.build();
+
+		AuctionBidRequest request = new AuctionBidRequest(newBidPrice);
+
+		given(auctionRepository.findById(auctionId)).willReturn(Optional.of(auction));
+		given(getMemberCreditUseCase.execute(anyLong())).willReturn(1000L);
+
+		// when & then
+		assertThatThrownBy(() -> auctionInternalService.bid(request, auctionId, memberId))
+			.isInstanceOf(BusinessException.class)
+			.hasMessageContaining("보유한 크레딧");
+
+		verify(biddingDetailRepository, never()).save(any());
+	}
+
+	// [수정] ⭐️⭐️⭐️ 실패한 테스트 전체 수정 ⭐️⭐️⭐️
+	@Test
+	void sendBidNotifications_입찰을한상황_알람내역데이터정상반환() {
+		// given
+		long auctionId = 1L;
+		long bidderId = 200L; // 입찰자(요청자)
+		long sellerId = 300L; // 판매자
+		long biddingPrice = 2500L;
+
+		Auction auction = Auction.builder()
+			.productId(10L)
+			.minPrice(1000L)
+			.currentPrice(1500L)
+			.registerId(sellerId)
+			.status(AuctionStatus.IN_PROGRESS)
+			.endAt(LocalDateTime.now().plusDays(1))
+			.build();
+
+		ReflectionTestUtils.setField(auction, "id", auctionId);
+
+		given(auctionRepository.findById(auctionId)).willReturn(Optional.of(auction));
+		given(getMemberCreditUseCase.execute(bidderId)).willReturn(999999L);
+		doNothing().when(updateMemberCreditUseCase).execute(anyLong(), anyLong());
+		given(auctionMapper.toEntity(anyLong(), anyLong(), anyLong()))
+			.willReturn(BiddingDetail.builder().build());
+
+		given(biddingDetailQueryRepository.findDistinctBidderIdsByAuctionId(auctionId))
+			.willReturn(List.of(100L, 200L, 150L));
+
+		// when
+		auctionInternalService.bid(new AuctionBidRequest(biddingPrice), auctionId, bidderId);
+
+		// then
+		// [수정] ⭐️ 1. 총 3번(판매자 1, 다른 입찰자 2)의 알림 호출을 캡처
+		then(sendNotificationUseCase).should(times(3)).execute(notificationCaptor.capture());
+
+		// 2. 캡처된 3개의 요청을 리스트로 가져옴
+		List<SendNotificationRequest> capturedRequests = notificationCaptor.getAllValues();
+
+		// 3. 판매자 알림 검증 (받는사람: sellerId)
+		SendNotificationRequest sellerNotification = capturedRequests.stream()
+			.filter(req -> req.getMemberId().equals(sellerId))
+			.findFirst()
+			.orElseThrow(() -> new AssertionError("판매자 알림이 없습니다."));
+
+		assertThat(sellerNotification.getType()).isEqualTo(NotificationType.BID);
+		assertThat(sellerNotification.getString1()).isEqualTo("새로운 입찰이 도착했습니다!");
+		assertThat(sellerNotification.getString2()).contains(bidderId + "님", biddingPrice + "원");
+
+		// 4. 다른 입찰자 알림 검증 (받는사람: 100L, 150L)
+		List<SendNotificationRequest> participantNotifications = capturedRequests.stream()
+			.filter(req -> !req.getMemberId().equals(sellerId))
+			.toList();
+
+		assertThat(participantNotifications).hasSize(2); // ⭐️ 본인(200L) 제외 2명
+		// ⭐️ ID가 100L, 150L인지 순서 상관없이 확인
+		assertThat(participantNotifications).extracting(SendNotificationRequest::getMemberId)
+			.containsExactlyInAnyOrder(100L, 150L);
+
+		// ⭐️ 내용이 모두 동일한지 확인
+		assertThat(participantNotifications).allMatch(req ->
+			req.getType().equals(NotificationType.BID) &&
+				req.getString1().equals("새로운 경쟁 입찰 발생") &&
+				req.getString2().contains(biddingPrice + "원")
+		);
+	}
 
 }
