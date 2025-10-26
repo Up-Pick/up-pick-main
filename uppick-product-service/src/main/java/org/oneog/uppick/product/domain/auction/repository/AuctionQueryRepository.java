@@ -1,6 +1,5 @@
 package org.oneog.uppick.product.domain.auction.repository;
 
-import static org.oneog.uppick.product.domain.auction.entity.QAuction.*;
 import static org.oneog.uppick.product.domain.product.entity.QProduct.*;
 
 import org.springframework.stereotype.Repository;
@@ -14,16 +13,6 @@ import lombok.RequiredArgsConstructor;
 public class AuctionQueryRepository {
 
 	private final JPAQueryFactory jpaQueryFactory;
-
-	public Long findSellerIdByAuctionId(Long auctionId) {
-		return jpaQueryFactory
-			.select(product.registerId)
-			.from(auction)
-			.join(product)
-			.on(auction.productId.eq(product.id))
-			.where(auction.id.eq(auctionId))
-			.fetchOne();
-	}
 
 	/**
 	 * 상품 ID로 상품 이름 조회
