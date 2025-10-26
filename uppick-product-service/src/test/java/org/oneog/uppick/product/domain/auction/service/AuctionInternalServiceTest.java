@@ -21,7 +21,6 @@ import org.oneog.uppick.product.domain.auction.entity.AuctionStatus;
 import org.oneog.uppick.product.domain.auction.entity.BiddingDetail;
 import org.oneog.uppick.product.domain.auction.exception.AuctionErrorCode;
 import org.oneog.uppick.product.domain.auction.mapper.AuctionMapper;
-import org.oneog.uppick.product.domain.auction.repository.AuctionQueryRepository;
 import org.oneog.uppick.product.domain.auction.repository.AuctionRepository;
 import org.oneog.uppick.product.domain.auction.repository.BiddingDetailQueryRepository;
 import org.oneog.uppick.product.domain.auction.repository.BiddingDetailRepository;
@@ -37,8 +36,7 @@ public class AuctionInternalServiceTest {
 
 	@Mock
 	private AuctionRepository auctionRepository;
-	@Mock
-	private AuctionQueryRepository auctionQueryRepository;
+
 	@Mock
 	private AuctionMapper auctionMapper;
 	@Mock
@@ -71,7 +69,7 @@ public class AuctionInternalServiceTest {
 			.productId(10L)
 			.minPrice(1000L)
 			.currentPrice(1500L)
-			.registerId(10L)
+			.registerId(sellerId)
 			.status(AuctionStatus.IN_PROGRESS)
 			.endAt(LocalDateTime.now().plusDays(1))
 			.build();
@@ -106,7 +104,6 @@ public class AuctionInternalServiceTest {
 		// then
 		assertThat(auction.getCurrentPrice()).isEqualTo(newBidPrice);
 		assertThat(auction.getLastBidderId()).isEqualTo(memberId);
-		assertThat(auction.getCurrentPrice()).isEqualTo(newBidPrice);
 
 		// 2. DB에 입찰 내역 호출
 		verify(biddingDetailRepository).save(biddingDetail);
@@ -202,12 +199,11 @@ public class AuctionInternalServiceTest {
 		// when & then
 		assertThatThrownBy(() -> auctionInternalService.bid(request, auctionId, memberId))
 			.isInstanceOf(BusinessException.class)
-			.hasMessageContaining("보유한 크레딧");
+			.hasMessageContaining(AuctionErrorCode.INSUFFICIENT_CREDIT.getMessage());
 
 		verify(biddingDetailRepository, never()).save(any());
 	}
 
-	// [수정] ⭐️⭐️⭐️ 실패한 테스트 전체 수정 ⭐️⭐️⭐️
 	@Test
 	void sendBidNotifications_입찰을한상황_알람내역데이터정상반환() {
 		// given
@@ -240,13 +236,12 @@ public class AuctionInternalServiceTest {
 		auctionInternalService.bid(new AuctionBidRequest(biddingPrice), auctionId, bidderId);
 
 		// then
-		// [수정] ⭐️ 1. 총 3번(판매자 1, 다른 입찰자 2)의 알림 호출을 캡처
 		then(sendNotificationUseCase).should(times(3)).execute(notificationCaptor.capture());
 
-		// 2. 캡처된 3개의 요청을 리스트로 가져옴
+		// 캡처된 3개의 요청을 리스트로 가져옴
 		List<SendNotificationRequest> capturedRequests = notificationCaptor.getAllValues();
 
-		// 3. 판매자 알림 검증 (받는사람: sellerId)
+		//판매자 알림 검증
 		SendNotificationRequest sellerNotification = capturedRequests.stream()
 			.filter(req -> req.getMemberId().equals(sellerId))
 			.findFirst()
@@ -256,17 +251,15 @@ public class AuctionInternalServiceTest {
 		assertThat(sellerNotification.getString1()).isEqualTo("새로운 입찰이 도착했습니다!");
 		assertThat(sellerNotification.getString2()).contains(bidderId + "님", biddingPrice + "원");
 
-		// 4. 다른 입찰자 알림 검증 (받는사람: 100L, 150L)
 		List<SendNotificationRequest> participantNotifications = capturedRequests.stream()
 			.filter(req -> !req.getMemberId().equals(sellerId))
 			.toList();
 
 		assertThat(participantNotifications).hasSize(2); // ⭐️ 본인(200L) 제외 2명
-		// ⭐️ ID가 100L, 150L인지 순서 상관없이 확인
+
 		assertThat(participantNotifications).extracting(SendNotificationRequest::getMemberId)
 			.containsExactlyInAnyOrder(100L, 150L);
 
-		// ⭐️ 내용이 모두 동일한지 확인
 		assertThat(participantNotifications).allMatch(req ->
 			req.getType().equals(NotificationType.BID) &&
 				req.getString1().equals("새로운 경쟁 입찰 발생") &&
