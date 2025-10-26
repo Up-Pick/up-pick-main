@@ -140,35 +140,36 @@ public class AuctionInternalServiceTest {
 			.hasMessage(AuctionErrorCode.WRONG_BIDDING_PRICE.getMessage());
 
 	}
-	//
-	// @Test
-	// void bid_판매자_본인입찰_예외() {
-	// 	// given
-	// 	long auctionId = 1L;
-	// 	long memberId = 100L; // 입찰자 = 판매자
-	// 	long newBidPrice = 2000L;
-	//
-	// 	Auction auction = Auction.builder()
-	// 		.productId(10L)
-	// 		.minPrice(1000L)
-	// 		.currentPrice(1500L)
-	// 		.status(AuctionStatus.IN_PROGRESS)
-	// 		.endAt(LocalDateTime.now().plusDays(1))
-	// 		.build();
-	//
-	// 	AuctionBidRequest request = new AuctionBidRequest(newBidPrice);
-	//
-	// 	given(auctionRepository.findById(auctionId)).willReturn(Optional.of(auction));
-	// 	given(auctionQueryRepository.findSellerIdByAuctionId(auctionId)).willReturn(memberId); // 판매자 == 입찰자
-	//
-	// 	// when & then
-	// 	assertThatThrownBy(() -> auctionInternalService.bid(request, auctionId, memberId))
-	// 		.isInstanceOf(BusinessException.class)
-	// 		.hasMessageContaining("본인의 판매 물품에는 입찰할 수 없습니다.");
-	//
-	// 	verify(biddingDetailRepository, never()).save(any());
-	// 	verify(auctionQueryRepository).findSellerIdByAuctionId(auctionId);
-	// }
+
+	@Test
+	void bid_판매자_본인입찰_예외() {
+		// given
+		long auctionId = 1L;
+		long memberId = 100L; // 입찰자 = 판매자
+		long newBidPrice = 2000L;
+
+		Auction auction = Auction.builder()
+			.productId(10L)
+			.minPrice(1000L)
+			.currentPrice(1500L)
+			.registerId(memberId)
+			.status(AuctionStatus.IN_PROGRESS)
+			.endAt(LocalDateTime.now().plusDays(1))
+			.build();
+
+		AuctionBidRequest request = new AuctionBidRequest(newBidPrice);
+
+		given(auctionRepository.findById(auctionId)).willReturn(Optional.of(auction));
+
+		// when & then
+		assertThatThrownBy(() -> auctionInternalService.bid(request, auctionId, memberId))
+			.isInstanceOf(BusinessException.class)
+			.hasMessage(AuctionErrorCode.CANNOT_BID_OWN_AUCTION.getMessage());
+
+		verify(biddingDetailRepository, never()).save(any());
+		verify(updateMemberCreditUseCase, never()).execute(anyLong(), anyLong());
+
+	}
 	//
 	// @Test
 	// void bid_크레딧부족_예외() {
