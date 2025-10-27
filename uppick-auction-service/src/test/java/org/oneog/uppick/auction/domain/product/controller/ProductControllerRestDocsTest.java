@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.oneog.uppick.auction.domain.product.controller.ProductController;
 import org.oneog.uppick.auction.domain.product.dto.request.ProductRegisterRequest;
 import org.oneog.uppick.auction.domain.product.dto.request.SearchProductRequest;
 import org.oneog.uppick.auction.domain.product.dto.response.ProductBiddingInfoResponse;
@@ -76,11 +75,11 @@ class ProductControllerRestDocsTest extends RestDocsBase {
 			.registerProduct(any(ProductRegisterRequest.class), any(MultipartFile.class), eq(10L));
 
 		this.mockMvc.perform(multipart("/api/v1/products")
-			.file(productPart)
-			.file(imagePart)
-			.header("Authorization", "Bearer token")
-			.contentType(MediaType.MULTIPART_FORM_DATA)
-			.accept(MediaType.APPLICATION_JSON))
+				.file(productPart)
+				.file(imagePart)
+				.header("Authorization", "Bearer token")
+				.contentType(MediaType.MULTIPART_FORM_DATA)
+				.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andDo(document("product-register-product",
 				requestHeaders(
@@ -125,8 +124,8 @@ class ProductControllerRestDocsTest extends RestDocsBase {
 			.willReturn(response);
 
 		this.mockMvc.perform(get("/api/v1/products/{productId}", productId)
-			.header("Authorization", "Bearer token")
-			.accept(MediaType.APPLICATION_JSON))
+				.header("Authorization", "Bearer token")
+				.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andDo(document("product-get-product-info",
 				requestHeaders(
@@ -156,14 +155,18 @@ class ProductControllerRestDocsTest extends RestDocsBase {
 	void getProductSimpleInfo_정상적인상황_상품간단조회성공() throws Exception {
 
 		Long productId = 1L;
-		ProductSimpleInfoResponse response = new ProductSimpleInfoResponse(
-			"테스트 상품", "image.jpg", 1000L, 1500L);
+		ProductSimpleInfoResponse response = ProductSimpleInfoResponse.builder()
+			.name("테스트 상품")
+			.image("image.jpg")
+			.minBidPrice(1_000L)
+			.currentBidPrice(1_500L)
+			.build();
 
 		given(productInternalService.getProductSimpleInfoById(eq(productId)))
 			.willReturn(response);
 
 		this.mockMvc.perform(get("/api/v1/products/{productId}/simple-info", productId)
-			.accept(MediaType.APPLICATION_JSON))
+				.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andDo(document("product-get-product-simple-info",
 				pathParameters(
@@ -207,8 +210,8 @@ class ProductControllerRestDocsTest extends RestDocsBase {
 			.willReturn(page);
 
 		this.mockMvc.perform(get("/api/v1/products/sold/me")
-			.header("Authorization", "Bearer token")
-			.accept(MediaType.APPLICATION_JSON))
+				.header("Authorization", "Bearer token")
+				.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andDo(document("product-get-sold-products",
 				requestHeaders(
@@ -253,8 +256,8 @@ class ProductControllerRestDocsTest extends RestDocsBase {
 			.willReturn(page);
 
 		this.mockMvc.perform(get("/api/v1/products/purchased/me")
-			.header("Authorization", "Bearer token")
-			.accept(MediaType.APPLICATION_JSON))
+				.header("Authorization", "Bearer token")
+				.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andDo(document("product-get-purchased-products",
 				requestHeaders(
@@ -277,16 +280,30 @@ class ProductControllerRestDocsTest extends RestDocsBase {
 	void getBiddingProducts_정상적인상황_입찰중인상품목록조회성공() throws Exception {
 
 		List<ProductBiddingInfoResponse> contents = List.of(
-			new ProductBiddingInfoResponse(1L, "상품1", "image1.jpg", LocalDateTime.now().plusDays(1), 1000L, 1100L),
-			new ProductBiddingInfoResponse(2L, "상품2", "image2.jpg", LocalDateTime.now().plusDays(2), 2000L, 2100L));
+			ProductBiddingInfoResponse.builder()
+				.id(1L)
+				.name("상품1")
+				.image("image1.jpg")
+				.endAt(LocalDateTime.now().plusDays(1))
+				.currentBid(1_000L)
+				.bidPrice(1_100L)
+				.build(),
+			ProductBiddingInfoResponse.builder()
+				.id(2L)
+				.name("상품2")
+				.image("image2.jpg")
+				.endAt(LocalDateTime.now().plusDays(2))
+				.currentBid(2_000L)
+				.bidPrice(2_100L)
+				.build());
 		Page<ProductBiddingInfoResponse> page = new PageImpl<>(contents, Pageable.ofSize(10), 2);
 
 		given(productInternalService.getBiddingProductInfoByMemberId(eq(10L), any(Pageable.class)))
 			.willReturn(page);
 
 		this.mockMvc.perform(get("/api/v1/products/bidding/me")
-			.header("Authorization", "Bearer token")
-			.accept(MediaType.APPLICATION_JSON))
+				.header("Authorization", "Bearer token")
+				.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andDo(document("product-get-bidding-products",
 				requestHeaders(
@@ -310,16 +327,30 @@ class ProductControllerRestDocsTest extends RestDocsBase {
 	void getSellingProducts_정상적인상황_경매중인상품목록조회성공() throws Exception {
 
 		List<ProductSellingInfoResponse> contents = List.of(
-			new ProductSellingInfoResponse(1L, "상품1", "image1.jpg", LocalDateTime.now().plusDays(1), 1000L, 1L),
-			new ProductSellingInfoResponse(2L, "상품2", "image2.jpg", LocalDateTime.now().plusDays(2), 2000L, 2L));
+			ProductSellingInfoResponse.builder()
+				.id(1L)
+				.name("상품1")
+				.image("image1.jpg")
+				.endAt(LocalDateTime.now().plusDays(1))
+				.currentBid(1_000L)
+				.auctionId(1L)
+				.build(),
+			ProductSellingInfoResponse.builder()
+				.id(1L)
+				.name("상품2")
+				.image("image2.jpg")
+				.endAt(LocalDateTime.now().plusDays(2))
+				.currentBid(2_000L)
+				.auctionId(2L)
+				.build());
 		Page<ProductSellingInfoResponse> page = new PageImpl<>(contents, Pageable.ofSize(10), 2);
 
 		given(productInternalService.getSellingProductInfoByMemberId(eq(10L), any(Pageable.class)))
 			.willReturn(page);
 
 		this.mockMvc.perform(get("/api/v1/products/selling/me")
-			.header("Authorization", "Bearer token")
-			.accept(MediaType.APPLICATION_JSON))
+				.header("Authorization", "Bearer token")
+				.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andDo(document("product-get-bidding-products",
 				requestHeaders(
@@ -369,9 +400,9 @@ class ProductControllerRestDocsTest extends RestDocsBase {
 
 		// when & then
 		mockMvc.perform(
-			post("/api/v1/products/search")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(request)))
+				post("/api/v1/products/search")
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(objectMapper.writeValueAsString(request)))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("success").value(true))
 			.andExpect(jsonPath("message").value("요청에 성공했습니다."))
