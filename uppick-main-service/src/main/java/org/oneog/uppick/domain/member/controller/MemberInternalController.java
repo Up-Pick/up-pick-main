@@ -27,38 +27,46 @@ public class MemberInternalController {
 
 	@GetMapping("/members/nickname")
 	public String getMemberNickname(@RequestParam Long memberId) {
+
 		return memberInternalService.getMemberNicknameByMemberId(memberId);
 	}
 
 	@GetMapping("/sales/sell-at")
 	List<SoldProductSellAtResponse> getSoldProductsSellAt(@RequestParam List<Long> productIds) {
+
 		return memberInternalService.findSellAtByProductIds(productIds);
 	}
 
 	@GetMapping("/purchases/buy-at")
 	List<PurchasedProductBuyAtResponse> getPurchasedProductsBuyAt(@RequestParam List<Long> productIds) {
+
 		return memberInternalService.findBuyAtByProductIds(productIds);
 	}
 
 	@GetMapping("/members/{memberId}/credit")
 	public long getMemberCredit(@PathVariable long memberId) {
+
 		return memberInternalService.getMemberCreditByMemberId(memberId);
 	}
 
 	@PostMapping("/members/{memberId}/credit")
 	public void updateMemberCredit(@PathVariable long memberId,
 		@RequestBody UpdateMemberCreditRequest updateMemberCreditRequest) {
+
 		memberInternalService.updateMemberCredit(memberId, updateMemberCreditRequest.getAmount());
 	}
 
 	@PostMapping("/members/purchase-detail")
 	public void registerPurchaseDetail(@RequestParam RegisterPurchaseDetailRequest request) {
+
 		memberInternalService.registerPurchaseDetail(request);
 	}
 
 	@PostMapping("/members/sell-detail")
 	public void registerSellDetail(@RequestParam RegisterSellDetailRequest request) {
+
 		memberInternalService.registerSellDetail(request);
 
 	}
+
 }

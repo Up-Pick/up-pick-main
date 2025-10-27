@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class AuthService {
+
 	private final DefaultMemberInnerService memberExternalService;
 	private final PasswordEncoder passwordEncoder;
 	private final JwtUtil jwtUtil;
@@ -41,6 +42,7 @@ public class AuthService {
 	}
 
 	public LoginResponse login(LoginRequest loginRequest) {
+
 		Member member = memberExternalService.findByEmail(loginRequest.getEmail());
 
 		if (!passwordEncoder.matches(loginRequest.getPassword(), member.getPassword())) {
@@ -53,4 +55,5 @@ public class AuthService {
 		return new LoginResponse(token);
 
 	}
+
 }

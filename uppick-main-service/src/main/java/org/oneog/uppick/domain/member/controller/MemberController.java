@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/members")
 public class MemberController {
+
 	private final MemberService memberService;
 
 	@PreAuthorize("isAuthenticated()")
@@ -30,6 +31,7 @@ public class MemberController {
 		CreditChargeRequest creditChargeRequest,
 		@AuthenticationPrincipal
 		AuthMember authMember) {
+
 		CreditChargeResponse response = memberService.chargeCredit(creditChargeRequest, authMember);
 		return GlobalApiResponse.ok(response);
 	}
@@ -39,6 +41,7 @@ public class MemberController {
 	public GlobalApiResponse<CreditGetResponse> getCredit(
 		@AuthenticationPrincipal
 		AuthMember authMember) {
+
 		CreditGetResponse response = memberService.getCredit(authMember);
 		return GlobalApiResponse.ok(response);
 	}
