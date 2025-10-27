@@ -17,6 +17,8 @@ public class NotificationInternalService {
 
 	@Transactional
 	public void sendNotification(SendNotificationRequest request) {
+
 		notificationJpaRepository.save(notificationMapper.toEntity(request));
 	}
+
 }

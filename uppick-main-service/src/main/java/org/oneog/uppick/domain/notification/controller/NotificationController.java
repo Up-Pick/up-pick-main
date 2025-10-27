@@ -16,12 +16,15 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/notifications")
 public class NotificationController {
+
 	private final NotificationService notificationService;
 
 	@GetMapping("/me")
 	@PreAuthorize("isAuthenticated()")
 	public GlobalApiResponse<GetUnreadNotificationsResponse> getUnreadNotifications(@AuthenticationPrincipal
 	AuthMember authMember) {
+
 		return GlobalApiResponse.ok(notificationService.getUnreadNotifications(authMember.getMemberId()));
 	}
+
 }

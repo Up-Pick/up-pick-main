@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class GetUnreadNotificationsResponse {
+
 	private List<NotificationDetail> notifications;
 
 	@Getter
@@ -22,9 +23,12 @@ public class GetUnreadNotificationsResponse {
 	@AllArgsConstructor(access = AccessLevel.PRIVATE)
 	@Builder
 	public static class NotificationDetail {
+
 		private NotificationType type;
 		private String title;
 		private String message;
 		private LocalDateTime notifiedAt;
+
 	}
+
 }

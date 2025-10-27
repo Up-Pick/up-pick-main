@@ -14,11 +14,13 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
+
 	private final NotificationJpaRepository notificationJpaRepository;
 	private final NotificationMapper notificationMapper;
 
 	@Transactional
 	public GetUnreadNotificationsResponse getUnreadNotifications(long memberId) {
+
 		List<Notification> unreadNotifications = notificationJpaRepository.findAllByMemberIdAndIsReadFalse(memberId);
 
 		// 읽음 처리

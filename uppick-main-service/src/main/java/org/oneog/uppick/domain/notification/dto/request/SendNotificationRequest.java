@@ -13,8 +13,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 public class SendNotificationRequest {
+
 	private Long memberId;
 	private NotificationType type;
 	private String string1;
 	private String string2;
+
 }

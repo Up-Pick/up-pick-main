@@ -9,7 +9,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class NotificationMapper {
+
 	public GetUnreadNotificationsResponse toResponse(List<Notification> notifications) {
+
 		List<GetUnreadNotificationsResponse.NotificationDetail> notificationDetails = notifications.stream()
 			.map(notification -> {
 				return GetUnreadNotificationsResponse.NotificationDetail.builder()
@@ -24,6 +26,7 @@ public class NotificationMapper {
 	}
 
 	public Notification toEntity(SendNotificationRequest request) {
+
 		Notification notification = Notification.builder()
 			.memberId(request.getMemberId())
 			.type(request.getType())

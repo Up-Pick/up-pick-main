@@ -23,39 +23,43 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 public class Notification {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
 
-    @Column(name = "member_id", nullable = false)
-    private Long memberId;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
+	private Long id;
 
-    @Enumerated(EnumType.STRING)
-    private NotificationType type;
+	@Column(name = "member_id", nullable = false)
+	private Long memberId;
 
-    @Column(name = "title", nullable = false)
-    private String title;
+	@Enumerated(EnumType.STRING)
+	private NotificationType type;
 
-    @Column(name = "message", nullable = false)
-    private String message;
+	@Column(name = "title", nullable = false)
+	private String title;
 
-    @CreatedDate
-    @Column(name = "notified_at", nullable = false, updatable = false)
-    private LocalDateTime notifiedAt;
+	@Column(name = "message", nullable = false)
+	private String message;
 
-    @Column(name = "is_read", nullable = false)
-    private Boolean isRead = false;
+	@CreatedDate
+	@Column(name = "notified_at", nullable = false, updatable = false)
+	private LocalDateTime notifiedAt;
 
-    @Builder
-    private Notification(Long memberId, NotificationType type, String title, String message) {
-        this.memberId = memberId;
-        this.type = type;
-        this.title = title;
-        this.message = message;
-    }
+	@Column(name = "is_read", nullable = false)
+	private Boolean isRead = false;
 
-    public void markAsRead() {
-        this.isRead = true;
-    }
+	@Builder
+	private Notification(Long memberId, NotificationType type, String title, String message) {
+
+		this.memberId = memberId;
+		this.type = type;
+		this.title = title;
+		this.message = message;
+	}
+
+	public void markAsRead() {
+
+		this.isRead = true;
+	}
+
 }
