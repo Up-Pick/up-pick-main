@@ -1,10 +1,14 @@
 ## 도커 실행
-
+### windows
 docker-compose up --build
+### linux
+docker compose up --build
 
 ## 도커 종료
-
+### windows
 docker-compose down
+### linux
+docker compose down
 
 ## REST Docs
 
