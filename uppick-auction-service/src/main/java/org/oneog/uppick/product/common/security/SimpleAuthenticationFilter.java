@@ -1,11 +1,11 @@
-package org.oneog.uppick.common.security;
+package org.oneog.uppick.product.common.security;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import org.oneog.uppick.common.auth.SimpleAuthenticationToken;
 import org.oneog.uppick.common.constants.AuthConstant;
 import org.oneog.uppick.common.dto.AuthMember;
+import org.oneog.uppick.common.auth.SimpleAuthenticationToken;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;

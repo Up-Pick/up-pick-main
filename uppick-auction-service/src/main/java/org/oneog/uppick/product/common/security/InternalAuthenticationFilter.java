@@ -1,4 +1,4 @@
-package org.oneog.uppick.common.security;
+package org.oneog.uppick.product.common.security;
 
 import java.io.IOException;
 import java.util.Objects;

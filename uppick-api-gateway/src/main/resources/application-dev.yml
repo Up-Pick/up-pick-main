@@ -8,8 +8,8 @@ spring:
       server:
         webflux:
           routes:
-            - id: uppick-product-service
-              uri: ${PRODUCT_SERVICE_URL}
+            - id: uppick-auction-service
+              uri: ${AUCTION_SERVICE_URL}
               predicates:
                 - Path=/product/**
               filters:
@@ -20,12 +20,6 @@ spring:
                 - Path=/main/**
               filters:
                 - StripPrefix=1
-            - id: uppick-main-grpc-service
-              uri: ${MAIN_GRPC_SERVICE_URL}
-              predicates:
-                - Path=/grpc/main/** 
-              filters:
-                - StripPrefix=2
 jwt:
   secret:
     key: ${JWT_KEY}

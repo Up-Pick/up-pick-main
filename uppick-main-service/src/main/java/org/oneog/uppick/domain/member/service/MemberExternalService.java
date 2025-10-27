@@ -7,8 +7,6 @@ import org.oneog.uppick.domain.member.entity.Member;
 import org.oneog.uppick.domain.member.exception.MemberErrorCode;
 import org.oneog.uppick.domain.member.mapper.MemberMapper;
 import org.oneog.uppick.domain.member.repository.MemberRepository;
-import org.oneog.uppick.domain.member.repository.PurchaseDetailRepository;
-import org.oneog.uppick.domain.member.repository.SellDetailRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,8 +17,6 @@ import lombok.RequiredArgsConstructor;
 public class MemberExternalService implements MemberExternalServiceApi {
 	private final MemberRepository memberRepository;
 	private final MemberMapper memberMapper;
-	private final PurchaseDetailRepository purchaseDetailRepository;
-	private final SellDetailRepository sellDetailRepository;
 
 	// @Override
 	// public void registerPurchaseDetail(Long auctionId, Long buyerId, Long productId, Long price) {
