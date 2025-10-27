@@ -41,14 +41,17 @@ public class MemberInternalService {
 	}
 
 	public List<SoldProductSellAtResponse> findSellAtByProductIds(List<Long> productIds) {
+
 		return memberQueryRepository.findSellAtByProductIds(productIds);
 	}
 
 	public List<PurchasedProductBuyAtResponse> findBuyAtByProductIds(List<Long> productIds) {
+
 		return memberQueryRepository.findBuyAtByProductIds(productIds);
 	}
 
 	public long getMemberCreditByMemberId(long memberId) {
+
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new BusinessException(MemberErrorCode.MEMBER_NOT_FOUND));
 
@@ -57,6 +60,7 @@ public class MemberInternalService {
 
 	@Transactional
 	public void updateMemberCredit(long memberId, long amount) {
+
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new BusinessException(MemberErrorCode.MEMBER_NOT_FOUND));
 
@@ -64,12 +68,15 @@ public class MemberInternalService {
 	}
 
 	public void registerPurchaseDetail(RegisterPurchaseDetailRequest request) {
+
 		PurchaseDetail purchaseDetail = memberMapper.purchaseDetailToEntity(request);
 		purchaseDetailRepository.save(purchaseDetail);
 	}
 
 	public void registerSellDetail(RegisterSellDetailRequest request) {
+
 		SellDetail sellDetail = memberMapper.sellDetailToEntity(request);
 		sellDetailRepository.save(sellDetail);
 	}
+
 }

@@ -9,8 +9,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class RegisterPurchaseDetailRequest {
+
 	private Long auctionId;
 	private Long buyerId;
 	private Long productId;
 	private Long price;
+
 }

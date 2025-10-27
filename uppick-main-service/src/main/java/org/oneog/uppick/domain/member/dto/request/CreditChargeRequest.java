@@ -15,4 +15,5 @@ public class CreditChargeRequest {
 	@Positive(message = "충전 금액은 0보다 커야 합니다.")//양수인지 확인
 	@NotNull(message = "충전 금액을 입력해야 합니다.")
 	private Long amount;
+
 }

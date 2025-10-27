@@ -13,16 +13,19 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class DefaultMemberInnerService implements MemberInnerService {
+
 	private final MemberRepository memberRepository;
 	private final MemberMapper memberMapper;
 
 	@Override
 	public boolean existsByEmail(String email) {
+
 		return memberRepository.existsByEmail(email);
 	}
 
 	@Override
 	public boolean existsByNickname(String nickname) {
+
 		return memberRepository.existsByNickname(nickname);
 	}
 
@@ -36,6 +39,7 @@ public class DefaultMemberInnerService implements MemberInnerService {
 
 	@Override
 	public Member findByEmail(String email) {
+
 		return memberRepository.findByEmail(email)
 			.orElseThrow(() -> new BusinessException(AuthErrorCode.USER_NOT_FOUND));
 	}

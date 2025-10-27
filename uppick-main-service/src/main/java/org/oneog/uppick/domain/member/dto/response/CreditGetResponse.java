@@ -9,5 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class CreditGetResponse {
+
 	private Long currentCredit;
+
 }

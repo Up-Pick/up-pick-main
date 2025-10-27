@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class PurchasedProductBuyAtResponse {
+
 	private Long id;
 	private LocalDateTime buyAt;
+
 }

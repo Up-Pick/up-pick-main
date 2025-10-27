@@ -45,9 +45,11 @@ public class SellDetail {
 
 	@Builder
 	private SellDetail(Long finalPrice, Long auctionId, Long productId, Long sellerId) {
+
 		this.finalPrice = finalPrice;
 		this.auctionId = auctionId;
 		this.productId = productId;
 		this.sellerId = sellerId;
 	}
+
 }

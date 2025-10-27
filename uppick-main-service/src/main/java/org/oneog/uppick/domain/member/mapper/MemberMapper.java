@@ -10,7 +10,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class MemberMapper {
+
 	public Member toEntity(SignupRequest request, String encodedPassword) {
+
 		return Member.builder()
 			.email(request.getEmail())
 			.nickname(request.getNickname())
@@ -19,6 +21,7 @@ public class MemberMapper {
 	}
 
 	public PurchaseDetail purchaseDetailToEntity(RegisterPurchaseDetailRequest request) {
+
 		return PurchaseDetail.builder()
 			.auctionId(request.getAuctionId())
 			.buyerId(request.getBuyerId())
@@ -28,6 +31,7 @@ public class MemberMapper {
 	}
 
 	public SellDetail sellDetailToEntity(RegisterSellDetailRequest request) {
+
 		return SellDetail.builder()
 			.auctionId(request.getAuctionId())
 			.sellerId(request.getSellerId())
@@ -35,4 +39,5 @@ public class MemberMapper {
 			.finalPrice(request.getPrice())
 			.build();
 	}
+
 }
