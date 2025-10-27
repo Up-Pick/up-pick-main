@@ -11,7 +11,7 @@ spring:
             - id: uppick-auction-service
               uri: ${AUCTION_SERVICE_URL}
               predicates:
-                - Path=/product/**
+                - Path=/auction/**
               filters:
                 - StripPrefix=1
             - id: uppick-main-service
