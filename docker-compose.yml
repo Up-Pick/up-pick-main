@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  mysql:
+  main-mysql:
     image: mysql:8.0
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
@@ -11,7 +11,73 @@ services:
     ports:
       - "3307:3306"
     volumes:
-      - mysql_data:/var/lib/mysql
+      - main_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  auction-mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: uppick_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3308:3306"
+    volumes:
+      - auction_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  uppick-api-gateway:
+    build:
+      context: .
+      dockerfile: uppick-api-gateway/Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      AUCTION_SERVICE_URL: http://uppick-auction-service:8080
+      MAIN_SERVICE_URL: http://uppick-main-service:8080
+    ports:
+      - "8080:8080"
+
+  uppick-auction-service:
+    build:
+      context: .
+      dockerfile: uppick-auction-service/Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      DB_URL: jdbc:mysql://auction-mysql:3306/uppick_db
+      DB_USER: user
+      DB_PASS: password
+      GATEWAY_URL: http://uppick-api-gateway:8080
+    ports:
+      - "8082:8080"
+    depends_on:
+      auction-mysql:
+        condition: service_healthy
+
+  uppick-main-service:
+    build:
+      context: .
+      dockerfile: uppick-main-service/Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      DB_URL: jdbc:mysql://main-mysql:3306/uppick_db
+      DB_USER: user
+      DB_PASS: password
+    ports:
+      - "8081:8080"
+      - "9090:9090"
+    depends_on:
+      main-mysql:
+        condition: service_healthy
 
 volumes:
-  mysql_data:
+  main_mysql_data:
+  auction_mysql_data:

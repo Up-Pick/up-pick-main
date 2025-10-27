@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: api-gateway
+  main:
+    web-application-type: reactive
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: uppick-auction-service
+              uri: ${AUCTION_SERVICE_URL}
+              predicates:
+                - Path=/auction/**
+              filters:
+                - StripPrefix=1
+            - id: uppick-main-service
+              uri: ${MAIN_SERVICE_URL}
+              predicates:
+                - Path=/main/**
+              filters:
+                - StripPrefix=1
+jwt:
+  secret:
+    key: ${JWT_KEY}
+server:
+  http2:
+    enabled: true

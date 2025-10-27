@@ -1,134 +1,230 @@
-import org.asciidoctor.gradle.jvm.AsciidoctorTask
-import org.springframework.boot.gradle.tasks.bundling.BootJar
-
+// 루트 프로젝트는 하위 프로젝트들을 관리하는 역할만 합니다.
+// 'apply false'를 통해 플러그인을 루트에는 적용하지 않고, 하위 모듈에서 필요에 따라 적용하도록 합니다.
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.5.6'
+    id 'org.springframework.boot' version '3.5.6' apply false
     id 'io.spring.dependency-management' version '1.1.7'
-    id 'jacoco'
-    id 'org.asciidoctor.jvm.convert' version '3.3.2' // spring rest docs
+    id 'org.asciidoctor.jvm.convert' version '4.0.5'
 }
 
-group = 'org.1og'
-version = '0.0.1-SNAPSHOT'
-description = 'Demo project for Spring Boot'
+// 모든 하위 프로젝트에 적용될 공통 설정 (그룹, 버전, 저장소)
+allprojects {
+    group = 'org.oneog'
+    version = '0.0.1-SNAPSHOT'
 
-// QueryDSL 버전 선언
-def querydslVersion = '5.1.0'
-
-def jjwtVersion = '0.13.0'
-
-def springCloudAwsVersion = '3.4.0'
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+    repositories {
+        mavenCentral()
     }
+}
+
+// 전역으로 사용할 변수 설정
+ext {
+    querydslVersion = '5.1.0'
+    jjwtVersion = '0.13.0'
+    springCloudAwsVersion = '3.4.0'
+    snippetsDir = file("$buildDir/generated-snippets")
+    springCloudVersion = '2025.0.0'
 }
 
 configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
     asciidoctorExtensions
+}
+
+dependencies {
+    asciidoctorExtensions 'org.springframework.restdocs:spring-restdocs-asciidoctor'
 }
 
 dependencyManagement {
     imports {
-        mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:${springCloudAwsVersion}"
+        mavenBom "org.springframework.boot:spring-boot-dependencies:3.5.6"
     }
 }
 
-repositories {
-    mavenCentral()
-}
+// 모든 하위 프로젝트에 적용될 공통 플러그인, 자바 설정, 의존성 관리
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'io.spring.dependency-management'
 
-dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    compileOnly 'org.projectlombok:lombok'
-    runtimeOnly 'com.mysql:mysql-connector-j'
-    annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.security:spring-security-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    testImplementation 'com.h2database:h2'
-
-    // QueryDSL: JPA 및 APT (jakarta 플러그인 사용)
-    implementation "com.querydsl:querydsl-jpa:${querydslVersion}:jakarta"
-    annotationProcessor "com.querydsl:querydsl-apt:${querydslVersion}:jakarta"
-    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
-
-    // JJWT for JSON Web Tokens
-    implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
-    runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
-    runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
-
-    //Rest Docs
-    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
-    asciidoctorExtensions 'org.springframework.restdocs:spring-restdocs-asciidoctor'
-
-    // AWS S3
-    implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3'
-}
-
-// REST Docs 스니펫 디렉토리 설정
-ext {
-    snippetsDir = file('build/generated-snippets')
-}
-
-apply from: 'gradle/scripts/restdocs-index.gradle'
-
-tasks.named('test', Test) {
-    outputs.dir snippetsDir
-    useJUnitPlatform()
-    finalizedBy 'asciidoctor'
-}
-
-tasks.jacocoTestReport {
-    dependsOn test
-    reports {
-        xml.required = true
-        html.required = false
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
     }
-}
 
+    configurations {
+        compileOnly {
+            extendsFrom annotationProcessor
+        }
+    }
 
-// QueryDSL이 생성하는 소스 디렉터리를 main 소스셋에 추가하고
-// Java 컴파일러의 APT 생성 경로를 명시적으로 설정합니다.
-sourceSets {
-    main {
-        java {
-            srcDirs += "$buildDir/generated/sources/annotationProcessor/java/main"
+    // QueryDSL: generated sources 디렉터리 추가 및 컴파일 타임 annotation processor 설정
+    sourceSets {
+        main {
+            java {
+                // QueryDSL이 생성하는 Q-타입을 포함시킵니다.
+                srcDir("$buildDir/generated/querydsl")
+            }
+        }
+    }
+
+    // Java 컴파일 시 annotation processor가 생성한 소스를 인식하도록 설정
+    tasks.withType(JavaCompile).configureEach {
+        // annotationProcessor configuration을 processor path로 사용
+        options.annotationProcessorPath = configurations.annotationProcessor
+        // QueryDSL이 생성하는 소스 위치
+        options.annotationProcessorGeneratedSourcesDirectory = file("$buildDir/generated/querydsl")
+    }
+
+    // Spring Boot BOM을 전역으로 import 해서 하위 모듈들의 버전 관리를 맡깁니다.
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework.boot:spring-boot-dependencies:3.5.6"
+            mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:${springCloudAwsVersion}"
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
         }
     }
 }
 
-tasks.withType(JavaCompile).configureEach { compileTask ->
-    // Gradle의 annotation processor 출력 디렉터리 지정 (신규 API)
-    def target = compileTask.name.toLowerCase().contains('test') ?
-            layout.buildDirectory.dir("generated/sources/annotationProcessor/java/test") :
-            layout.buildDirectory.dir("generated/sources/annotationProcessor/java/main")
-    compileTask.options.generatedSourceOutputDirectory.set(target)
-}
-
-tasks.named('asciidoctor', AsciidoctorTask) {
-    inputs.dir snippetsDir
-    configurations('asciidoctorExtensions')
-    dependsOn tasks.named('generateRestDocsIndex')
-    baseDirFollowsSourceDir()
-    attributes('snippets': snippetsDir)
-}
-
-tasks.named('bootJar', BootJar) {
-    dependsOn tasks.named('asciidoctor')
-    from(layout.buildDirectory.dir('docs/asciidoc').map { it.asFile }) {
-        into 'static/docs'
+// 각 서비스의 RestDocs 스니펫을 루트로 복사
+task copySnippets {
+    // 각 서브프로젝트의 generateRestDocsIndex가 완료된 후 실행
+    dependsOn {
+        subprojects.findAll { 
+            it.tasks.findByName('generateRestDocsIndex') != null 
+        }.collect { 
+            it.tasks.named('generateRestDocsIndex') 
+        }
+    }
+    
+    // test가 실행되지 않으면 건너뜀
+    onlyIf {
+        subprojects.any { subproject ->
+            new File(subproject.buildDir, 'generated-snippets').exists()
+        }
+    }
+    
+    doLast {
+        def targetDir = file("$buildDir/generated-snippets")
+        targetDir.mkdirs()
+        
+        subprojects.each { subproject ->
+            def snippetsDir = new File(subproject.buildDir, 'generated-snippets')
+            if (snippetsDir.exists() && snippetsDir.list()?.length > 0) {
+                println "Copying snippets from ${subproject.name}"
+                copy {
+                    from snippetsDir
+                    into "$targetDir/${subproject.name}"
+                    include '**/*'
+                }
+            }
+        }
     }
 }
 
-tasks.named('build') {
-    dependsOn tasks.named('asciidoctor')
+// 통합 index.adoc 생성
+task generateUnifiedIndex {
+    dependsOn copySnippets
+    
+    def outputFile = file("$buildDir/docs/asciidoc/index.adoc")
+    outputs.file(outputFile)
+    
+    // copySnippets가 실행되었을 때만 실행
+    onlyIf {
+        file("$buildDir/generated-snippets").exists()
+    }
+    
+    doLast {
+        def content = new StringBuilder()
+        content.append("= Up-Pick 통합 API 문서\n")
+        content.append(":toc: left\n")
+        content.append(":toclevels: 3\n")
+        content.append(":sectnums:\n")
+        content.append(":sectanchors:\n")
+        content.append(":source-highlighter: highlightjs\n")
+        content.append(":highlightjs-theme: github\n")
+        content.append(":icons: font\n")
+        content.append(":sectlinks:\n\n")
+        
+        def hasContent = false
+        
+        // snippets가 실제로 있는 서비스만 포함
+        subprojects.each { subproject ->
+            def snippetsDir = new File(buildDir, "generated-snippets/${subproject.name}")
+            
+            if (snippetsDir.exists() && snippetsDir.list()?.length > 0) {
+                hasContent = true
+                def serviceName = subproject.name.replace('uppick-', '').replace('-service', '')
+                content.append("== ${serviceName.capitalize()} Service\n\n")
+                
+                // auto-index를 직접 include (상대 경로)
+                def autoIndexFile = new File(snippetsDir, 'auto-index.adoc')
+                if (autoIndexFile.exists()) {
+                    // auto-index.adoc의 내용을 읽어서 snippet 경로를 조정하여 직접 포함
+                    def autoIndexContent = autoIndexFile.text
+                    // {snippets}를 실제 상대 경로로 변경
+                    def relativeSnippetsPath = "../../generated-snippets/${subproject.name}"
+                    def adjustedContent = autoIndexContent.replaceAll(/\{snippets\}/, relativeSnippetsPath)
+                    content.append(adjustedContent)
+                    content.append("\n\n")
+                }
+            }
+        }
+        
+        if (!hasContent) {
+            content.append("== 문서 없음\n\n")
+            content.append("생성된 API 문서가 없습니다.\n")
+        }
+        
+        outputFile.parentFile.mkdirs()
+        outputFile.text = content.toString()
+        println "Generated unified index at: ${outputFile.absolutePath}"
+    }
+}
+
+asciidoctor {
+    configurations 'asciidoctorExtensions'
+    sourceDir file("$buildDir/docs/asciidoc")
+    
+    dependsOn generateUnifiedIndex
+    
+    // 통합 문서가 생성되었을 때만 실행
+    onlyIf {
+        file("$buildDir/docs/asciidoc/index.adoc").exists()
+    }
+    
+    attributes "snippets": file("$buildDir/generated-snippets")
+    baseDirFollowsSourceDir()
+}
+
+apply from: "$rootDir/gradle/scripts/restdocs-index.gradle"
+
+// test 실행 시 통합 문서 자동 생성
+tasks.register('unifiedDocs') {
+    group = 'documentation'
+    description = '모든 서비스의 RestDocs를 통합하여 생성합니다'
+    
+    dependsOn copySnippets, generateUnifiedIndex, asciidoctor
+    
+    // snippets가 있을 때만 실행
+    onlyIf {
+        subprojects.any { subproject ->
+            new File(subproject.buildDir, 'generated-snippets').exists()
+        }
+    }
+    
+    // 실행 순서 보장
+    copySnippets.mustRunAfter subprojects.collect { it.tasks.withType(Test) }
+    generateUnifiedIndex.mustRunAfter copySnippets
+    asciidoctor.mustRunAfter generateUnifiedIndex
+}
+
+// 각 서브프로젝트의 test 완료 후 통합 문서 생성
+subprojects {
+    tasks.withType(Test).configureEach {
+        finalizedBy rootProject.tasks.named('unifiedDocs')
+    }
+}
+
+tasks.named("build") {
+    dependsOn asciidoctor
 }
