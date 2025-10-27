@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class CategoryExternalService implements CategoryExternalServiceApi {
+public class DefaultCategoryInnerService implements CategoryInnerService {
 
 	private final CategoryRepository categoryRepository;
 	private final CategoryMapper categoryMapper;

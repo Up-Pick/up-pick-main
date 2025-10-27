@@ -16,7 +16,7 @@ import org.oneog.uppick.auction.domain.category.repository.CategoryRepository;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
-public class CategoryInternalServiceTest {
+public class CategoryServiceTest {
 
 	@Mock
 	private CategoryRepository categoryRepository;
