@@ -56,6 +56,7 @@ public class Auction {
 	@Builder
 	private Auction(Long productId, Long registerId, Long currentPrice, Long minPrice, LocalDateTime startAt,
 		AuctionStatus status, LocalDateTime endAt) {
+
 		this.productId = productId;
 		this.registerId = registerId;
 		this.currentPrice = currentPrice;
@@ -68,6 +69,7 @@ public class Auction {
 	// --- 도메인 메서드 ---
 	//입찰 성공시 현재 입찰가 및 마지막 입찰자 ID를 갱신하기 위함
 	public void updateCurrentPrice(Long biddingPrice, Long lastBidderId) {
+
 		if (biddingPrice == null || biddingPrice <= 0) {
 			throw new BusinessException(AuctionErrorCode.WRONG_BIDDING_PRICE);
 		}
@@ -77,11 +79,14 @@ public class Auction {
 
 	//경매마감시 상태변경(판매된거)
 	public void markAsSold() {
+
 		this.status = AuctionStatus.FINISHED;
 	}
 
 	//유찰되면 상태변경
 	public void markAsExpired() {
+
 		this.status = AuctionStatus.EXPIRED;
 	}
+
 }

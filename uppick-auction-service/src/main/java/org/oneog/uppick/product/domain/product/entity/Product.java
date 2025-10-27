@@ -21,6 +21,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 public class Product {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
@@ -53,6 +54,7 @@ public class Product {
 	@Builder
 	private Product(String name, String description, String image, Long categoryId, Long registerId, String bigCategory,
 		String smallCategory) {
+
 		this.name = name;
 		this.description = description;
 		this.image = image;
@@ -64,6 +66,8 @@ public class Product {
 
 	// ***** Method ***** //
 	public void increaseViewCount() {
+
 		this.viewCount++;
 	}
+
 }

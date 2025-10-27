@@ -12,13 +12,15 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class AuctionExternalServiceProvider implements AuctionExternalService {
+public class DefaultAuctionInnerService implements AuctionInnerService {
+
 	private final AuctionRepository auctionRepository;
 
 	@Override
 	@Transactional
 	public void registerAuction(Long id, Long registerId, Long startBid, LocalDateTime registeredAt,
 		LocalDateTime endAt) {
+
 		Auction auction = Auction.builder()
 			.productId(id)
 			.registerId(registerId)
@@ -29,4 +31,5 @@ public class AuctionExternalServiceProvider implements AuctionExternalService {
 			.build();
 		auctionRepository.save(auction);
 	}
+
 }

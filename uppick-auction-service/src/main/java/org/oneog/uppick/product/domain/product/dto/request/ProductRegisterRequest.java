@@ -31,4 +31,5 @@ public class ProductRegisterRequest {
 	@NotNull(message = "마감 날짜는 비울 수 없습니다.")
 	@Future(message = "마감 날짜는 현재 날짜 이후여야 합니다.")
 	private final LocalDateTime endAt;
+
 }

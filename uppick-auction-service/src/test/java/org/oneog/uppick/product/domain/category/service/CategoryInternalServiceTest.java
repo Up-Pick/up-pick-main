@@ -44,7 +44,7 @@ public class CategoryInternalServiceTest {
 			.willReturn(List.of(category1, category2));
 
 		// when
-		List<CategoryResponse> responses = categoryInternalService.getAllcategories();
+		List<CategoryResponse> responses = categoryInternalService.getAllCategories();
 
 		// then
 		assertThat(responses).hasSize(2);

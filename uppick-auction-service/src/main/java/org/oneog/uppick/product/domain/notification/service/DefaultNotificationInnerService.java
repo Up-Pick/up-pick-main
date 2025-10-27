@@ -8,11 +8,13 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class SendNotificationUseCase {
+public class DefaultNotificationInnerService implements NotificationInnerService {
 
 	private final NotificationClient notificationClient;
 
-	public void execute(SendNotificationRequest request) {
+	public void sendNotification(SendNotificationRequest request) {
+
 		notificationClient.sendNotification(request);
 	}
+
 }

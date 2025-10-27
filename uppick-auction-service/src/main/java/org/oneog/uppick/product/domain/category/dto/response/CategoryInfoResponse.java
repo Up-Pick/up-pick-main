@@ -6,6 +6,8 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class CategoryInfoResponse {
+
 	private String bigCategory;
 	private String smallCategory;
+
 }

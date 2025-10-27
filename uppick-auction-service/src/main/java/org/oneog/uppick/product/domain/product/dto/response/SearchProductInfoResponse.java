@@ -10,6 +10,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Builder
 public class SearchProductInfoResponse {
+
 	private final long id;
 	private final String image;
 	private final String name;
@@ -18,4 +19,5 @@ public class SearchProductInfoResponse {
 	private final Long currentBidPrice;
 	private final long minBidPrice;
 	private final boolean isSold;
+
 }

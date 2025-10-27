@@ -11,7 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.oneog.uppick.product.domain.auction.dto.request.AuctionBidRequest;
-import org.oneog.uppick.product.domain.auction.service.AuctionInternalService;
+import org.oneog.uppick.product.domain.auction.service.AuctionService;
 import org.oneog.uppick.product.support.auth.WithMockAuthMember;
 import org.oneog.uppick.product.support.restdocs.RestDocsBase;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -29,7 +29,7 @@ class AuctionControllerRestDocsTest extends RestDocsBase {
 	private final Long memberId = 1L;
 	private final Long auctionId = 10L;
 	@MockitoBean
-	private AuctionInternalService auctionInternalService;
+	private AuctionService auctionService;
 
 	@Test
 	@DisplayName("경매 입찰 API를 Rest Docs로 문서화한다")
@@ -38,14 +38,14 @@ class AuctionControllerRestDocsTest extends RestDocsBase {
 		Long biddingPrice = 120000L;
 		AuctionBidRequest request = new AuctionBidRequest(biddingPrice);
 
-		doNothing().when(auctionInternalService).bid(any(AuctionBidRequest.class), eq(auctionId), eq(memberId));
+		doNothing().when(auctionService).bid(any(AuctionBidRequest.class), eq(auctionId), eq(memberId));
 
 		// when & then
 		mockMvc.perform(
-			post("/api/v1/auctions/{auctionId}/bid", auctionId)
-				.header("Authorization", "Bearer token")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(request)))
+				post("/api/v1/auctions/{auctionId}/bid", auctionId)
+					.header("Authorization", "Bearer token")
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(objectMapper.writeValueAsString(request)))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("success").value(true))
 			.andExpect(jsonPath("message").value("요청에 성공했습니다."))

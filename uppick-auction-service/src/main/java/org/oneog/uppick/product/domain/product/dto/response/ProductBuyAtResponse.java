@@ -8,6 +8,8 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class ProductBuyAtResponse {
+
 	private final Long id;
 	private final LocalDateTime buyAt;
+
 }

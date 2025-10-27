@@ -14,6 +14,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Builder
 public class SearchProductRequest {
+
 	private final String keyword;
 	private final Long categoryId;
 	private final Boolean onlyNotSold;
@@ -24,6 +25,7 @@ public class SearchProductRequest {
 	private final LocalDate endAtFrom;
 
 	public static SearchProductRequest ofDefault() {
+
 		return SearchProductRequest.builder()
 			.keyword(null)
 			.categoryId(null)
@@ -34,4 +36,5 @@ public class SearchProductRequest {
 			.endAtFrom(null)
 			.build();
 	}
+
 }

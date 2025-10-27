@@ -19,12 +19,15 @@ public class CategoryExternalService implements CategoryExternalServiceApi {
 
 	@Override
 	public CategoryInfoResponse getCategoriesByCategoryId(Long categoryId) {
+
 		Category category = findCategoryByIdOrElseThrow(categoryId);
 		return categoryMapper.toCategoryInfoResponse(category);
 	}
 
 	private Category findCategoryByIdOrElseThrow(Long categoryId) {
+
 		return categoryRepository.findById(categoryId)
 			.orElseThrow(() -> new BusinessException(CategoryErrorCode.CATEGORY_NOT_FOUND));
 	}
+
 }

@@ -19,7 +19,7 @@ import org.oneog.uppick.common.dto.AuthMember;
 import org.oneog.uppick.product.domain.product.dto.request.ProductRegisterRequest;
 import org.oneog.uppick.product.domain.product.dto.request.SearchProductRequest;
 import org.oneog.uppick.product.domain.product.dto.response.ProductBiddingInfoResponse;
-import org.oneog.uppick.product.domain.product.dto.response.ProductInfoResponse;
+import org.oneog.uppick.product.domain.product.dto.response.ProductDetailResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductSellingInfoResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductSimpleInfoResponse;
 import org.oneog.uppick.product.domain.product.dto.response.PurchasedProductInfoResponse;
@@ -103,10 +103,20 @@ class ProductControllerRestDocsTest extends RestDocsBase {
 	@WithMockAuthMember(memberId = 10L, memberNickname = "tester")
 	void getProductInfo_정상적인상황_상품상세조회성공() throws Exception {
 		Long productId = 1L;
-		ProductInfoResponse response = new ProductInfoResponse(
-			1L, "테스트 상품", "상품 설명", 10L, LocalDateTime.now(), "image.jpg",
-			"전자제품", 1000L, 1500L, LocalDateTime.now().plusDays(7), 10L);
-		response.setSellerName("sellerName");
+		ProductDetailResponse response = ProductDetailResponse
+			.builder()
+			.id(1L)
+			.name("테스트 상품")
+			.description("상품 설명")
+			.viewCount(10L)
+			.registeredAt(LocalDateTime.now())
+			.image("image.jpg")
+			.categoryName("전자제품")
+			.minPrice(1_000L)
+			.currentBid(1_500L)
+			.endAt(LocalDateTime.now().plusDays(7))
+			.sellerName("sellerName")
+			.build();
 
 		given(productInternalService.getProductInfoById(eq(productId), any(AuthMember.class)))
 			.willReturn(response);
@@ -136,7 +146,6 @@ class ProductControllerRestDocsTest extends RestDocsBase {
 						.description("현재 입찰가")
 						.attributes(key("optional").value(true)),
 					fieldWithPath("data.endAt").type(JsonFieldType.STRING).description("마감 일시 (ISO-8601)"),
-					fieldWithPath("data.sellerId").type(JsonFieldType.NUMBER).description("판매자 ID"),
 					fieldWithPath("data.sellerName").type(JsonFieldType.STRING).description("판매자 이름"))));
 	}
 

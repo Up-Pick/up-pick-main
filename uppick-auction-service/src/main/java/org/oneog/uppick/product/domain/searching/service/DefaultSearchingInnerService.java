@@ -10,12 +10,15 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class SaveSearchHistoriesUseCase {
+public class DefaultSearchingInnerService implements SearchingInnerService {
 
 	private final SearchingClient searchingClient;
 
-	public void execute(List<String> keywords) {
+	@Override
+	public void saveSearchHistories(List<String> keywords) {
+
 		SaveSearchHistoriesRequest request = new SaveSearchHistoriesRequest(keywords);
 		searchingClient.saveSearchHistory(request);
 	}
+
 }

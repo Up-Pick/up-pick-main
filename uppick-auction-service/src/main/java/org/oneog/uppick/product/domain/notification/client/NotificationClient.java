@@ -10,4 +10,5 @@ public interface NotificationClient {
 
 	@PostMapping("/main/internal/v1/notifications")
 	void sendNotification(@RequestBody SendNotificationRequest request);
+
 }

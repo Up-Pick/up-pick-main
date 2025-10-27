@@ -3,7 +3,6 @@ package org.oneog.uppick.product.domain.auction.repository;
 import static org.oneog.uppick.product.domain.auction.entity.QBiddingDetail.*;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
@@ -26,16 +25,4 @@ public class BiddingDetailQueryRepository {
 			.fetch();
 	}
 
-	// 현재 경매의 최고 입찰자 조회 (최근 입찰자 = 최고가 입찰자)
-	public Optional<Long> findTopBidderIdByAuctionId(Long auctionId) {
-		Long bidderId = jpaQueryFactory
-			.select(biddingDetail.memberId)
-			.from(biddingDetail)
-			.where(biddingDetail.auctionId.eq(auctionId))
-			.orderBy(biddingDetail.bidPrice.desc())
-			.limit(1)
-			.fetchOne();
-
-		return Optional.ofNullable(bidderId);
-	}
 }

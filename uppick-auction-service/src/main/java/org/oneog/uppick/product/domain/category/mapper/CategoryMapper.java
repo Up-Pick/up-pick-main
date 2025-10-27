@@ -1,6 +1,7 @@
 package org.oneog.uppick.product.domain.category.mapper;
 
 import org.oneog.uppick.product.domain.category.dto.response.CategoryInfoResponse;
+import org.oneog.uppick.product.domain.category.dto.response.CategoryResponse;
 import org.oneog.uppick.product.domain.category.entity.Category;
 import org.springframework.stereotype.Component;
 
@@ -8,6 +9,17 @@ import org.springframework.stereotype.Component;
 public class CategoryMapper {
 
 	public CategoryInfoResponse toCategoryInfoResponse(Category category) {
+
 		return new CategoryInfoResponse(category.getBig(), category.getSmall());
 	}
+
+	public CategoryResponse toResponse(Category category) {
+
+		return CategoryResponse.builder()
+			.categoryId(category.getId())
+			.smallCategory(category.getSmall())
+			.bigCategory(category.getBig())
+			.build();
+	}
+
 }

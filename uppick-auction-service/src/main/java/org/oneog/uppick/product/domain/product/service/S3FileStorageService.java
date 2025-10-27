@@ -30,6 +30,7 @@ public class S3FileStorageService implements S3FileManager {
 		"jpg", "jpeg", "png", "gif", "webp");
 	private static final long MAX_FILE_SIZE = 10 * 1024 * 1024;
 	private final S3Client s3Client;
+
 	@Value("${spring.cloud.aws.s3.bucket}")
 	private String bucketName;
 	@Value("${spring.cloud.aws.region.static}")
@@ -37,27 +38,33 @@ public class S3FileStorageService implements S3FileManager {
 
 	@Override
 	public String store(MultipartFile file) {
+
 		if (file == null || file.isEmpty()) {
+
 			throw new BusinessException(ProductErrorCode.EMPTY_FILE);
 		}
 
 		if (file.getSize() > MAX_FILE_SIZE) {
+
 			throw new BusinessException(ProductErrorCode.FILE_SIZE_EXCEEDED);
 		}
 
 		String originalFilename = file.getOriginalFilename();
 		if (originalFilename == null || originalFilename.isBlank()) {
+
 			throw new BusinessException(ProductErrorCode.INVALID_FILE_TYPE);
 		}
 
 		String extension = getExtension(originalFilename);
 		if (!ALLOWED_EXTENSIONS.contains(extension.toLowerCase())) {
+
 			throw new BusinessException(ProductErrorCode.INVALID_FILE_TYPE);
 		}
 
 		String s3Key = generateS3Key(extension);
 
 		try {
+
 			PutObjectRequest putObjectRequest = PutObjectRequest.builder()
 				.bucket(bucketName)
 				.key(s3Key)
@@ -74,25 +81,33 @@ public class S3FileStorageService implements S3FileManager {
 				bucketName, region, s3Key);
 
 			log.info("S3 업로드 성공: {}", fileUrl);
+
 			return fileUrl;
 
 		} catch (IOException e) {
+
 			log.error("S3 업로드 실패: {}", e.getMessage());
 			throw new BusinessException(ProductErrorCode.FILE_UPLOAD_FAILED);
 		}
 	}
 
 	private String generateS3Key(String extension) {
+
 		String timestamp = LocalDateTime.now()
 			.format(DateTimeFormatter.ofPattern("yyyyMMdd/HHmmss"));
 		String uuid = UUID.randomUUID().toString().substring(0, 8);
+
 		return String.format("products/%s_%s.%s", timestamp, uuid, extension);
 	}
 
 	private String getExtension(String filename) {
+
 		if (filename == null || !filename.contains(".")) {
+
 			throw new BusinessException(ProductErrorCode.INVALID_FILE_TYPE);
 		}
+
 		return filename.substring(filename.lastIndexOf(".") + 1);
 	}
+
 }

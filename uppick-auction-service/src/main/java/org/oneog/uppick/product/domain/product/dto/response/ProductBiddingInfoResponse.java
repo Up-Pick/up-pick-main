@@ -8,10 +8,12 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class ProductBiddingInfoResponse {
+
 	private final Long id;
 	private final String name;
 	private final String image;
 	private final LocalDateTime endAt;
 	private final Long currentBid;
 	private final Long bidPrice;
+
 }

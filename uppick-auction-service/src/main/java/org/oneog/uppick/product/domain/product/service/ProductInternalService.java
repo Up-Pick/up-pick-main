@@ -8,12 +8,11 @@ import java.util.stream.Collectors;
 
 import org.oneog.uppick.common.dto.AuthMember;
 import org.oneog.uppick.common.exception.BusinessException;
-import org.oneog.uppick.product.domain.auction.service.AuctionExternalService;
+import org.oneog.uppick.product.domain.auction.service.AuctionInnerService;
 import org.oneog.uppick.product.domain.category.dto.response.CategoryInfoResponse;
 import org.oneog.uppick.product.domain.category.service.CategoryExternalServiceApi;
-import org.oneog.uppick.product.domain.member.service.GetMemberNicknameUseCase;
-import org.oneog.uppick.product.domain.member.service.GetProductBuyAtUseCase;
-import org.oneog.uppick.product.domain.member.service.GetProductSellAtUseCase;
+import org.oneog.uppick.product.domain.member.service.MemberInnerService;
+import org.oneog.uppick.product.domain.product.dto.projection.ProductDetailProjection;
 import org.oneog.uppick.product.domain.product.dto.projection.PurchasedProductInfoProjection;
 import org.oneog.uppick.product.domain.product.dto.projection.SearchProductProjection;
 import org.oneog.uppick.product.domain.product.dto.projection.SoldProductInfoProjection;
@@ -21,7 +20,7 @@ import org.oneog.uppick.product.domain.product.dto.request.ProductRegisterReques
 import org.oneog.uppick.product.domain.product.dto.request.SearchProductRequest;
 import org.oneog.uppick.product.domain.product.dto.response.ProductBiddingInfoResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductBuyAtResponse;
-import org.oneog.uppick.product.domain.product.dto.response.ProductInfoResponse;
+import org.oneog.uppick.product.domain.product.dto.response.ProductDetailResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductSellAtResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductSellingInfoResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductSimpleInfoResponse;
@@ -34,7 +33,7 @@ import org.oneog.uppick.product.domain.product.mapper.ProductMapper;
 import org.oneog.uppick.product.domain.product.repository.ProductQueryRepository;
 import org.oneog.uppick.product.domain.product.repository.ProductRepository;
 import org.oneog.uppick.product.domain.product.repository.SearchingQueryRepository;
-import org.oneog.uppick.product.domain.searching.service.SaveSearchHistoriesUseCase;
+import org.oneog.uppick.product.domain.searching.service.SearchingInnerService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -55,19 +54,20 @@ public class ProductInternalService {
 	private static final long DEFAULT_CATEGORY_ID = 1L;
 	private static final boolean DEFAULT_ONLY_NOT_SOLD = false;
 	private static final int DEFAULT_SIZE = 20;
-	private final SaveSearchHistoriesUseCase saveSearchHistoriesUseCase;
-	private final GetMemberNicknameUseCase getMemberNicknameUseCase;
-	private final GetProductSellAtUseCase getProductSellerInfos;
-	private final GetProductBuyAtUseCase getProductBuyAtUseCase;
+
 	// ***** Product Domain ***** //
 	private final ProductRepository productRepository;
 	private final ProductQueryRepository productQueryRepository;
 	private final SearchingQueryRepository searchingQueryRepository;
 	private final ProductMapper productMapper;
+
 	// ****** S3 ***** //
 	private final S3FileManager s3FileManager;
+
 	// ****** External Domain API ***** //
-	private final AuctionExternalService auctionExternalServiceApi;
+	private final AuctionInnerService auctionInnerService;
+	private final MemberInnerService memberInnerService;
+	private final SearchingInnerService searchingInnerService;
 	private final CategoryExternalServiceApi categoryExternalServiceApi;
 
 	// ***** Internal Service Method ***** //
@@ -88,12 +88,12 @@ public class ProductInternalService {
 
 		// 상품 및 경매 등록
 		productRepository.save(product);
-		auctionExternalServiceApi.registerAuction(product.getId(), registerId, request.getStartBid(),
+		auctionInnerService.registerAuction(product.getId(), registerId, request.getStartBid(),
 			product.getRegisteredAt(), request.getEndAt());
 	}
 
 	@Transactional
-	public ProductInfoResponse getProductInfoById(Long productId, AuthMember authMember) {
+	public ProductDetailResponse getProductInfoById(Long productId, AuthMember authMember) {
 
 		if (authMember != null) {
 			// 조회수 +1
@@ -101,14 +101,16 @@ public class ProductInternalService {
 			product.increaseViewCount();
 		}
 
-		ProductInfoResponse response = productQueryRepository.getProductInfoById(productId).orElseThrow(
+		ProductDetailProjection projection = productQueryRepository.getProductInfoById(productId).orElseThrow(
 			() -> new BusinessException(ProductErrorCode.CANNOT_READ_PRODUCT_INFO));
-		response.setSellerName(getMemberNicknameUseCase.execute(response.getSellerId()));
 
-		return response;
+		String sellerName = memberInnerService.getMemberNickname(projection.getSellerId());
+
+		return productMapper.combineProductDetailWithSeller(projection, sellerName);
 	}
 
 	public ProductSimpleInfoResponse getProductSimpleInfoById(Long productId) {
+
 		return productQueryRepository.getProductSimpleInfoById(productId).orElseThrow(
 			() -> new BusinessException(ProductErrorCode.CANNOT_READ_PRODUCT_SIMPLE_INFO));
 	}
@@ -126,7 +128,7 @@ public class ProductInternalService {
 			.toList();
 
 		// List<ProductId> -> List<ProductSellerInfoResponse> (각각의 id 값마다 seller Info 포함된 객체, 판매 시간 내림차순으로 반환받음)
-		List<ProductSellAtResponse> sellAtInfos = getProductSellerInfos.execute(productIds);
+		List<ProductSellAtResponse> sellAtInfos = memberInnerService.getProductSellAt(productIds);
 
 		// ProductList를 Map<ProductId, 객체> 형태로 변환
 		Map<Long, SoldProductInfoProjection> productInfoMap = productPageInfo.getContent()
@@ -155,7 +157,7 @@ public class ProductInternalService {
 			.map(PurchasedProductInfoProjection::getId)
 			.toList();
 
-		List<ProductBuyAtResponse> buyAtInfos = getProductBuyAtUseCase.execute(productIds);
+		List<ProductBuyAtResponse> buyAtInfos = memberInnerService.getProductBuyAt(productIds);
 
 		Map<Long, PurchasedProductInfoProjection> productInfoMap = productPageInfo.getContent()
 			.stream()
@@ -172,21 +174,25 @@ public class ProductInternalService {
 	}
 
 	public Page<ProductBiddingInfoResponse> getBiddingProductInfoByMemberId(Long memberId, Pageable pageable) {
+
 		return productQueryRepository.getBiddingProductInfoByMemberId(memberId, pageable);
 	}
 
 	public Page<ProductSellingInfoResponse> getSellingProductInfoByMemberId(Long memberId, Pageable pageable) {
+
 		return productQueryRepository.getSellingProductInfoMyMemberId(memberId, pageable);
 	}
 
 	// ***** Internal Private Method ***** //
 	private Product findProductByIdOrElseThrow(Long productId) {
+
 		return productRepository.findById(productId)
 			.orElseThrow(() -> new BusinessException(ProductErrorCode.PRODUCT_NOT_FOUND));
 	}
 
 	@Transactional
 	public Page<SearchProductInfoResponse> searchProduct(SearchProductRequest searchProductRequest) {
+
 		Long categoryId = searchProductRequest.getCategoryId();
 
 		if (categoryId == null) {
@@ -230,11 +236,13 @@ public class ProductInternalService {
 			searchProductRequest.getKeyword());
 
 		if (StringUtils.hasText(searchProductRequest.getKeyword())) {
+
 			String[] splitKeywords = searchProductRequest.getKeyword().trim().split(" ");
 			List<String> keywords = List.of(splitKeywords);
-			saveSearchHistoriesUseCase.execute(keywords);
+			searchingInnerService.saveSearchHistories(keywords);
 		}
 
 		return productMapper.toResponse(productProjections);
 	}
+
 }

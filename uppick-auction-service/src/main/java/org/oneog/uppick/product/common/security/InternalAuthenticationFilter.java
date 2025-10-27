@@ -20,24 +20,29 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 public class InternalAuthenticationFilter extends OncePerRequestFilter {
-    private final String internalApiSecret;
 
-    public InternalAuthenticationFilter(@Value("${internal.api.secret}") String internalApiSecret) {
-        this.internalApiSecret = internalApiSecret;
-    }
+	private final String internalApiSecret;
 
-    @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
-        @NonNull FilterChain filterChain)
-        throws ServletException,
-        IOException {
-        String internalAuthHeaderValue = request.getHeader(AuthConstant.INTERNAL_AUTH_HEADER);
-        if (Objects.equals(internalApiSecret, internalAuthHeaderValue)) {
-            EmptyAuthenticationToken authentication = new EmptyAuthenticationToken();
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-        } else {
-            log.warn("Missing authentication headers");
-        }
-        filterChain.doFilter(request, response);
-    }
+	public InternalAuthenticationFilter(@Value("${internal.api.secret}") String internalApiSecret) {
+
+		this.internalApiSecret = internalApiSecret;
+	}
+
+	@Override
+	protected void doFilterInternal(
+		@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
+		@NonNull FilterChain filterChain) throws ServletException, IOException {
+
+		String internalAuthHeaderValue = request.getHeader(AuthConstant.INTERNAL_AUTH_HEADER);
+
+		if (Objects.equals(internalApiSecret, internalAuthHeaderValue)) {
+			EmptyAuthenticationToken authentication = new EmptyAuthenticationToken();
+			SecurityContextHolder.getContext().setAuthentication(authentication);
+		} else {
+			log.warn("Missing authentication headers");
+		}
+		
+		filterChain.doFilter(request, response);
+	}
+
 }

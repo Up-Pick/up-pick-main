@@ -9,15 +9,20 @@ import feign.RequestTemplate;
 
 @Component
 public class InternalRequestInterceptor implements RequestInterceptor {
-    private final String internalApiSecret;
 
-    public InternalRequestInterceptor(@Value("${internal.api.secret}")
-    String internalApiSecret) {
-        this.internalApiSecret = internalApiSecret;
-    }
+	private final String internalApiSecret;
 
-    @Override
-    public void apply(RequestTemplate template) {
-        template.header(AuthConstant.INTERNAL_AUTH_HEADER, internalApiSecret);
-    }
+	public InternalRequestInterceptor(
+		@Value("${internal.api.secret}")
+		String internalApiSecret) {
+
+		this.internalApiSecret = internalApiSecret;
+	}
+
+	@Override
+	public void apply(RequestTemplate template) {
+
+		template.header(AuthConstant.INTERNAL_AUTH_HEADER, internalApiSecret);
+	}
+
 }

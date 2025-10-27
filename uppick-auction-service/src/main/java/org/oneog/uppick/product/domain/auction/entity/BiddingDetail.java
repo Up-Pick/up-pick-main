@@ -42,8 +42,11 @@ public class BiddingDetail {
 
 	@Builder
 	private BiddingDetail(Long auctionId, Long memberId, Long bidPrice) {
+
 		this.auctionId = auctionId;
 		this.memberId = memberId;
 		this.bidPrice = bidPrice;
 	}
+
 }
+

@@ -36,12 +36,12 @@ class CategoryControllerRestDocsTest extends RestDocsBase {
 			new CategoryResponse(4L, "패션", "남성 의류"));
 
 		// Mocking: Service 호출 시 위 리스트 반환 설정
-		given(categoryInternalService.getAllcategories()).willReturn(mockCategories);
+		given(categoryInternalService.getAllCategories()).willReturn(mockCategories);
 
 		// when & then
 		mockMvc.perform(
-			get("/api/v1/categories")
-				.accept(MediaType.APPLICATION_JSON))
+				get("/api/v1/categories")
+					.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("success").value(true))
 			.andExpect(jsonPath("data.size()").value(mockCategories.size()))
