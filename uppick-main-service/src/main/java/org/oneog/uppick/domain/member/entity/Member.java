@@ -23,6 +23,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 public class Member {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
@@ -46,23 +47,23 @@ public class Member {
 
 	@Builder
 	private Member(String email, String nickname, String password, Long credit) {
+
 		this.email = email;
 		this.nickname = nickname;
 		this.password = password;
 	}
 
 	public void addCredit(Long amount) {
+
 		if (amount <= 0) {
 			throw new BusinessException(MemberErrorCode.INVALID_CHARGE_AMOUNT);
 		}
 		this.credit += amount;
 	}
 
-	public void updateCredit(Long newCredit) {
-		this.credit = newCredit;
-	}
-
 	public void calculateCredit(long amount) {
+
 		this.credit += amount;
 	}
+
 }

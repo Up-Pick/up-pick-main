@@ -18,6 +18,8 @@ public class NotificationInternalController {
 
 	@PostMapping("/notifications")
 	public void sendNotification(@RequestBody SendNotificationRequest request) {
+
 		notificationInternalService.sendNotification(request);
 	}
+
 }

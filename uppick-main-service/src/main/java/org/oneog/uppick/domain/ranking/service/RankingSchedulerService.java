@@ -42,4 +42,5 @@ public class RankingSchedulerService {
 
 		log.info("[Scheduler] 키워드 랭킹 업데이트 종료");
 	}
+
 }

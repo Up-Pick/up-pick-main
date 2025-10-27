@@ -20,19 +20,22 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 public class SearchHistory {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
 
-    @Column(name = "keyword", nullable = false)
-    private String keyword;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
+	private Long id;
 
-    @CreatedDate
-    @Column(name = "searched_at", nullable = false, updatable = false)
-    private LocalDateTime searchedAt;
+	@Column(name = "keyword", nullable = false)
+	private String keyword;
 
-    public SearchHistory(String keyword) {
-        this.keyword = keyword;
-    }
+	@CreatedDate
+	@Column(name = "searched_at", nullable = false, updatable = false)
+	private LocalDateTime searchedAt;
+
+	public SearchHistory(String keyword) {
+
+		this.keyword = keyword;
+	}
+
 }

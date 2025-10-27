@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.oneog.uppick.domain.member.dto.request.CreditChargeRequest;
 import org.oneog.uppick.domain.member.dto.response.CreditChargeResponse;
 import org.oneog.uppick.domain.member.dto.response.CreditGetResponse;
-import org.oneog.uppick.domain.member.service.MemberInternalService;
+import org.oneog.uppick.domain.member.service.MemberService;
 import org.oneog.uppick.support.auth.WithMockAuthMember;
 import org.oneog.uppick.support.restdocs.RestDocsBase;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,7 @@ class MemberControllerRestDocsTest extends RestDocsBase {
 	private ObjectMapper objectMapper;
 
 	@MockitoBean
-	private MemberInternalService memberInternalService;
+	private MemberService memberInternalService;
 
 	@Test
 	@DisplayName("크레딧 충전 API Rest Docs 문서화")
@@ -46,11 +46,11 @@ class MemberControllerRestDocsTest extends RestDocsBase {
 
 		// when & then
 		mockMvc.perform(
-			post("/api/v1/members/me/credit/charge")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(request))
+				post("/api/v1/members/me/credit/charge")
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(objectMapper.writeValueAsString(request))
 
-		)
+			)
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.success").value(true))
 			.andExpect(jsonPath("$.message").value("요청에 성공했습니다."))
@@ -79,10 +79,10 @@ class MemberControllerRestDocsTest extends RestDocsBase {
 
 		// when & then
 		mockMvc.perform(
-			get("/api/v1/members/me/credit")
-				.accept(MediaType.APPLICATION_JSON)
+				get("/api/v1/members/me/credit")
+					.accept(MediaType.APPLICATION_JSON)
 
-		)
+			)
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.success").value(true))
 			.andExpect(jsonPath("$.message").value("요청에 성공했습니다."))

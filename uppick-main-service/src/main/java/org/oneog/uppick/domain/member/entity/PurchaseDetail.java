@@ -21,32 +21,35 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 public class PurchaseDetail {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
 
-    @Column(name = "auction_id", nullable = false)
-    private Long auctionId;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
+	private Long id;
 
-    @Column(name = "product_id", nullable = false)
-    private Long productId;
+	@Column(name = "auction_id", nullable = false)
+	private Long auctionId;
 
-    @Column(name = "buyer_id", nullable = false)
-    private Long buyerId;
+	@Column(name = "product_id", nullable = false)
+	private Long productId;
 
-    @Column(name = "purchase_price", nullable = false)
-    private Long purchasePrice;
+	@Column(name = "buyer_id", nullable = false)
+	private Long buyerId;
 
-    @CreatedDate
-    @Column(name = "purchase_at", nullable = false, updatable = false)
-    private LocalDateTime purchaseAt;
+	@Column(name = "purchase_price", nullable = false)
+	private Long purchasePrice;
 
-    @Builder
-    private PurchaseDetail(Long auctionId, Long productId, Long buyerId, Long purchasePrice) {
-        this.auctionId = auctionId;
-        this.productId = productId;
-        this.buyerId = buyerId;
-        this.purchasePrice = purchasePrice;
-    }
+	@CreatedDate
+	@Column(name = "purchase_at", nullable = false, updatable = false)
+	private LocalDateTime purchaseAt;
+
+	@Builder
+	private PurchaseDetail(Long auctionId, Long productId, Long buyerId, Long purchasePrice) {
+
+		this.auctionId = auctionId;
+		this.productId = productId;
+		this.buyerId = buyerId;
+		this.purchasePrice = purchasePrice;
+	}
+
 }

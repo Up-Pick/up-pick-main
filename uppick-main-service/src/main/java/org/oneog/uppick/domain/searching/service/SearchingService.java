@@ -11,15 +11,17 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class SearchingInternalService {
+public class SearchingService {
 
 	private final SearchHistoryJpaRepository repository;
 
 	@Transactional
 	public void saveSearchingHistories(List<String> keywords) {
+
 		keywords.forEach(keyword -> {
 			SearchHistory history = new SearchHistory(keyword);
 			repository.save(history);
 		});
 	}
+
 }

@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 public class SignupRequest {
+
 	@Email(message = "유효한 이메일 형식이어야 합니다.")
 	@NotBlank(message = "이메일은 필수입니다.")
 	private String email;
@@ -30,4 +31,5 @@ public class SignupRequest {
 		message = "비밀번호는 8~16자, 대문자 1개 이상, 소문자 1개 이상, 숫자 1개 이상, 특수문자 1개 이상을 포함해야 합니다."
 	)
 	private String password;
+
 }

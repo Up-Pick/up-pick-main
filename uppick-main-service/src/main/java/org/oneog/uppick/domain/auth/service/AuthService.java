@@ -7,7 +7,7 @@ import org.oneog.uppick.domain.auth.dto.request.SignupRequest;
 import org.oneog.uppick.domain.auth.dto.response.LoginResponse;
 import org.oneog.uppick.domain.auth.exception.AuthErrorCode;
 import org.oneog.uppick.domain.member.entity.Member;
-import org.oneog.uppick.domain.member.service.MemberExternalService;
+import org.oneog.uppick.domain.member.service.DefaultMemberInnerService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +18,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class AuthService {
-	private final MemberExternalService memberExternalService;
+
+	private final DefaultMemberInnerService memberExternalService;
 	private final PasswordEncoder passwordEncoder;
 	private final JwtUtil jwtUtil;
 
@@ -41,6 +42,7 @@ public class AuthService {
 	}
 
 	public LoginResponse login(LoginRequest loginRequest) {
+
 		Member member = memberExternalService.findByEmail(loginRequest.getEmail());
 
 		if (!passwordEncoder.matches(loginRequest.getPassword(), member.getPassword())) {
@@ -53,4 +55,5 @@ public class AuthService {
 		return new LoginResponse(token);
 
 	}
+
 }

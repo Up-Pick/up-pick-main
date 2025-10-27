@@ -35,8 +35,8 @@ public class AuthController {
 	public GlobalApiResponse<LoginResponse> login(
 		@Valid @RequestBody
 		LoginRequest loginRequest) {
-		LoginResponse loginResponse = authService.login(loginRequest);
 
+		LoginResponse loginResponse = authService.login(loginRequest);
 		return GlobalApiResponse.ok(loginResponse);
 	}
 

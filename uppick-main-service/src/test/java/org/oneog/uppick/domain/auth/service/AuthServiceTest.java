@@ -17,7 +17,7 @@ import org.oneog.uppick.domain.auth.dto.request.SignupRequest;
 import org.oneog.uppick.domain.auth.dto.response.LoginResponse;
 import org.oneog.uppick.domain.auth.exception.AuthErrorCode;
 import org.oneog.uppick.domain.member.entity.Member;
-import org.oneog.uppick.domain.member.service.MemberExternalService;
+import org.oneog.uppick.domain.member.service.DefaultMemberInnerService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -25,7 +25,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 class AuthServiceTest {
 
 	@Mock
-	private MemberExternalService memberExternalService;
+	private DefaultMemberInnerService memberExternalService;
 
 	@Mock
 	private PasswordEncoder passwordEncoder;

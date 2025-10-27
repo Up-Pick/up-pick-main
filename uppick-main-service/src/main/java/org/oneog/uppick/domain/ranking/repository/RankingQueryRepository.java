@@ -21,6 +21,7 @@ public class RankingQueryRepository {
 
 	//주간 인기검색어 상위 10개의 키워드 조회
 	public List<HotKeywordCalculationDto> findTop10HotKeywordsByCount() {
+
 		LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
 
 		return queryFactory
