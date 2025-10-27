@@ -2,20 +2,23 @@ package org.oneog.uppick.auction.domain.product.dto.projection;
 
 import java.time.LocalDateTime;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class SearchProductProjection {
 
-	private final long id;
-	private final String image;
-	private final String name;
-	private final LocalDateTime registeredAt;
-	private final LocalDateTime endAt;
-	private final Long currentBidPrice;
-	private final long minBidPrice;
-	private final boolean isSold;
+	private long id;
+	private String image;
+	private String name;
+	private LocalDateTime registeredAt;
+	private LocalDateTime endAt;
+	private Long currentBidPrice;
+	private long minBidPrice;
+	private boolean isSold;
 
 }
