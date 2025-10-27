@@ -20,7 +20,9 @@ public class RankingController {
 
 	@GetMapping("search-keywords")
 	public GlobalApiResponse<List<HotKeywordResponse>> getHotKeywords() {
+
 		List<HotKeywordResponse> responses = rankingService.getHotKeywords();
 		return GlobalApiResponse.ok(responses);
 	}
+
 }

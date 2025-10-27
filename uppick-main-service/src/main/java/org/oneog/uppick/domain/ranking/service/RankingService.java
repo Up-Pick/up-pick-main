@@ -19,15 +19,18 @@ public class RankingService {
 
 	//핫 키워드 TOP10 조회
 	public List<HotKeywordResponse> getHotKeywords() {
+
 		List<HotKeyword> hotKeywords = hotKeywordRepository.findAllByOrderByRankNoAsc();
 		return toHotKeywordResponseList(hotKeywords);
 	}
 
 	private HotKeywordResponse toResponse(HotKeyword hotKeyword) {
+
 		return new HotKeywordResponse(hotKeyword.getKeyword(), hotKeyword.getRankNo());
 	}
 
 	private List<HotKeywordResponse> toHotKeywordResponseList(List<HotKeyword> hotKeywords) {
+
 		return hotKeywords.stream()
 			.map(this::toResponse)
 			.toList();

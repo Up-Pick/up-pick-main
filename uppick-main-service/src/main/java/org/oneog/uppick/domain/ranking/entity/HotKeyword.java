@@ -26,6 +26,7 @@ public class HotKeyword {
 	private Integer rankNo;
 
 	public HotKeyword(String keyword, Integer rankNo) {
+
 		this.keyword = keyword;
 		this.rankNo = rankNo;
 	}
