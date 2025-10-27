@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class CategoryInternalService {
+public class CategoryService {
 
 	private final CategoryRepository categoryRepository;
 	private final CategoryMapper categoryMapper;
