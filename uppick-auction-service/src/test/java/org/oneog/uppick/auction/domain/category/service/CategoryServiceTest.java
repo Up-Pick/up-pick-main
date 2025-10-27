@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.oneog.uppick.auction.domain.category.dto.response.CategoryResponse;
 import org.oneog.uppick.auction.domain.category.entity.Category;
 import org.oneog.uppick.auction.domain.category.repository.CategoryRepository;
+import org.oneog.uppick.auction.domain.category.mapper.CategoryMapper;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -20,6 +21,9 @@ public class CategoryServiceTest {
 
 	@Mock
 	private CategoryRepository categoryRepository;
+
+	@Mock
+	private CategoryMapper categoryMapper;
 
 	@InjectMocks
 	private CategoryService categoryService;
@@ -43,6 +47,20 @@ public class CategoryServiceTest {
 
 		given(categoryRepository.findAll())
 			.willReturn(List.of(category1, category2));
+
+		given(categoryMapper.toResponse(category1))
+			.willReturn(CategoryResponse.builder()
+				.categoryId(1L)
+				.bigCategory("전자제품")
+				.smallCategory("휴대폰")
+				.build());
+
+		given(categoryMapper.toResponse(category2))
+			.willReturn(CategoryResponse.builder()
+				.categoryId(2L)
+				.bigCategory("가전")
+				.smallCategory("냉장고")
+				.build());
 
 		// when
 		List<CategoryResponse> responses = categoryService.getAllCategories();
