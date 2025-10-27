@@ -3,7 +3,7 @@ package org.oneog.uppick.domain.member.service;
 import org.oneog.uppick.domain.auth.dto.request.SignupRequest;
 import org.oneog.uppick.domain.member.entity.Member;
 
-public interface MemberExternalServiceApi {
+public interface MemberInnerService {
 
 	// /**
 	//  * 구매 내역 등록
@@ -33,10 +33,4 @@ public interface MemberExternalServiceApi {
 
 	Member findByEmail(String email);
 
-	/**
-	 * 특정 회원의 크레딧(포인트) 차감/추가
-	 * @param memberId 대상 회원 ID
-	 * @param amount   증감 금액
-	 */
-	void updateMemberCredit(Long memberId, Long amount);
 }

@@ -5,7 +5,7 @@ import org.oneog.uppick.common.dto.GlobalApiResponse;
 import org.oneog.uppick.domain.member.dto.request.CreditChargeRequest;
 import org.oneog.uppick.domain.member.dto.response.CreditChargeResponse;
 import org.oneog.uppick.domain.member.dto.response.CreditGetResponse;
-import org.oneog.uppick.domain.member.service.MemberInternalService;
+import org.oneog.uppick.domain.member.service.MemberService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/members")
 public class MemberController {
-	private final MemberInternalService memberInternalService;
+	private final MemberService memberService;
 
 	@PreAuthorize("isAuthenticated()")
 	@PostMapping("/me/credit/charge")
@@ -30,7 +30,7 @@ public class MemberController {
 		CreditChargeRequest creditChargeRequest,
 		@AuthenticationPrincipal
 		AuthMember authMember) {
-		CreditChargeResponse response = memberInternalService.chargeCredit(creditChargeRequest, authMember);
+		CreditChargeResponse response = memberService.chargeCredit(creditChargeRequest, authMember);
 		return GlobalApiResponse.ok(response);
 	}
 
@@ -39,7 +39,7 @@ public class MemberController {
 	public GlobalApiResponse<CreditGetResponse> getCredit(
 		@AuthenticationPrincipal
 		AuthMember authMember) {
-		CreditGetResponse response = memberInternalService.getCredit(authMember);
+		CreditGetResponse response = memberService.getCredit(authMember);
 		return GlobalApiResponse.ok(response);
 	}
 

@@ -28,7 +28,7 @@ public class MemberInternalServiceTest {
 	private MemberRepository memberRepository;
 
 	@InjectMocks
-	private MemberInternalService memberInternalService;
+	private MemberService memberInternalService;
 
 	private AuthMember authMember;
 	private Member testMember;

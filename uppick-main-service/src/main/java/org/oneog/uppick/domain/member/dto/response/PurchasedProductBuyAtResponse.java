@@ -2,12 +2,15 @@ package org.oneog.uppick.domain.member.dto.response;
 
 import java.time.LocalDateTime;
 
-import lombok.Builder;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class PurchasedProductBuyAtResponse {
-	private final Long id;
-	private final LocalDateTime buyAt;
+	private Long id;
+	private LocalDateTime buyAt;
 }
