@@ -9,7 +9,7 @@ concurrency:
 # 워크플로우가 언제 실행될지를 정의하는 "트리거" 설정입니다.
 on:
   push:
-    branches: [ "disabled" ] # 'dev' 브랜치에 코드가 푸시(push)될 때마다 실행됩니다.
+    branches: [ disabled ] # 'dev' 브랜치에 코드가 푸시(push)될 때마다 실행됩니다.
 
 # TODO 차후 개발용 CI/CD 파이프라인 수정해야합니다!
 
