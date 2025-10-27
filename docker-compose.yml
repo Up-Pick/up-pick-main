@@ -18,7 +18,7 @@ services:
       timeout: 5s
       retries: 5
 
-  product-mysql:
+  auction-mysql:
     image: mysql:8.0
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
@@ -28,7 +28,7 @@ services:
     ports:
       - "3308:3306"
     volumes:
-      - product_mysql_data:/var/lib/mysql
+      - auction_mysql_data:/var/lib/mysql
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       interval: 10s
@@ -41,27 +41,25 @@ services:
       dockerfile: uppick-api-gateway/Dockerfile
     environment:
       SPRING_PROFILES_ACTIVE: local
-      PRODUCT_SERVICE_URL: http://uppick-product-service:8080
+      AUCTION_SERVICE_URL: http://uppick-auction-service:8080
       MAIN_SERVICE_URL: http://uppick-main-service:8080
-      MAIN_GRPC_SERVICE_URL: static://uppick-main-service:9090
     ports:
       - "8080:8080"
 
-  uppick-product-service:
+  uppick-auction-service:
     build:
       context: .
-      dockerfile: uppick-product-service/Dockerfile
+      dockerfile: uppick-auction-service/Dockerfile
     environment:
       SPRING_PROFILES_ACTIVE: local
-      DB_URL: jdbc:mysql://product-mysql:3306/uppick_db
+      DB_URL: jdbc:mysql://auction-mysql:3306/uppick_db
       DB_USER: user
       DB_PASS: password
-      MAIN_GRPC_SERVICE_URL: static://uppick-main-service:9090
       GATEWAY_URL: http://uppick-api-gateway:8080
     ports:
       - "8082:8080"
     depends_on:
-      product-mysql:
+      auction-mysql:
         condition: service_healthy
 
   uppick-main-service:
@@ -82,4 +80,4 @@ services:
 
 volumes:
   main_mysql_data:
-  product_mysql_data:
+  auction_mysql_data:

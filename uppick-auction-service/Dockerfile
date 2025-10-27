@@ -12,16 +12,16 @@ COPY build.gradle ./
 # Copy common module
 COPY uppick-common ./uppick-common
 
-# Copy main module
-COPY uppick-main-service ./uppick-main-service
+# Copy member-service module
+COPY uppick-auction-service ./uppick-auction-service
 
 # Build the application
 WORKDIR /app
-RUN ./gradlew :uppick-main-service:build -x test
+RUN ./gradlew :uppick-auction-service:build -x test
 
 # Runtime stage
 FROM openjdk:21-jdk-slim
 WORKDIR /app
-COPY --from=build /app/uppick-main-service/build/libs/*.jar app.jar
+COPY --from=build /app/uppick-auction-service/build/libs/*.jar app.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
