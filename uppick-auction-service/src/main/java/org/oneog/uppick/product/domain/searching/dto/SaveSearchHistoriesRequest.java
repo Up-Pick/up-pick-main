@@ -10,4 +10,5 @@ import lombok.Getter;
 public class SaveSearchHistoriesRequest {
 
 	private List<String> keywords;
+
 }

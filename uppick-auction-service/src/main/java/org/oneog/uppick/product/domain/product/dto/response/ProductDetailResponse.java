@@ -7,13 +7,19 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class SoldProductInfoResponse {
+public class ProductDetailResponse {
 
 	private final Long id;
 	private final String name;
 	private final String description;
+	private final Long viewCount;
+	private final LocalDateTime registeredAt;
 	private final String image;
-	private final Long finalPrice;
-	private final LocalDateTime soldAt;
+
+	private final String categoryName;
+	private final Long minPrice;
+	private final Long currentBid;
+	private final LocalDateTime endAt;
+	private String sellerName;
 
 }

@@ -11,10 +11,10 @@ import java.util.Optional;
 import org.oneog.uppick.product.domain.auction.entity.AuctionStatus;
 import org.oneog.uppick.product.domain.auction.entity.QAuction;
 import org.oneog.uppick.product.domain.auction.entity.QBiddingDetail;
+import org.oneog.uppick.product.domain.product.dto.projection.ProductDetailProjection;
 import org.oneog.uppick.product.domain.product.dto.projection.PurchasedProductInfoProjection;
 import org.oneog.uppick.product.domain.product.dto.projection.SoldProductInfoProjection;
 import org.oneog.uppick.product.domain.product.dto.response.ProductBiddingInfoResponse;
-import org.oneog.uppick.product.domain.product.dto.response.ProductInfoResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductSellingInfoResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductSimpleInfoResponse;
 import org.springframework.data.domain.Page;
@@ -35,12 +35,12 @@ public class ProductQueryRepository {
 
 	private final JPAQueryFactory queryFactory;
 
-	public Optional<ProductInfoResponse> getProductInfoById(Long productId) {
+	public Optional<ProductDetailProjection> getProductInfoById(Long productId) {
 
-		ProductInfoResponse qResponse = queryFactory
+		ProductDetailProjection qResponse = queryFactory
 			.select(
 				Projections.constructor(
-					ProductInfoResponse.class,
+					ProductDetailProjection.class,
 					product.id,
 					product.name,
 					product.description,
@@ -223,4 +223,5 @@ public class ProductQueryRepository {
 
 		return new PageImpl<>(qResponses, pageable, total);
 	}
+
 }

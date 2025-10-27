@@ -2,7 +2,7 @@ package org.oneog.uppick.product.domain.auction.service;
 
 import java.time.LocalDateTime;
 
-public interface AuctionExternalService {
+public interface AuctionInnerService {
 
 	void registerAuction(Long id, Long registerId, Long startBid, LocalDateTime registeredAt, LocalDateTime endAt);
 

@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 @Repository
 @RequiredArgsConstructor
 public class SearchingQueryRepository {
+
 	private static final QAuction AUCTION = QAuction.auction;
 	private static final QProduct PRODUCT = QProduct.product;
 	private static final String SORT_END_AT_DESC = "endAtDesc";
@@ -36,6 +37,7 @@ public class SearchingQueryRepository {
 		boolean onlyNotSold,
 		String sortBy,
 		String keyword) {
+
 		BooleanExpression whereClause = buildWhereClause(categoryId, endAtFrom, onlyNotSold, keyword);
 
 		List<SearchProductProjection> results = buildSelectQuery(whereClause, sortBy, pageable).fetch();
@@ -47,9 +49,12 @@ public class SearchingQueryRepository {
 
 	private OrderSpecifier<?> getOrderSpecifier(String sortBy, QAuction auction,
 		QProduct product) {
+
 		if (SORT_END_AT_DESC.equals(sortBy)) {
+
 			return auction.endAt.desc();
 		} else {
+
 			// 기본: 등록 날짜 내림차순
 			return product.registeredAt.desc();
 		}
@@ -57,17 +62,21 @@ public class SearchingQueryRepository {
 
 	private BooleanExpression buildWhereClause(long categoryId, LocalDateTime endAtFrom, boolean onlyNotSold,
 		String keyword) {
+
 		BooleanExpression clause = categoryPredicate(categoryId);
 
 		if (endAtFrom != null) {
+
 			clause = clause.and(endAtPredicate(endAtFrom));
 		}
 
 		if (onlyNotSold) {
+
 			clause = clause.and(onlyNotSoldPredicate());
 		}
 
 		if (keyword != null && !keyword.isBlank()) {
+
 			clause = clause.and(nameContains(keyword));
 		}
 
@@ -75,23 +84,28 @@ public class SearchingQueryRepository {
 	}
 
 	private BooleanExpression categoryPredicate(long categoryId) {
+
 		return PRODUCT.categoryId.eq(categoryId);
 	}
 
 	private BooleanExpression endAtPredicate(LocalDateTime endAtFrom) {
+
 		return AUCTION.endAt.goe(endAtFrom);
 	}
 
 	private BooleanExpression onlyNotSoldPredicate() {
+
 		return AUCTION.status.ne(AuctionStatus.FINISHED);
 	}
 
 	private BooleanExpression nameContains(String keyword) {
+
 		return PRODUCT.name.contains(keyword);
 	}
 
 	private JPAQuery<SearchProductProjection> buildSelectQuery(BooleanExpression whereClause, String sortBy,
 		Pageable pageable) {
+
 		return jpaQueryFactory
 			.select(Projections.constructor(SearchProductProjection.class,
 				PRODUCT.id,
@@ -116,10 +130,12 @@ public class SearchingQueryRepository {
 	}
 
 	private JPAQuery<Long> buildCountQuery(BooleanExpression whereClause) {
+
 		return jpaQueryFactory
 			.select(PRODUCT.count())
 			.from(PRODUCT)
 			.join(AUCTION).on(PRODUCT.id.eq(AUCTION.productId))
 			.where(whereClause);
 	}
+
 }

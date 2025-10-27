@@ -20,7 +20,9 @@ public class CategoryController {
 
 	@GetMapping
 	public GlobalApiResponse<List<CategoryResponse>> getAllCategories() {
-		List<CategoryResponse> allCategories = categoryInternalService.getAllcategories();
+
+		List<CategoryResponse> allCategories = categoryInternalService.getAllCategories();
 		return GlobalApiResponse.ok(allCategories);
 	}
+
 }

@@ -11,6 +11,8 @@ public enum AuctionStatus {
 	private final String description;
 
 	AuctionStatus(String description) {
+
 		this.description = description;
 	}
+
 }

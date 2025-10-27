@@ -6,7 +6,7 @@ import org.oneog.uppick.common.dto.GlobalPageResponse;
 import org.oneog.uppick.product.domain.product.dto.request.ProductRegisterRequest;
 import org.oneog.uppick.product.domain.product.dto.request.SearchProductRequest;
 import org.oneog.uppick.product.domain.product.dto.response.ProductBiddingInfoResponse;
-import org.oneog.uppick.product.domain.product.dto.response.ProductInfoResponse;
+import org.oneog.uppick.product.domain.product.dto.response.ProductDetailResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductSellingInfoResponse;
 import org.oneog.uppick.product.domain.product.dto.response.ProductSimpleInfoResponse;
 import org.oneog.uppick.product.domain.product.dto.response.PurchasedProductInfoResponse;
@@ -41,13 +41,8 @@ public class ProductController {
 	// 판매 상품 등록
 	@PreAuthorize("isAuthenticated()")
 	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public GlobalApiResponse<Void> registerProduct(
-		@Valid @RequestPart("product")
-		ProductRegisterRequest request,
-		@RequestPart("image")
-		MultipartFile image,
-		@AuthenticationPrincipal
-		AuthMember authMember) {
+	public GlobalApiResponse<Void> registerProduct(@Valid @RequestPart("product") ProductRegisterRequest request,
+		@RequestPart("image") MultipartFile image, @AuthenticationPrincipal AuthMember authMember) {
 
 		productInternalService.registerProduct(request, image, authMember.getMemberId());
 		return GlobalApiResponse.ok(null);
@@ -55,13 +50,10 @@ public class ProductController {
 
 	// 상품 상세 조회
 	@GetMapping("/{productId}")
-	public GlobalApiResponse<ProductInfoResponse> getProductInfo(
-		@PathVariable
-		Long productId,
-		@AuthenticationPrincipal
-		AuthMember authMember) {
+	public GlobalApiResponse<ProductDetailResponse> getProductInfo(@PathVariable Long productId,
+		@AuthenticationPrincipal AuthMember authMember) {
 
-		ProductInfoResponse response = productInternalService.getProductInfoById(productId, authMember);
+		ProductDetailResponse response = productInternalService.getProductInfoById(productId, authMember);
 		return GlobalApiResponse.ok(response);
 	}
 
@@ -77,11 +69,8 @@ public class ProductController {
 	// 판매 완료된 상품 내역 조회
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/sold/me")
-	public GlobalPageResponse<SoldProductInfoResponse> getSoldProducts(
-		@AuthenticationPrincipal
-		AuthMember authMember,
-		@PageableDefault(size = 20)
-		Pageable pageable) {
+	public GlobalPageResponse<SoldProductInfoResponse> getSoldProducts(@AuthenticationPrincipal AuthMember authMember,
+		@PageableDefault(size = 20) Pageable pageable) {
 
 		Page<SoldProductInfoResponse> responses = productInternalService.getSoldProductInfosByMemberId(
 			authMember.getMemberId(), pageable);
@@ -92,10 +81,7 @@ public class ProductController {
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/purchased/me")
 	public GlobalPageResponse<PurchasedProductInfoResponse> getPurchasedProducts(
-		@AuthenticationPrincipal
-		AuthMember authMember,
-		@PageableDefault(size = 20)
-		Pageable pageable) {
+		@AuthenticationPrincipal AuthMember authMember, @PageableDefault(size = 20) Pageable pageable) {
 
 		Page<PurchasedProductInfoResponse> responses = productInternalService.getPurchasedProductInfoByMemberId(
 			authMember.getMemberId(), pageable);
@@ -106,10 +92,7 @@ public class ProductController {
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/bidding/me")
 	public GlobalPageResponse<ProductBiddingInfoResponse> getBiddingProducts(
-		@AuthenticationPrincipal
-		AuthMember authMember,
-		@PageableDefault
-		Pageable pageable) {
+		@AuthenticationPrincipal AuthMember authMember, @PageableDefault Pageable pageable) {
 
 		Page<ProductBiddingInfoResponse> responses = productInternalService.getBiddingProductInfoByMemberId(
 			authMember.getMemberId(), pageable);
@@ -120,10 +103,7 @@ public class ProductController {
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/selling/me")
 	public GlobalPageResponse<ProductSellingInfoResponse> getSellingProducts(
-		@AuthenticationPrincipal
-		AuthMember authMember,
-		@PageableDefault
-		Pageable pageable) {
+		@AuthenticationPrincipal AuthMember authMember, @PageableDefault Pageable pageable) {
 
 		Page<ProductSellingInfoResponse> responses = productInternalService.getSellingProductInfoByMemberId(
 			authMember.getMemberId(), pageable);
@@ -132,13 +112,16 @@ public class ProductController {
 
 	@PostMapping("/search")
 	public GlobalApiResponse<GlobalPageResponse<SearchProductInfoResponse>> searchProduct(
-		@Valid @RequestBody(required = false)
-		SearchProductRequest searchProductRequest) {
+		@Valid @RequestBody(required = false) SearchProductRequest searchProductRequest) {
+
 		if (searchProductRequest == null) {
 			searchProductRequest = SearchProductRequest.ofDefault();
 		}
+
 		System.out.println(searchProductRequest.getKeyword());
+
 		return GlobalApiResponse.ok(
 			GlobalPageResponse.of(productInternalService.searchProduct(searchProductRequest)));
 	}
+
 }

@@ -28,6 +28,7 @@ public class BiddingDetailQueryRepository {
 
 	// 현재 경매의 최고 입찰자 조회 (최근 입찰자 = 최고가 입찰자)
 	public Optional<Long> findTopBidderIdByAuctionId(Long auctionId) {
+
 		Long bidderId = jpaQueryFactory
 			.select(biddingDetail.memberId)
 			.from(biddingDetail)
@@ -38,4 +39,5 @@ public class BiddingDetailQueryRepository {
 
 		return Optional.ofNullable(bidderId);
 	}
+
 }

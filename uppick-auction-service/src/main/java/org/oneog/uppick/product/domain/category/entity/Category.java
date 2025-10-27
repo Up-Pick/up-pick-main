@@ -2,6 +2,8 @@ package org.oneog.uppick.product.domain.category.entity;
 
 import java.time.LocalDateTime;
 
+import org.springframework.data.annotation.CreatedDate;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -30,7 +32,8 @@ public class Category {
 	@Column(nullable = false)
 	private String small;
 
+	@CreatedDate
 	@Column(nullable = false, updatable = false)
-	@Builder.Default
-	private LocalDateTime createdAt = LocalDateTime.now();
+	private LocalDateTime createdAt;
+
 }

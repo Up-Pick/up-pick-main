@@ -6,9 +6,11 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class SoldProductInfoProjection {
+
 	private final Long id;
 	private final String name;
 	private final String description;
 	private final String image;
 	private final Long finalPrice;
+
 }

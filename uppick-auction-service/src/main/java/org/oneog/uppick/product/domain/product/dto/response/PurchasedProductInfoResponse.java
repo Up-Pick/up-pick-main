@@ -8,9 +8,11 @@ import lombok.Getter;
 @Getter
 @Builder
 public class PurchasedProductInfoResponse {
+
 	private final Long id;
 	private final String name;
 	private final String image;
 	private final Long finalPrice;
 	private final LocalDateTime buyAt;
+
 }

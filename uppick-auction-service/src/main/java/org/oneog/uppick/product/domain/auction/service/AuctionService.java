@@ -11,11 +11,10 @@ import org.oneog.uppick.product.domain.auction.mapper.AuctionMapper;
 import org.oneog.uppick.product.domain.auction.repository.AuctionRepository;
 import org.oneog.uppick.product.domain.auction.repository.BiddingDetailQueryRepository;
 import org.oneog.uppick.product.domain.auction.repository.BiddingDetailRepository;
-import org.oneog.uppick.product.domain.member.service.GetMemberCreditUseCase;
-import org.oneog.uppick.product.domain.member.service.UpdateMemberCreditUseCase;
+import org.oneog.uppick.product.domain.member.service.MemberInnerService;
 import org.oneog.uppick.product.domain.notification.dto.request.SendNotificationRequest;
 import org.oneog.uppick.product.domain.notification.enums.NotificationType;
-import org.oneog.uppick.product.domain.notification.service.SendNotificationUseCase;
+import org.oneog.uppick.product.domain.notification.service.NotificationInnerService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class AuctionInternalService {
+public class AuctionService {
 
 	// ***** Auction Domain ***** //
 	private final AuctionRepository auctionRepository;
@@ -35,14 +34,15 @@ public class AuctionInternalService {
 
 	private final BiddingDetailRepository biddingDetailRepository;
 	private final BiddingDetailQueryRepository biddingDetailQueryRepository;
-	// ****** External Domain API ***** //
-	private final UpdateMemberCreditUseCase updateMemberCreditUseCase;
-	private final SendNotificationUseCase sendNotificationUseCase;
-	private final GetMemberCreditUseCase getMemberCreditUseCase;
 
-	//특정 상품에 입찰 시도를 한다
+	// ****** Inner Service ***** //
+	private final MemberInnerService memberInnerService;
+	private final NotificationInnerService notificationInnerService;
+
+	// 특정 상품에 입찰 시도를 한다
 	@Transactional
 	public void bid(@Valid AuctionBidRequest request, long auctionId, long memberId) {
+
 		try {
 			Auction auction = findAuctionById(auctionId);
 
@@ -56,7 +56,7 @@ public class AuctionInternalService {
 			Long minPrice = auction.getMinPrice();
 
 			// 포인트 잔액 확인
-			Long memberCredit = getMemberCreditUseCase.execute(memberId);
+			Long memberCredit = memberInnerService.getMemberCredit(memberId);
 			if (biddingPrice > memberCredit) {
 				throw new BusinessException(AuctionErrorCode.INSUFFICIENT_CREDIT);
 			}
@@ -77,15 +77,15 @@ public class AuctionInternalService {
 			if (previousBidderId != null && previousBidderId.equals(memberId) && previousBidPrice != null) {
 				// 본인 재입찰: 차액만 차감
 				long additionalAmount = biddingPrice - previousBidPrice;
-				updateMemberCreditUseCase.execute(memberId, -additionalAmount);
+				memberInnerService.updateMemberCredit(memberId, -additionalAmount);
 				log.info("기존 입찰자({}) 재입찰: 추가 차감 {}", memberId, additionalAmount);
 			} else {
 				// 새 입찰자: 전체 금액 차감
-				updateMemberCreditUseCase.execute(memberId, -biddingPrice);
+				memberInnerService.updateMemberCredit(memberId, -biddingPrice);
 
 				// 이전 최고 입찰자 환불
 				if (previousBidderId != null && previousBidPrice != null) {
-					updateMemberCreditUseCase.execute(previousBidderId, previousBidPrice);
+					memberInnerService.updateMemberCredit(previousBidderId, previousBidPrice);
 					log.info("이전 최고 입찰자({}) 환불: {}", previousBidderId, previousBidPrice);
 				}
 			}
@@ -111,6 +111,7 @@ public class AuctionInternalService {
 	}
 
 	private Auction findAuctionById(long auctionId) {
+
 		return auctionRepository.findById(auctionId)
 			.orElseThrow(() -> new BusinessException(AuctionErrorCode.AUCTION_FOUND_FOUND));
 	}
@@ -128,10 +129,10 @@ public class AuctionInternalService {
 			.string2("회원 " + bidderId + "님이 " + biddingPrice + "원으로 입찰했습니다.")
 			.build();
 
-		sendNotificationUseCase.execute(requestToSeller);
+		notificationInnerService.sendNotification(requestToSeller);
 
 		// 해당 경매의 다른 입찰자들에게 알림
-		//JPA메서드로 가져오려다가 자꾸 타입 불일치 문제가 나와서 변경
+		// JPA메서드로 가져오려다가 자꾸 타입 불일치 문제가 나와서 변경
 		List<Long> participantIds = biddingDetailQueryRepository.findDistinctBidderIdsByAuctionId(auction.getId());
 		for (Long participantId : participantIds) {
 			if (!participantId.equals(bidderId)) {
@@ -144,8 +145,9 @@ public class AuctionInternalService {
 					.string2("다른 사용자가 " + biddingPrice + "원으로 입찰했습니다. 다시 입찰해보세요!")
 					.build();
 
-				sendNotificationUseCase.execute(requestToParticipant);
+				notificationInnerService.sendNotification(requestToParticipant);
 			}
 		}
 	}
+
 }

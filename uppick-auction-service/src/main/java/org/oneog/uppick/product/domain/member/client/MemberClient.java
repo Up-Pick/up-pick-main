@@ -38,4 +38,5 @@ public interface MemberClient {
 
 	@PostMapping("/main/internal/v1/members/sell-detail")
 	void registerSellDetail(@RequestParam RegisterSellDetailRequest request);
+
 }

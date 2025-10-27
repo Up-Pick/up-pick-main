@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 public class AuctionMapper {
 
 	public Auction registerToEntity(Long productID, Long minPrice, LocalDateTime registeredAt, LocalDateTime endAt) {
+
 		return Auction.builder()
 			.productId(productID)
 			.currentPrice(null)
@@ -22,10 +23,12 @@ public class AuctionMapper {
 	}
 
 	public BiddingDetail toEntity(Long auctionId, Long memberId, Long bidPrice) {
+
 		return BiddingDetail.builder()
 			.auctionId(auctionId)
 			.memberId(memberId)
 			.bidPrice(bidPrice)
 			.build();
 	}
+
 }

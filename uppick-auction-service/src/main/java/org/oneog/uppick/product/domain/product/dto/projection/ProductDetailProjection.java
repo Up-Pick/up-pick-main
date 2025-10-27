@@ -7,15 +7,19 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class SearchProductProjection {
+public class ProductDetailProjection {
 
-	private final long id;
-	private final String image;
+	private final Long id;
 	private final String name;
+	private final String description;
+	private final Long viewCount;
 	private final LocalDateTime registeredAt;
+	private final String image;
+
+	private final String categoryName;
+	private final Long minPrice;
+	private final Long currentBid;
 	private final LocalDateTime endAt;
-	private final Long currentBidPrice;
-	private final long minBidPrice;
-	private final boolean isSold;
+	private final Long sellerId;
 
 }

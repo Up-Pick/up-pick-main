@@ -12,11 +12,10 @@ import org.oneog.uppick.product.domain.auction.repository.AuctionRepository;
 import org.oneog.uppick.product.domain.auction.repository.BiddingDetailRepository;
 import org.oneog.uppick.product.domain.member.dto.request.RegisterPurchaseDetailRequest;
 import org.oneog.uppick.product.domain.member.dto.request.RegisterSellDetailRequest;
-import org.oneog.uppick.product.domain.member.service.RegisterPurchaseDetailUseCase;
-import org.oneog.uppick.product.domain.member.service.RegisterSellDetailUseCase;
+import org.oneog.uppick.product.domain.member.service.MemberInnerService;
 import org.oneog.uppick.product.domain.notification.dto.request.SendNotificationRequest;
 import org.oneog.uppick.product.domain.notification.enums.NotificationType;
-import org.oneog.uppick.product.domain.notification.service.SendNotificationUseCase;
+import org.oneog.uppick.product.domain.notification.service.NotificationInnerService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,14 +33,14 @@ public class AuctionSchedulerService {
 	private final BiddingDetailRepository biddingDetailRepository;
 	private final AuctionQueryRepository auctionQueryRepository;
 
-	// ****** External Domain API ***** //
-	private final RegisterPurchaseDetailUseCase registerPurchaseDetailUseCase;
-	private final RegisterSellDetailUseCase registerSellDetailUseCase;
-	private final SendNotificationUseCase sendNotificationUseCase;
+	// ****** Inner Service API ***** //
+	private final MemberInnerService memberInnerService;
+	private final NotificationInnerService notificationInnerService;
 
 	@Transactional
 	@Scheduled(cron = "0 0 * * * *") // 매 시 정각마다 실행
 	public void confirmFinishedAuctions() {
+
 		LocalDateTime now = LocalDateTime.now();
 
 		// 종료 시간이 현재 시간 이전인 '진행 중' 경매 조회
@@ -60,6 +59,7 @@ public class AuctionSchedulerService {
 	}
 
 	private void processAuctionResult(Auction auction) {
+
 		Long auctionId = auction.getId();
 
 		// 최고가 입찰 내역 1건 조회 (가격 기준 내림차순)
@@ -79,6 +79,7 @@ public class AuctionSchedulerService {
 	}
 
 	private void handleExpiredAuction(Auction auction) {
+
 		Long auctionId = auction.getId();
 
 		try {
@@ -102,6 +103,7 @@ public class AuctionSchedulerService {
 	 * - 경매 상태 업데이트
 	 */
 	private void handleAuctionCompletion(Auction auction, BiddingDetail winner) {
+
 		Long buyerId = winner.getMemberId(); //상품을 구매한사람
 		Long productId = auction.getProductId();
 		Long finalPrice = winner.getBidPrice();
@@ -125,8 +127,9 @@ public class AuctionSchedulerService {
 	 *  구매 내역 등록
 	 */
 	private void createPurchaseHistory(Long auctionId, Long buyerId, Long productId, Long price) {
+
 		RegisterPurchaseDetailRequest request = new RegisterPurchaseDetailRequest(auctionId, buyerId, productId, price);
-		registerPurchaseDetailUseCase.execute(request);
+		memberInnerService.registerPurchaseDetail(request);
 		log.info("구매내역 등록: 구매자={}, 상품={}, 금액={}", buyerId, productId, price);
 	}
 
@@ -134,8 +137,9 @@ public class AuctionSchedulerService {
 	 *  판매 내역 등록
 	 */
 	private void createSellHistory(Long auctionId, Long sellerId, Long productId, Long price) {
+
 		RegisterSellDetailRequest request = new RegisterSellDetailRequest(auctionId, sellerId, productId, price);
-		registerSellDetailUseCase.execute(request);
+		memberInnerService.registerSellDetail(request);
 		log.info("판매내역 등록: 판매자={}, 상품={}, 금액={}", sellerId, productId, price);
 	}
 
@@ -143,6 +147,7 @@ public class AuctionSchedulerService {
 	 *  낙찰자 알림 발송
 	 */
 	private void sendWinnerNotification(Long memberId, Long productId, Long price) {
+
 		String productName = auctionQueryRepository.findProductNameByProductId(productId);
 
 		SendNotificationRequest request = SendNotificationRequest.builder()
@@ -152,7 +157,7 @@ public class AuctionSchedulerService {
 			.string2("상품 '" + productName + "'을 " + price + "원에 낙찰받았습니다.")
 			.build();
 
-		sendNotificationUseCase.execute(request);
+		notificationInnerService.sendNotification(request);
 
 		log.info("[Notification] 낙찰자 {}에게 알림 전송 완료", memberId);
 	}
@@ -161,8 +166,10 @@ public class AuctionSchedulerService {
 	 *  경매 상태 변경 후 DB 반영
 	 */
 	private void updateAuctionStatus(Auction auction) {
+
 		auction.markAsSold();
 		auctionRepository.save(auction);
 		log.info("경매 {} 상태 저장 완료", auction.getId());
 	}
+
 }

@@ -10,4 +10,5 @@ public interface SearchingClient {
 
 	@PostMapping("/main/internal/v1/searching")
 	void saveSearchHistory(@RequestBody SaveSearchHistoriesRequest keyword);
+
 }
