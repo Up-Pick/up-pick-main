@@ -26,17 +26,13 @@ public class RankingControllerRestDocsTest extends RestDocsBase {
 	//핫키워드 조회
 	@Test
 	void getHotKeywords_정상적인상황_핫키워드조회성공() throws Exception {
+
 		List<HotKeywordResponse> responses = List.of(
 			new HotKeywordResponse("유영관", 1),
 			new HotKeywordResponse("정직한", 2),
 			new HotKeywordResponse("김석준", 3),
 			new HotKeywordResponse("백도현", 4),
-			new HotKeywordResponse("박수현", 5),
-			new HotKeywordResponse("김선용", 6),
-			new HotKeywordResponse("박성규", 7),
-			new HotKeywordResponse("안형욱", 8),
-			new HotKeywordResponse("현석훈", 9),
-			new HotKeywordResponse("최원빈", 10));
+			new HotKeywordResponse("박수현", 5));
 
 		given(rankingInternalService.getHotKeywords()).willReturn(responses);
 
@@ -53,7 +49,6 @@ public class RankingControllerRestDocsTest extends RestDocsBase {
 					responseFields(
 						fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
 						fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-						fieldWithPath("data[]").type(JsonFieldType.ARRAY).description("인기 검색어 목록"),
 						fieldWithPath("data[].keyword").type(JsonFieldType.STRING).description("검색어"),
 						fieldWithPath("data[].rankNo").type(JsonFieldType.NUMBER).description("순위"))));
 	}
