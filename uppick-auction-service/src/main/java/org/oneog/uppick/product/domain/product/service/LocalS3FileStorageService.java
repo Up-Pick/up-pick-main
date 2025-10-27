@@ -12,7 +12,7 @@ public class LocalS3FileStorageService implements S3FileManager {
 	public String store(MultipartFile file) {
 
 		// 랜덤 문자열의 파일 이름 리턴
-		return "local-" + java.util.UUID.randomUUID().toString() + "-" + file.getOriginalFilename();
+		return "local-" + java.util.UUID.randomUUID() + "-" + file.getOriginalFilename();
 	}
 
 }

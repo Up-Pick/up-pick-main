@@ -1,26 +1,10 @@
 package org.oneog.uppick.product.domain.auction.mapper;
 
-import java.time.LocalDateTime;
-
-import org.oneog.uppick.product.domain.auction.entity.Auction;
-import org.oneog.uppick.product.domain.auction.entity.AuctionStatus;
 import org.oneog.uppick.product.domain.auction.entity.BiddingDetail;
 import org.springframework.stereotype.Component;
 
 @Component
 public class AuctionMapper {
-
-	public Auction registerToEntity(Long productID, Long minPrice, LocalDateTime registeredAt, LocalDateTime endAt) {
-
-		return Auction.builder()
-			.productId(productID)
-			.currentPrice(null)
-			.minPrice(minPrice)
-			.status(AuctionStatus.IN_PROGRESS)
-			.startAt(registeredAt)
-			.endAt(endAt)
-			.build();
-	}
 
 	public BiddingDetail toEntity(Long auctionId, Long memberId, Long bidPrice) {
 
