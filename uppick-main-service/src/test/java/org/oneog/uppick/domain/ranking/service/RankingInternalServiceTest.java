@@ -13,7 +13,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.oneog.uppick.domain.ranking.dto.response.HotKeywordResponse;
 import org.oneog.uppick.domain.ranking.entity.HotKeyword;
-import org.oneog.uppick.domain.ranking.mapper.RankingMapper;
 import org.oneog.uppick.domain.ranking.repository.HotKeywordRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -26,7 +25,7 @@ class RankingInternalServiceTest {
 	private RankingMapper rankingMapper;
 
 	@InjectMocks
-	private RankingInternalService rankingInternalService;
+	private RankingService rankingInternalService;
 
 	// === 주간 키워드 조회 ===
 	@Test

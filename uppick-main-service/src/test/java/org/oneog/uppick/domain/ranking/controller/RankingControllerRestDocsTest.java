@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.oneog.uppick.domain.ranking.dto.response.HotKeywordResponse;
-import org.oneog.uppick.domain.ranking.service.RankingInternalService;
+import org.oneog.uppick.domain.ranking.service.RankingService;
 import org.oneog.uppick.support.restdocs.RestDocsBase;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
@@ -21,7 +21,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 public class RankingControllerRestDocsTest extends RestDocsBase {
 
 	@MockitoBean
-	private RankingInternalService rankingInternalService;
+	private RankingService rankingInternalService;
 
 	//핫키워드 조회
 	@Test
