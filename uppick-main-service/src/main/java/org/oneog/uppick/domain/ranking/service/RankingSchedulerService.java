@@ -2,7 +2,7 @@ package org.oneog.uppick.domain.ranking.service;
 
 import java.util.List;
 
-import org.oneog.uppick.domain.ranking.dto.HotKeywordCalculationDto;
+import org.oneog.uppick.domain.ranking.dto.projection.HotKeywordProjection;
 import org.oneog.uppick.domain.ranking.entity.HotKeyword;
 import org.oneog.uppick.domain.ranking.repository.HotKeywordRepository;
 import org.oneog.uppick.domain.ranking.repository.RankingQueryRepository;
@@ -31,11 +31,11 @@ public class RankingSchedulerService {
 		hotKeywordRepository.deleteAll();
 
 		//핫 키워드 랭킹 가져오기(키워드, 검색 횟수)
-		List<HotKeywordCalculationDto> rankings = rankingQueryRepository.findTop10HotKeywordsByCount();
+		List<HotKeywordProjection> rankings = rankingQueryRepository.findTop10HotKeywordsByCount();
 
 		//핫 키워드 랭킹 rankNo 설정 및 저장
 		for (int i = 0; i < rankings.size(); i++) {
-			HotKeywordCalculationDto dto = rankings.get(i);
+			HotKeywordProjection dto = rankings.get(i);
 			HotKeyword hotKeyword = new HotKeyword(dto.getKeyword(), i + 1);
 			hotKeywordRepository.save(hotKeyword);
 		}

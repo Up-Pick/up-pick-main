@@ -1,4 +1,4 @@
-package org.oneog.uppick.domain.ranking.dto;
+package org.oneog.uppick.domain.ranking.dto.projection;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class HotKeywordCalculationDto {
+@AllArgsConstructor
+public class HotKeywordProjection {
 
 	private String keyword;
 
