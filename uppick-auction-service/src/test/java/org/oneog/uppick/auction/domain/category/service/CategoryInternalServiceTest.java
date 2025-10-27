@@ -13,7 +13,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.oneog.uppick.auction.domain.category.dto.response.CategoryResponse;
 import org.oneog.uppick.auction.domain.category.entity.Category;
 import org.oneog.uppick.auction.domain.category.repository.CategoryRepository;
-import org.oneog.uppick.auction.domain.category.service.CategoryInternalService;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -23,7 +22,7 @@ public class CategoryInternalServiceTest {
 	private CategoryRepository categoryRepository;
 
 	@InjectMocks
-	private CategoryInternalService categoryInternalService;
+	private CategoryService categoryService;
 
 	@Test
 	void getAllCategories_실행시_성공() {
@@ -46,7 +45,7 @@ public class CategoryInternalServiceTest {
 			.willReturn(List.of(category1, category2));
 
 		// when
-		List<CategoryResponse> responses = categoryInternalService.getAllCategories();
+		List<CategoryResponse> responses = categoryService.getAllCategories();
 
 		// then
 		assertThat(responses).hasSize(2);
