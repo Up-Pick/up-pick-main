@@ -8,9 +8,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.oneog.uppick.auction.domain.auction.controller.AuctionController;
 import org.oneog.uppick.auction.domain.auction.dto.request.AuctionBidRequest;
 import org.oneog.uppick.auction.domain.auction.service.AuctionService;
 import org.oneog.uppick.auction.support.auth.WithMockAuthMember;
@@ -33,7 +31,6 @@ class AuctionControllerRestDocsTest extends RestDocsBase {
 	private AuctionService auctionService;
 
 	@Test
-	@DisplayName("경매 입찰 API를 Rest Docs로 문서화한다")
 	void auctionBid_정상적인입력_입찰성공() throws Exception {
 
 		// given
@@ -44,10 +41,10 @@ class AuctionControllerRestDocsTest extends RestDocsBase {
 
 		// when & then
 		mockMvc.perform(
-			post("/api/v1/auctions/{auctionId}/bid", auctionId)
-				.header("Authorization", "Bearer token")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(request)))
+				post("/api/v1/auctions/{auctionId}/bid", auctionId)
+					.header("Authorization", "Bearer token")
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(objectMapper.writeValueAsString(request)))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("success").value(true))
 			.andExpect(jsonPath("message").value("요청에 성공했습니다."))
