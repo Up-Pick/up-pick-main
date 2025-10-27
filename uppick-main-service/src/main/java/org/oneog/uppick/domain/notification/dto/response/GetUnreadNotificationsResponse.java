@@ -5,22 +5,26 @@ import java.util.List;
 
 import org.oneog.uppick.domain.notification.entity.NotificationType;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class GetUnreadNotificationsResponse {
-    private final List<NotificationDetail> notifications;
+	private List<NotificationDetail> notifications;
 
-    @Getter
-    @AllArgsConstructor
-    @Builder
-    public static class NotificationDetail {
-        private final NotificationType type;
-        private final String title;
-        private final String message;
-        private final LocalDateTime notifiedAt;
-    }
+	@Getter
+	@NoArgsConstructor(access = AccessLevel.PROTECTED)
+	@AllArgsConstructor(access = AccessLevel.PRIVATE)
+	@Builder
+	public static class NotificationDetail {
+		private NotificationType type;
+		private String title;
+		private String message;
+		private LocalDateTime notifiedAt;
+	}
 }
