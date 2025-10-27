@@ -1,16 +1,19 @@
 package org.oneog.uppick.auction.domain.product.dto.projection;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class SoldProductInfoProjection {
 
-	private final Long id;
-	private final String name;
-	private final String description;
-	private final String image;
-	private final Long finalPrice;
+	private Long id;
+	private String name;
+	private String description;
+	private String image;
+	private Long finalPrice;
 
 }

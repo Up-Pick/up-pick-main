@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 import org.oneog.uppick.auction.domain.auction.service.AuctionInnerService;
 import org.oneog.uppick.auction.domain.category.dto.response.CategoryInfoResponse;
-import org.oneog.uppick.auction.domain.category.service.CategoryExternalServiceApi;
+import org.oneog.uppick.auction.domain.category.service.CategoryInnerService;
 import org.oneog.uppick.auction.domain.member.service.MemberInnerService;
 import org.oneog.uppick.auction.domain.product.dto.projection.ProductDetailProjection;
 import org.oneog.uppick.auction.domain.product.dto.projection.PurchasedProductInfoProjection;
@@ -68,7 +68,7 @@ public class ProductInternalService {
 	private final AuctionInnerService auctionInnerService;
 	private final MemberInnerService memberInnerService;
 	private final SearchingInnerService searchingInnerService;
-	private final CategoryExternalServiceApi categoryExternalServiceApi;
+	private final CategoryInnerService categoryInnerService;
 
 	// ***** Internal Service Method ***** //
 	@Transactional
@@ -83,7 +83,7 @@ public class ProductInternalService {
 		String imageUrl = s3FileManager.store(image);
 
 		// 3. Product 엔티티 생성 (imageUrl 포함)
-		CategoryInfoResponse category = categoryExternalServiceApi.getCategoriesByCategoryId(request.getCategoryId());
+		CategoryInfoResponse category = categoryInnerService.getCategoriesByCategoryId(request.getCategoryId());
 		Product product = productMapper.registerToEntity(request, registerId, imageUrl, category);
 
 		// 상품 및 경매 등록

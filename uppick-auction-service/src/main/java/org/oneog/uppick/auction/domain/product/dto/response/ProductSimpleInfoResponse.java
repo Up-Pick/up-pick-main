@@ -1,15 +1,20 @@
 package org.oneog.uppick.auction.domain.product.dto.response;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@AllArgsConstructor
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class ProductSimpleInfoResponse {
 
-	private final String name;
-	private final String image;
-	private final Long minBidPrice;
-	private final Long currentBidPrice;
+	private String name;
+	private String image;
+	private Long minBidPrice;
+	private Long currentBidPrice;
 
 }
