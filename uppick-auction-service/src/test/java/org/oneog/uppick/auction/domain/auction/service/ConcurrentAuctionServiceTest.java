@@ -21,13 +21,16 @@ import org.oneog.uppick.auction.domain.auction.repository.AuctionRepository;
 import org.oneog.uppick.auction.domain.auction.repository.BiddingDetailRepository;
 import org.oneog.uppick.auction.domain.member.service.MemberInnerService;
 import org.oneog.uppick.auction.domain.notification.service.NotificationInnerService;
+import org.redisson.spring.starter.RedissonAutoConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
+@Import(RedissonAutoConfiguration.class)
 @Transactional
 @Disabled("동시성 테스트는 수동으로 실행하세요")
 public class ConcurrentAuctionServiceTest {
