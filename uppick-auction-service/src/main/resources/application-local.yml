@@ -21,6 +21,10 @@ spring:
       s3:
         enabled: false
         bucket: test-bucket
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
 management:
   endpoints:
     web:
