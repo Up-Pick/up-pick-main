@@ -21,11 +21,23 @@ spring:
       s3:
         enabled: false
         bucket: test-bucket
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+# Actuator 및 모니터링 설정
 management:
   endpoints:
     web:
       exposure:
-        include: health
+        include: health,prometheus
+      # Prometheus 메트릭 설정: 보안을 위해 health와 prometheus 노출
+  metrics:
+    tags:
+      application: ${spring.application.name}
+    export:
+      prometheus:
+        enabled: true
 server:
   port: 8080
 jwt:

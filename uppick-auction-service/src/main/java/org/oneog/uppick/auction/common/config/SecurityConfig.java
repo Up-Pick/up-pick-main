@@ -55,4 +55,19 @@ public class SecurityConfig {
 		return http.build();
 	}
 
+	// Prometheus 메트릭 수집을 위한 Actuator 엔드포인트 허용
+	@Bean
+	@Order(3)
+	public SecurityFilterChain actuatorFilterChain(HttpSecurity http) throws Exception {
+
+		http
+			.securityMatcher("/actuator/**")
+			.csrf(csrf -> csrf.disable())
+			.authorizeHttpRequests(authz -> authz
+				.anyRequest()
+				.permitAll());
+
+		return http.build();
+	}
+
 }

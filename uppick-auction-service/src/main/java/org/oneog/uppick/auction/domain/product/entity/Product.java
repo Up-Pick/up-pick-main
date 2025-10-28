@@ -32,6 +32,7 @@ public class Product {
 	@Column(name = "description", nullable = false)
 	private String description;
 
+	@Column(name = "view_count", nullable = false)
 	private Long viewCount = 0L;
 
 	@CreatedDate

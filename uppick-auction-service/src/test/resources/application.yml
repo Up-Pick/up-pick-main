@@ -20,6 +20,13 @@ spring:
       s3:
         enabled: false
         bucket: test-bucket
+  data:
+    redis:
+      host: localhost
+      port: 6380
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
 jwt:
   secret:
     key: "VXBwaWNrUHJvamVjdFNlY3JldEtleUZvclRlc3RpbmdQdXJwb3NlczEyMzQ1Njc4OTA="

@@ -2,7 +2,7 @@ name: Code Coverage Quality Gate
 
 on:
   pull_request:
-    branches: [ disabled ]
+    branches: [ dev ]
 
 jobs:
   coverage_check:

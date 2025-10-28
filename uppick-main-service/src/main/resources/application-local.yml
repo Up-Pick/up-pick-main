@@ -16,11 +16,19 @@ spring:
       enabled: true
 server:
   port: 8080
+# Actuator 및 모니터링 설정
 management:
   endpoints:
     web:
       exposure:
-        include: health
+        include: health,prometheus
+  # Prometheus 메트릭 설정: 보안을 위해 health와 prometheus만 노출
+  metrics:
+    tags:
+      application: ${spring.application.name}
+    export:
+      prometheus:
+        enabled: true
 grpc:
   server:
     port: 9090

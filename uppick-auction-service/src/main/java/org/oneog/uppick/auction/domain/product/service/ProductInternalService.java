@@ -44,7 +44,9 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -60,6 +62,7 @@ public class ProductInternalService {
 	private final ProductQueryRepository productQueryRepository;
 	private final SearchingQueryRepository searchingQueryRepository;
 	private final ProductMapper productMapper;
+	private final ProductViewCountIncreaseService productViewCountIncreaseService;
 
 	// ****** S3 ***** //
 	private final S3FileManager s3FileManager;
@@ -95,15 +98,12 @@ public class ProductInternalService {
 	@Transactional
 	public ProductDetailResponse getProductInfoById(Long productId, AuthMember authMember) {
 
-		if (authMember != null) {
-			// 조회수 +1
-			Product product = findProductByIdOrElseThrow(productId);
-			product.increaseViewCount();
+		if (authMember != null && productRepository.existsById(productId)) {
+			productViewCountIncreaseService.increaseProductViewCount(productId);
 		}
 
 		ProductDetailProjection projection = productQueryRepository.getProductInfoById(productId)
-			.orElseThrow(
-				() -> new BusinessException(ProductErrorCode.CANNOT_READ_PRODUCT_INFO));
+			.orElseThrow(() -> new BusinessException(ProductErrorCode.CANNOT_READ_PRODUCT_INFO));
 
 		String sellerName = memberInnerService.getMemberNickname(projection.getSellerId());
 
@@ -113,8 +113,7 @@ public class ProductInternalService {
 	public ProductSimpleInfoResponse getProductSimpleInfoById(Long productId) {
 
 		return productQueryRepository.getProductSimpleInfoById(productId)
-			.orElseThrow(
-				() -> new BusinessException(ProductErrorCode.CANNOT_READ_PRODUCT_SIMPLE_INFO));
+			.orElseThrow(() -> new BusinessException(ProductErrorCode.CANNOT_READ_PRODUCT_SIMPLE_INFO));
 	}
 
 	public Page<SoldProductInfoResponse> getSoldProductInfosByMemberId(Long memberId, Pageable pageable) {
@@ -185,13 +184,6 @@ public class ProductInternalService {
 	public Page<ProductSellingInfoResponse> getSellingProductInfoByMemberId(Long memberId, Pageable pageable) {
 
 		return productQueryRepository.getSellingProductInfoMyMemberId(memberId, pageable);
-	}
-
-	// ***** Internal Private Method ***** //
-	private Product findProductByIdOrElseThrow(Long productId) {
-
-		return productRepository.findById(productId)
-			.orElseThrow(() -> new BusinessException(ProductErrorCode.PRODUCT_NOT_FOUND));
 	}
 
 	@Transactional

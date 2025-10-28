@@ -37,6 +37,8 @@ public class ProductInternalServiceTest {
 	@Mock
 	SearchingQueryRepository searchingQueryRepository;
 	@Mock
+	ProductViewCountIncreaseService productViewCountIncreaseService;
+	@Mock
 	S3FileManager s3FileManager;
 	@Mock
 	AuctionInnerService auctionInnerService;
@@ -57,6 +59,7 @@ public class ProductInternalServiceTest {
 			productQueryRepository,
 			searchingQueryRepository,
 			productMapper,
+			productViewCountIncreaseService,
 
 			s3FileManager,
 
