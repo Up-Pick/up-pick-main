@@ -1,9 +1,5 @@
 package org.oneog.uppick.auction.domain.product.service;
 
-import static org.mockito.BDDMockito.*;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -12,29 +8,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.oneog.uppick.auction.domain.member.service.MemberInnerService;
-import org.oneog.uppick.auction.domain.product.dto.projection.ProductDetailProjection;
 import org.oneog.uppick.auction.domain.product.entity.Product;
-import org.oneog.uppick.auction.domain.product.repository.ProductQueryRepository;
 import org.oneog.uppick.auction.domain.product.repository.ProductRepository;
-import org.oneog.uppick.common.dto.AuthMember;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @Disabled
 @SpringBootTest
-public class ProductOptLockTest {
+public class ProductViewCountConcurrencyTest {
 
 	@Autowired
-	private ProductInternalService productInternalService;
+	private ProductViewCountIncreaseService productViewCountIncreaseService;
 	@Autowired
 	private ProductRepository productRepository;
-	@MockitoBean
-	private ProductQueryRepository productQueryRepository;
-	@MockitoBean
-	private MemberInnerService memberInnerService;
 
 	private Long productId;
 
@@ -55,30 +41,9 @@ public class ProductOptLockTest {
 	}
 
 	@Test
-	void 낙관적_락_테스트() throws InterruptedException {
+	void redis_동시성_테스트() throws InterruptedException {
 
-		AuthMember authMember = new AuthMember(1L, "닉네임");
-
-		Product product = productRepository.findById(productId).get();
-
-		ProductDetailProjection projection = new ProductDetailProjection(
-			product.getId(),
-			product.getName(),
-			product.getDescription(),
-			product.getViewCount(),
-			product.getRegisteredAt(),
-			product.getImage(),
-			"대충 카테고리",
-			1_000L,
-			1_500L,
-			LocalDateTime.now().plusDays(1L),
-			authMember.getMemberId()
-		);
-
-		given(productQueryRepository.getProductInfoById(productId)).willReturn(Optional.of(projection));
-		given(memberInnerService.getMemberNickname(projection.getSellerId())).willReturn("판매자닉네임");
-
-		int testcase = 1000;
+		int testcase = 5000;
 
 		long startTime = System.currentTimeMillis();
 
@@ -89,9 +54,7 @@ public class ProductOptLockTest {
 			for (int t = 0; t < testcase; t++) {
 				executor.execute(() -> {
 					try {
-						productInternalService.getProductInfoById(productId, authMember);
-					} catch (OptimisticLockingFailureException e) {
-						failureCount.incrementAndGet();
+						productViewCountIncreaseService.increaseProductViewCount(productId);
 					} finally {
 						latch.countDown();
 					}
@@ -103,6 +66,8 @@ public class ProductOptLockTest {
 
 		long endTime = System.currentTimeMillis();
 		double durationSeconds = (endTime - startTime) / 1000.0;
+
+		productViewCountIncreaseService.syncToDb();
 
 		System.out.println("테스트 실행 시간: " + durationSeconds + "초");
 		System.out.println("테스트 횟수: " + testcase);

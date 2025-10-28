@@ -34,7 +34,6 @@ import org.oneog.uppick.auction.domain.product.repository.SearchingQueryReposito
 import org.oneog.uppick.auction.domain.searching.service.SearchingInnerService;
 import org.oneog.uppick.common.dto.AuthMember;
 import org.oneog.uppick.common.exception.BusinessException;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -57,14 +56,13 @@ public class ProductInternalService {
 	private static final long DEFAULT_CATEGORY_ID = 1L;
 	private static final boolean DEFAULT_ONLY_NOT_SOLD = false;
 	private static final int DEFAULT_SIZE = 20;
-	private final int MAX_RETRY = 5;
-	private final long RETRY_DELAY_MS = 100L;
 
 	// ***** Product Domain ***** //
 	private final ProductRepository productRepository;
 	private final ProductQueryRepository productQueryRepository;
 	private final SearchingQueryRepository searchingQueryRepository;
 	private final ProductMapper productMapper;
+	private final ProductViewCountIncreaseService productViewCountIncreaseService;
 
 	// ****** S3 ***** //
 	private final S3FileManager s3FileManager;
@@ -100,28 +98,8 @@ public class ProductInternalService {
 	@Transactional
 	public ProductDetailResponse getProductInfoById(Long productId, AuthMember authMember) {
 
-		int attempts = 0;
-
-		if (authMember != null) {
-			// 낙관적 락 적용 -> 딜레이 100ms 최대 5회 시도
-			while (true) {
-				try {
-					Product product = productRepository.findById(productId)
-						.orElseThrow(() -> new BusinessException(ProductErrorCode.PRODUCT_NOT_FOUND));
-					product.increaseViewCount();
-					break;
-				} catch (OptimisticLockingFailureException e) {
-					if (attempts++ >= MAX_RETRY) {
-						log.warn("상품 조회 _ 낙관적 락 -> 재시도 실패");
-					}
-					try {
-						long delay = RETRY_DELAY_MS;
-						Thread.sleep(delay);
-					} catch (InterruptedException ie) {
-						log.warn("상품 조회 _ 낙관적 락 -> 스레드 오류 발생");
-					}
-				}
-			}
+		if (authMember != null && productRepository.existsById(productId)) {
+			productViewCountIncreaseService.increaseProductViewCount(productId);
 		}
 
 		ProductDetailProjection projection = productQueryRepository.getProductInfoById(productId)
