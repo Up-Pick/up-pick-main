@@ -95,7 +95,37 @@ services:
       main-mysql:
         condition: service_healthy
 
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9091:9090"
+    volumes:
+      # Prometheus 설정 파일만 마운트 (데이터는 저장하지 않음)
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      # 메트릭 데이터 보관 기간 (기본 15일 -> 1일로 단축)
+      - '--storage.tsdb.retention.time=1d'
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+      - ./monitoring/grafana/dashboards:/etc/grafana/dashboards
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+
 volumes:
   main_mysql_data:
   auction_mysql_data:
   auction_redis_data:
+  # Grafana 설정 및 대시보드만 유지 (Prometheus 데이터는 컨테이너 재시작시 초기화)
+  grafana_data:

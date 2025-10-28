@@ -1,0 +1,27 @@
+# Prometheus 전역 설정
+global:
+  # 메트릭 수집 주기 (15초마다 타겟에서 메트릭 수집)
+  scrape_interval: 15s
+  # 룰 평가 주기 (알람 등)
+  evaluation_interval: 15s
+
+# 메트릭 수집 대상 설정
+scrape_configs:
+  # Main Service 모니터링
+  - job_name: 'uppick-main-service'
+    # Spring Boot Actuator의 Prometheus 엔드포인트 경로
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      # Docker Compose 내부 네트워크에서 접근 (서비스명:포트)
+      # 8080은 HTTP 포트, 9090은 gRPC 포트
+      - targets: [ 'uppick-main-service:8080' ]
+        labels:
+          application: 'uppick-main-service'
+
+  # Auction Service 모니터링
+  - job_name: 'uppick-auction-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'uppick-auction-service:8080' ]
+        labels:
+          application: 'uppick-auction-service'

@@ -1,0 +1,18 @@
+# Grafana 데이터소스 자동 프로비저닝 설정
+apiVersion: 1
+
+datasources:
+  # Prometheus 데이터소스 설정
+  - name: Prometheus
+    # 데이터소스 타입 (prometheus, mysql, postgres 등)
+    type: prometheus
+    # 접근 방식 (proxy: Grafana 서버를 통해 접근, direct: 브라우저에서 직접 접근)
+    access: proxy
+    # Prometheus 서버 주소 (Docker Compose 내부 네트워크)
+    url: http://prometheus:9090
+    # UID 고정 (대시보드에서 참조하기 위해)
+    uid: prometheus
+    # 기본 데이터소스로 설정
+    isDefault: true
+    # UI에서 수정 가능 여부
+    editable: true
