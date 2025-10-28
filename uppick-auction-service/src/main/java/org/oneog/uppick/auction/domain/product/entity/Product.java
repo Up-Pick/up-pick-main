@@ -11,7 +11,6 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Version;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -52,10 +51,6 @@ public class Product {
 	private String bigCategory;
 	@Column(name = "small_category", nullable = false)
 	private String smallCategory;
-
-	// 낙관적 락
-	@Version
-	private Long version;
 
 	@Builder
 	private Product(String name, String description, String image, Long categoryId, Long registerId, String bigCategory,
