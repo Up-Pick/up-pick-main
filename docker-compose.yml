@@ -35,6 +35,19 @@ services:
       timeout: 5s
       retries: 5
 
+  # 추후 Lock과 Cache용 Redis를 분리해야함
+  auction-redis:
+    image: redis:8.2.2
+    ports:
+      - "6380:6379"
+    volumes:
+      - auction_redis_data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   uppick-api-gateway:
     build:
       context: .
@@ -55,11 +68,15 @@ services:
       DB_URL: jdbc:mysql://auction-mysql:3306/uppick_db
       DB_USER: user
       DB_PASS: password
+      REDIS_HOST: auction-redis
+      REDIS_PORT: 6379
       GATEWAY_URL: http://uppick-api-gateway:8080
     ports:
       - "8082:8080"
     depends_on:
       auction-mysql:
+        condition: service_healthy
+      auction-redis:
         condition: service_healthy
 
   uppick-main-service:
@@ -81,3 +98,4 @@ services:
 volumes:
   main_mysql_data:
   auction_mysql_data:
+  auction_redis_data:
