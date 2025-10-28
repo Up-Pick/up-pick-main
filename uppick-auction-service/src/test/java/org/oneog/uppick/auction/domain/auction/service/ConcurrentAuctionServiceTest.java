@@ -32,7 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @Import(RedissonAutoConfiguration.class)
 @Transactional
-// @Disabled("동시성 테스트는 수동으로 실행하세요")
+@Disabled("동시성 테스트는 수동으로 실행하세요")
 public class ConcurrentAuctionServiceTest {
 
     @Autowired
