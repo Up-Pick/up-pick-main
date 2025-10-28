@@ -10,7 +10,6 @@ import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.never;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
