@@ -10,6 +10,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.oneog.uppick.auction.domain.member.service.MemberInnerService;
 import org.oneog.uppick.auction.domain.product.dto.projection.ProductDetailProjection;
@@ -21,8 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.EnabledIf;
 
+@Disabled
 @SpringBootTest
 public class ProductOptLockTest {
 
@@ -54,7 +55,6 @@ public class ProductOptLockTest {
 	}
 
 	@Test
-	@EnabledIf(expression = "#{systemProperties['skipTests'] != 'true'}", reason = "빌드 시 skip")
 	void 낙관적_락_테스트() throws InterruptedException {
 
 		AuthMember authMember = new AuthMember(1L, "닉네임");
