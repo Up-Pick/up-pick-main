@@ -43,6 +43,9 @@ dependencies {
     
     // Open Feign
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+    // Redisson
+    implementation 'org.redisson:redisson-spring-boot-starter:3.52.0'
 }
 
 // REST Docs 스니펫 디렉토리 설정
