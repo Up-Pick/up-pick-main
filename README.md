@@ -192,7 +192,12 @@ Grafana 공식 대시보드를 임포트하여 더 상세한 모니터링이 가
 **실행:**
 
 ```bash
-k6 run k6-tests/find-max-tps-test.js
+k6 run --out experimental-prometheus-rw \
+  -e K6_PROMETHEUS_RW_SERVER_URL=http://localhost:9091/api/v1/write \
+  -e K6_PROMETHEUS_RW_TREND_AS_NATIVE_HISTOGRAM=false \
+  -e K6_PROMETHEUS_RW_PUSH_INTERVAL=5s \
+  -e BASE_URL=http://localhost:8080 \
+  k6-tests/find-max-tps-test.js
 ```
 
 ### 시스템 요구사항
