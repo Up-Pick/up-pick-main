@@ -1,9 +1,9 @@
 package org.oneog.uppick.auction.domain.product.mapper;
 
 import org.oneog.uppick.auction.domain.category.dto.response.CategoryInfoResponse;
+import org.oneog.uppick.auction.domain.product.document.ProductDocument;
 import org.oneog.uppick.auction.domain.product.dto.projection.ProductDetailProjection;
 import org.oneog.uppick.auction.domain.product.dto.projection.PurchasedProductInfoProjection;
-import org.oneog.uppick.auction.domain.product.dto.projection.SearchProductProjection;
 import org.oneog.uppick.auction.domain.product.dto.projection.SoldProductInfoProjection;
 import org.oneog.uppick.auction.domain.product.dto.request.ProductRegisterRequest;
 import org.oneog.uppick.auction.domain.product.dto.response.ProductBuyAtResponse;
@@ -13,7 +13,6 @@ import org.oneog.uppick.auction.domain.product.dto.response.PurchasedProductInfo
 import org.oneog.uppick.auction.domain.product.dto.response.SearchProductInfoResponse;
 import org.oneog.uppick.auction.domain.product.dto.response.SoldProductInfoResponse;
 import org.oneog.uppick.auction.domain.product.entity.Product;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -33,18 +32,18 @@ public class ProductMapper {
 			.build();
 	}
 
-	public Page<SearchProductInfoResponse> toResponse(Page<SearchProductProjection> productProjections) {
+	public SearchProductInfoResponse toSearchResponse(ProductDocument document) {
 
-		return productProjections.map(projection -> SearchProductInfoResponse.builder()
-			.id(projection.getId())
-			.image(projection.getImage())
-			.name(projection.getName())
-			.registeredAt(projection.getRegisteredAt())
-			.endAt(projection.getEndAt())
-			.currentBidPrice(projection.getCurrentBidPrice())
-			.minBidPrice(projection.getMinBidPrice())
-			.isSold(projection.isSold())
-			.build());
+		return SearchProductInfoResponse.builder()
+			.id(document.getId())
+			.image(document.getImage())
+			.name(document.getName())
+			.registeredAt(document.getRegisteredAt())
+			.endAt(document.getEndAt())
+			.currentBidPrice(document.getCurrentBidPrice())
+			.minBidPrice(document.getMinBidPrice())
+			.isSold(document.isSold())
+			.build();
 	}
 
 	public SoldProductInfoResponse combineSoldProductInfoWithSeller(SoldProductInfoProjection productInfo,
@@ -86,6 +85,21 @@ public class ProductMapper {
 			.currentBid(projection.getCurrentBid())
 			.endAt(projection.getEndAt())
 			.sellerName(sellerName)
+			.build();
+	}
+
+	public ProductDocument toDocument(Product product, ProductRegisterRequest request) {
+
+		return ProductDocument.builder()
+			.id(product.getId())
+			.name(product.getName())
+			.image(product.getImage())
+			.registeredAt(product.getRegisteredAt())
+			.endAt(request.getEndAt())
+			.currentBidPrice(null)
+			.minBidPrice(request.getStartBid())
+			.categoryId(product.getCategoryId())
+			.isSold(false)
 			.build();
 	}
 

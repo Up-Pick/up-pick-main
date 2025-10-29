@@ -1,6 +1,5 @@
 package org.oneog.uppick.auction.domain.product.service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -10,9 +9,9 @@ import org.oneog.uppick.auction.domain.auction.service.AuctionInnerService;
 import org.oneog.uppick.auction.domain.category.dto.response.CategoryInfoResponse;
 import org.oneog.uppick.auction.domain.category.service.CategoryInnerService;
 import org.oneog.uppick.auction.domain.member.service.MemberInnerService;
+import org.oneog.uppick.auction.domain.product.document.ProductDocument;
 import org.oneog.uppick.auction.domain.product.dto.projection.ProductDetailProjection;
 import org.oneog.uppick.auction.domain.product.dto.projection.PurchasedProductInfoProjection;
-import org.oneog.uppick.auction.domain.product.dto.projection.SearchProductProjection;
 import org.oneog.uppick.auction.domain.product.dto.projection.SoldProductInfoProjection;
 import org.oneog.uppick.auction.domain.product.dto.request.ProductRegisterRequest;
 import org.oneog.uppick.auction.domain.product.dto.request.SearchProductRequest;
@@ -28,9 +27,9 @@ import org.oneog.uppick.auction.domain.product.dto.response.SoldProductInfoRespo
 import org.oneog.uppick.auction.domain.product.entity.Product;
 import org.oneog.uppick.auction.domain.product.exception.ProductErrorCode;
 import org.oneog.uppick.auction.domain.product.mapper.ProductMapper;
+import org.oneog.uppick.auction.domain.product.repository.ProductDocumentRepository;
 import org.oneog.uppick.auction.domain.product.repository.ProductQueryRepository;
 import org.oneog.uppick.auction.domain.product.repository.ProductRepository;
-import org.oneog.uppick.auction.domain.product.repository.SearchingQueryRepository;
 import org.oneog.uppick.auction.domain.searching.service.SearchingInnerService;
 import org.oneog.uppick.common.dto.AuthMember;
 import org.oneog.uppick.common.exception.BusinessException;
@@ -38,11 +37,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.elasticsearch.client.elc.NativeQuery;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import co.elastic.clients.elasticsearch._types.SortOrder;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -53,14 +57,12 @@ import lombok.extern.slf4j.Slf4j;
 public class ProductInternalService {
 
 	// ****** search ****** //
-	private static final long DEFAULT_CATEGORY_ID = 1L;
-	private static final boolean DEFAULT_ONLY_NOT_SOLD = false;
-	private static final int DEFAULT_SIZE = 20;
+	private final ElasticsearchOperations elasticsearchOperations;
 
 	// ***** Product Domain ***** //
 	private final ProductRepository productRepository;
+	private final ProductDocumentRepository productDocumentRepository;
 	private final ProductQueryRepository productQueryRepository;
-	private final SearchingQueryRepository searchingQueryRepository;
 	private final ProductMapper productMapper;
 	private final ProductViewCountIncreaseService productViewCountIncreaseService;
 
@@ -90,9 +92,13 @@ public class ProductInternalService {
 		Product product = productMapper.registerToEntity(request, registerId, imageUrl, category);
 
 		// 상품 및 경매 등록
-		productRepository.save(product);
-		auctionInnerService.registerAuction(product.getId(), registerId, request.getStartBid(),
-			product.getRegisteredAt(), request.getEndAt());
+		Product savedProduct = productRepository.save(product);
+		auctionInnerService.registerAuction(savedProduct.getId(), registerId, request.getStartBid(),
+			savedProduct.getRegisteredAt(), request.getEndAt());
+
+		// Elasticsearch 저장
+		ProductDocument document = productMapper.toDocument(savedProduct, request);
+		productDocumentRepository.save(document);
 	}
 
 	@Transactional
@@ -189,48 +195,62 @@ public class ProductInternalService {
 	@Transactional
 	public Page<SearchProductInfoResponse> searchProduct(SearchProductRequest searchProductRequest) {
 
-		Long categoryId = searchProductRequest.getCategoryId();
+		// 정렬 기준
+		String[] sortType = searchProductRequest.getSortBy().getSortType().split(":");
 
-		if (categoryId == null) {
-			categoryId = DEFAULT_CATEGORY_ID;
-		}
+		NativeQuery query = NativeQuery.builder()
+			.withQuery(
+				Query.of(q -> q
+					.bool(b -> {
 
-		Boolean onlyNotSold = searchProductRequest.getOnlyNotSold();
+						// 상품 이름 : match 조회
+						b.must(m -> m.match(mq -> mq
+							.field("name")
+							.query(searchProductRequest.getKeyword())
+							.fuzziness("AUTO"))
+						);
 
-		if (onlyNotSold == null) {
-			onlyNotSold = DEFAULT_ONLY_NOT_SOLD;
-		}
+						// 기본 값 1L 또는 지정된 category_id 조회
+						b.filter(f -> f.term(t -> t
+							.field("category_id")
+							.value(searchProductRequest.getCategoryId())
+						));
 
-		Integer page = searchProductRequest.getPage();
+						// onlyNotSold == false 경우: 판매 안 된 상품만 조회
+						if (!searchProductRequest.isOnlyNotSold()) {
+							b.filter(f -> f.term(t -> t
+								.field("is_sold")
+								.value(false)
+							));
+						}
 
-		if (page == null || page < 0) {
-			page = 0;
-		}
+						// 최소 마감 날짜 기준이 null이 아닌 경우 필터링
+						if (searchProductRequest.getEndAtFrom() != null) {
+							b.filter(f -> f.range(r -> r
+								.date(d -> d
+									.field("end_at")
+									.gte(searchProductRequest.getEndAtFrom().toString())
+								)
+							));
+						}
 
-		Integer size = searchProductRequest.getSize();
+						return b;
+					})
+				)
+			)
+			.withPageable(PageRequest.of(
+				searchProductRequest.getPage(),
+				searchProductRequest.getSize()))
+			// 정렬 기준
+			.withSort(s -> s
+				.field(f -> f
+					.field(sortType[0])
+					.order(sortType[1].equals("asc") ? SortOrder.Asc : SortOrder.Desc)
+					.missing("_last")
+				))
+			.build();
 
-		if (size == null || size <= 0) {
-			size = DEFAULT_SIZE;
-		}
-
-		Pageable pageable = PageRequest.of(page, size);
-
-		LocalDateTime endAtFrom;
-
-		if (searchProductRequest.getEndAtFrom() != null) {
-			endAtFrom = searchProductRequest.getEndAtFrom().atStartOfDay();
-		} else {
-			endAtFrom = null;
-		}
-
-		Page<SearchProductProjection> productProjections = searchingQueryRepository.findProductsWithFilters(
-			pageable,
-			categoryId,
-			endAtFrom,
-			onlyNotSold,
-			searchProductRequest.getSortBy(),
-			searchProductRequest.getKeyword());
-
+		// Main 모듈의 검색어 랭킹에 키워드 전달
 		if (StringUtils.hasText(searchProductRequest.getKeyword())) {
 
 			String[] splitKeywords = searchProductRequest.getKeyword().trim().split(" ");
@@ -238,7 +258,14 @@ public class ProductInternalService {
 			searchingInnerService.saveSearchHistories(keywords);
 		}
 
-		return productMapper.toResponse(productProjections);
+		// Document -> SearchResponse 매핑
+		SearchHits<ProductDocument> searchHits = elasticsearchOperations.search(query, ProductDocument.class);
+		List<SearchProductInfoResponse> responseList = searchHits.getSearchHits().stream().map(searchHit -> {
+			ProductDocument productDocument = searchHit.getContent();
+			return productMapper.toSearchResponse(productDocument);
+		}).toList();
+
+		return new PageImpl<>(responseList, query.getPageable(), searchHits.getTotalHits());
 	}
 
 }
