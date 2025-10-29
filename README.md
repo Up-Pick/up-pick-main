@@ -192,7 +192,7 @@ Grafana 공식 대시보드를 임포트하여 더 상세한 모니터링이 가
 **실행:**
 
 ```bash
-k6 run find-max-tps-test.js
+k6 run k6-tests/find-max-tps-test.js
 ```
 
 ### 시스템 요구사항
