@@ -19,11 +19,11 @@ import lombok.NoArgsConstructor;
 public class SearchProductRequest {
 
 	private String keyword;
-	private Long categoryId;
-	private Boolean onlyNotSold;
-	private String sortBy;
-	private Integer page;
-	private Integer size;
+	private Long categoryId = 1L;
+	private Boolean onlyNotSold = false;
+	private String sortBy = "end_at";
+	private Integer page = 0;
+	private Integer size = 10;
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = FormatConstants.JSON_DATE_FORMAT)
 	private LocalDate endAtFrom;
