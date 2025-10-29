@@ -1,6 +1,9 @@
 package org.oneog.uppick.auction.domain.product.mapper;
 
+import java.time.LocalDateTime;
+
 import org.oneog.uppick.auction.domain.category.dto.response.CategoryInfoResponse;
+import org.oneog.uppick.auction.domain.product.document.ProductDocument;
 import org.oneog.uppick.auction.domain.product.dto.projection.ProductDetailProjection;
 import org.oneog.uppick.auction.domain.product.dto.projection.PurchasedProductInfoProjection;
 import org.oneog.uppick.auction.domain.product.dto.projection.SearchProductProjection;
@@ -13,7 +16,6 @@ import org.oneog.uppick.auction.domain.product.dto.response.PurchasedProductInfo
 import org.oneog.uppick.auction.domain.product.dto.response.SearchProductInfoResponse;
 import org.oneog.uppick.auction.domain.product.dto.response.SoldProductInfoResponse;
 import org.oneog.uppick.auction.domain.product.entity.Product;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -33,9 +35,9 @@ public class ProductMapper {
 			.build();
 	}
 
-	public Page<SearchProductInfoResponse> toResponse(Page<SearchProductProjection> productProjections) {
+	public SearchProductInfoResponse toSearchResponse(SearchProductProjection projection) {
 
-		return productProjections.map(projection -> SearchProductInfoResponse.builder()
+		return SearchProductInfoResponse.builder()
 			.id(projection.getId())
 			.image(projection.getImage())
 			.name(projection.getName())
@@ -44,7 +46,7 @@ public class ProductMapper {
 			.currentBidPrice(projection.getCurrentBidPrice())
 			.minBidPrice(projection.getMinBidPrice())
 			.isSold(projection.isSold())
-			.build());
+			.build();
 	}
 
 	public SoldProductInfoResponse combineSoldProductInfoWithSeller(SoldProductInfoProjection productInfo,
@@ -86,6 +88,17 @@ public class ProductMapper {
 			.currentBid(projection.getCurrentBid())
 			.endAt(projection.getEndAt())
 			.sellerName(sellerName)
+			.build();
+	}
+
+	public ProductDocument toDocument(Product product, LocalDateTime endAt) {
+
+		return ProductDocument.builder()
+			.id(product.getId())
+			.name(product.getName())
+			.endAt(endAt)
+			.categoryId(product.getCategoryId())
+			.isSold(false)
 			.build();
 	}
 
