@@ -20,6 +20,8 @@ spring:
       s3:
         enabled: false
         bucket: test-bucket
+  elasticsearch:
+    uris: http://localhost:9201
   data:
     redis:
       host: localhost
