@@ -11,6 +11,8 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
     hibernate:
       ddl-auto: update
+  elasticsearch:
+    uris: ${ELASTICSEARCH_URL}
   threads:
     virtual:
       enabled: true
