@@ -24,6 +24,7 @@ import org.oneog.uppick.auction.domain.product.dto.response.ProductSimpleInfoRes
 import org.oneog.uppick.auction.domain.product.dto.response.PurchasedProductInfoResponse;
 import org.oneog.uppick.auction.domain.product.dto.response.SearchProductInfoResponse;
 import org.oneog.uppick.auction.domain.product.dto.response.SoldProductInfoResponse;
+import org.oneog.uppick.auction.domain.product.enums.ProductSearchSortType;
 import org.oneog.uppick.auction.domain.product.service.ProductInternalService;
 import org.oneog.uppick.auction.support.auth.WithMockAuthMember;
 import org.oneog.uppick.auction.support.restdocs.RestDocsBase;
@@ -377,7 +378,7 @@ class ProductControllerRestDocsTest extends RestDocsBase {
 			.keyword("phone")
 			.categoryId(2L)
 			.onlyNotSold(true)
-			.sortBy("endAt")
+			.sortBy(ProductSearchSortType.REGISTERED_AT_DESC)
 			.page(0)
 			.size(10)
 			.endAtFrom(LocalDate.of(2025, 12, 31))

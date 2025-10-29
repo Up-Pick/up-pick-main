@@ -12,7 +12,6 @@ import org.oneog.uppick.auction.domain.member.service.MemberInnerService;
 import org.oneog.uppick.auction.domain.product.document.ProductDocument;
 import org.oneog.uppick.auction.domain.product.dto.projection.ProductDetailProjection;
 import org.oneog.uppick.auction.domain.product.dto.projection.PurchasedProductInfoProjection;
-import org.oneog.uppick.auction.domain.product.dto.projection.SearchProductProjection;
 import org.oneog.uppick.auction.domain.product.dto.projection.SoldProductInfoProjection;
 import org.oneog.uppick.auction.domain.product.dto.request.ProductRegisterRequest;
 import org.oneog.uppick.auction.domain.product.dto.request.SearchProductRequest;
@@ -31,7 +30,6 @@ import org.oneog.uppick.auction.domain.product.mapper.ProductMapper;
 import org.oneog.uppick.auction.domain.product.repository.ProductDocumentRepository;
 import org.oneog.uppick.auction.domain.product.repository.ProductQueryRepository;
 import org.oneog.uppick.auction.domain.product.repository.ProductRepository;
-import org.oneog.uppick.auction.domain.product.repository.SearchingQueryRepository;
 import org.oneog.uppick.auction.domain.searching.service.SearchingInnerService;
 import org.oneog.uppick.common.dto.AuthMember;
 import org.oneog.uppick.common.exception.BusinessException;
@@ -41,7 +39,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,16 +57,12 @@ import lombok.extern.slf4j.Slf4j;
 public class ProductInternalService {
 
 	// ****** search ****** //
-	private static final long DEFAULT_CATEGORY_ID = 1L;
-	private static final boolean DEFAULT_ONLY_NOT_SOLD = false;
-	private static final int DEFAULT_SIZE = 20;
 	private final ElasticsearchOperations elasticsearchOperations;
 
 	// ***** Product Domain ***** //
 	private final ProductRepository productRepository;
 	private final ProductDocumentRepository productDocumentRepository;
 	private final ProductQueryRepository productQueryRepository;
-	private final SearchingQueryRepository searchingQueryRepository;
 	private final ProductMapper productMapper;
 	private final ProductViewCountIncreaseService productViewCountIncreaseService;
 
@@ -104,7 +97,7 @@ public class ProductInternalService {
 			savedProduct.getRegisteredAt(), request.getEndAt());
 
 		// Elasticsearch 저장
-		ProductDocument document = productMapper.toDocument(savedProduct, request.getEndAt());
+		ProductDocument document = productMapper.toDocument(savedProduct, request);
 		productDocumentRepository.save(document);
 	}
 
@@ -202,6 +195,9 @@ public class ProductInternalService {
 	@Transactional
 	public Page<SearchProductInfoResponse> searchProduct(SearchProductRequest searchProductRequest) {
 
+		// 정렬 기준
+		String[] sortType = searchProductRequest.getSortBy().getSortType().split(":");
+
 		NativeQuery query = NativeQuery.builder()
 			.withQuery(
 				Query.of(q -> q
@@ -209,24 +205,32 @@ public class ProductInternalService {
 
 						// 상품 이름 : match 조회
 						b.must(m -> m.match(mq -> mq
-							.field("product_name")
+							.field("name")
 							.query(searchProductRequest.getKeyword())
 							.fuzziness("AUTO"))
 						);
 
 						// 기본 값 1L 또는 지정된 category_id 조회
 						b.filter(f -> f.term(t -> t
-							.field("category_id").value(
-								searchProductRequest.getCategoryId() != null ?
-									searchProductRequest.getCategoryId() : DEFAULT_CATEGORY_ID
-							))
-						);
+							.field("category_id")
+							.value(searchProductRequest.getCategoryId())
+						));
 
-						// 판매 안 된 상품만 조회 (onlyNotSold == true인 경우)
-						if (searchProductRequest.getOnlyNotSold()) {
+						// onlyNotSold == false 경우: 판매 안 된 상품만 조회
+						if (!searchProductRequest.isOnlyNotSold()) {
 							b.filter(f -> f.term(t -> t
 								.field("is_sold")
-								.value(DEFAULT_ONLY_NOT_SOLD)
+								.value(false)
+							));
+						}
+
+						// 최소 마감 날짜 기준이 null이 아닌 경우 필터링
+						if (searchProductRequest.getEndAtFrom() != null) {
+							b.filter(f -> f.range(r -> r
+								.date(d -> d
+									.field("end_at")
+									.gte(searchProductRequest.getEndAtFrom().toString())
+								)
 							));
 						}
 
@@ -237,11 +241,13 @@ public class ProductInternalService {
 			.withPageable(PageRequest.of(
 				searchProductRequest.getPage(),
 				searchProductRequest.getSize()))
+			// 정렬 기준
 			.withSort(s -> s
 				.field(f -> f
-					.field("end_at")
-					.order(SortOrder.Desc))
-			)
+					.field(sortType[0])
+					.order(sortType[1].equals("asc") ? SortOrder.Asc : SortOrder.Desc)
+					.missing("_last")
+				))
 			.build();
 
 		// Main 모듈의 검색어 랭킹에 키워드 전달
@@ -252,29 +258,12 @@ public class ProductInternalService {
 			searchingInnerService.saveSearchHistories(keywords);
 		}
 
+		// Document -> SearchResponse 매핑
 		SearchHits<ProductDocument> searchHits = elasticsearchOperations.search(query, ProductDocument.class);
-
-		// Elasticsearch 검색 결과 id값 추출
-		List<Long> productIds = searchHits.getSearchHits()
-			.stream()
-			.map(SearchHit::getContent)
-			.map(ProductDocument::getId)
-			.toList();
-
-		// QueryDSL 검색 결과 -> Map<id, projection>
-		List<SearchProductProjection> projections = searchingQueryRepository.findProductWithIds(productIds);
-		Map<Long, SearchProductProjection> projectionMap = projections
-			.stream()
-			.collect(Collectors.toMap(SearchProductProjection::getId, Function.identity()));
-
-		// Elasticsearch 에서 필터 및 정렬된 id 순서에 따라 QueryDSL 데이터를 response로 정렬
-		List<SearchProductInfoResponse> responseList = productIds
-			.stream()
-			.map(productId -> {
-				SearchProductProjection projection = projectionMap.get(productId);
-				return productMapper.toSearchResponse(projection);
-			})
-			.toList();
+		List<SearchProductInfoResponse> responseList = searchHits.getSearchHits().stream().map(searchHit -> {
+			ProductDocument productDocument = searchHit.getContent();
+			return productMapper.toSearchResponse(productDocument);
+		}).toList();
 
 		return new PageImpl<>(responseList, query.getPageable(), searchHits.getTotalHits());
 	}

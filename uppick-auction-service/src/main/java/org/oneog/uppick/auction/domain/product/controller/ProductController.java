@@ -111,7 +111,7 @@ public class ProductController {
 
 	@PostMapping("/search")
 	public GlobalApiResponse<GlobalPageResponse<SearchProductInfoResponse>> searchProduct(
-		@Valid @RequestBody(required = false) SearchProductRequest searchProductRequest) {
+		@RequestBody(required = false) SearchProductRequest searchProductRequest) {
 
 		if (searchProductRequest == null) {
 			searchProductRequest = SearchProductRequest.ofDefault();

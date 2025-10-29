@@ -1,12 +1,9 @@
 package org.oneog.uppick.auction.domain.product.mapper;
 
-import java.time.LocalDateTime;
-
 import org.oneog.uppick.auction.domain.category.dto.response.CategoryInfoResponse;
 import org.oneog.uppick.auction.domain.product.document.ProductDocument;
 import org.oneog.uppick.auction.domain.product.dto.projection.ProductDetailProjection;
 import org.oneog.uppick.auction.domain.product.dto.projection.PurchasedProductInfoProjection;
-import org.oneog.uppick.auction.domain.product.dto.projection.SearchProductProjection;
 import org.oneog.uppick.auction.domain.product.dto.projection.SoldProductInfoProjection;
 import org.oneog.uppick.auction.domain.product.dto.request.ProductRegisterRequest;
 import org.oneog.uppick.auction.domain.product.dto.response.ProductBuyAtResponse;
@@ -35,17 +32,17 @@ public class ProductMapper {
 			.build();
 	}
 
-	public SearchProductInfoResponse toSearchResponse(SearchProductProjection projection) {
+	public SearchProductInfoResponse toSearchResponse(ProductDocument document) {
 
 		return SearchProductInfoResponse.builder()
-			.id(projection.getId())
-			.image(projection.getImage())
-			.name(projection.getName())
-			.registeredAt(projection.getRegisteredAt())
-			.endAt(projection.getEndAt())
-			.currentBidPrice(projection.getCurrentBidPrice())
-			.minBidPrice(projection.getMinBidPrice())
-			.isSold(projection.isSold())
+			.id(document.getId())
+			.image(document.getImage())
+			.name(document.getName())
+			.registeredAt(document.getRegisteredAt())
+			.endAt(document.getEndAt())
+			.currentBidPrice(document.getCurrentBidPrice())
+			.minBidPrice(document.getMinBidPrice())
+			.isSold(document.isSold())
 			.build();
 	}
 
@@ -91,12 +88,16 @@ public class ProductMapper {
 			.build();
 	}
 
-	public ProductDocument toDocument(Product product, LocalDateTime endAt) {
+	public ProductDocument toDocument(Product product, ProductRegisterRequest request) {
 
 		return ProductDocument.builder()
 			.id(product.getId())
 			.name(product.getName())
-			.endAt(endAt)
+			.image(product.getImage())
+			.registeredAt(product.getRegisteredAt())
+			.endAt(request.getEndAt())
+			.currentBidPrice(null)
+			.minBidPrice(request.getStartBid())
 			.categoryId(product.getCategoryId())
 			.isSold(false)
 			.build();

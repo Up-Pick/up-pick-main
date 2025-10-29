@@ -19,10 +19,11 @@ import org.oneog.uppick.auction.domain.member.service.MemberInnerService;
 import org.oneog.uppick.auction.domain.product.dto.request.ProductRegisterRequest;
 import org.oneog.uppick.auction.domain.product.entity.Product;
 import org.oneog.uppick.auction.domain.product.mapper.ProductMapper;
+import org.oneog.uppick.auction.domain.product.repository.ProductDocumentRepository;
 import org.oneog.uppick.auction.domain.product.repository.ProductQueryRepository;
 import org.oneog.uppick.auction.domain.product.repository.ProductRepository;
-import org.oneog.uppick.auction.domain.product.repository.SearchingQueryRepository;
 import org.oneog.uppick.auction.domain.searching.service.SearchingInnerService;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.web.multipart.MultipartFile;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,11 +32,13 @@ public class ProductInternalServiceTest {
 	private final ProductMapper productMapper = new ProductMapper();
 	private final ArgumentCaptor<Product> captor = ArgumentCaptor.forClass(Product.class);
 	@Mock
+	ElasticsearchOperations elasticsearchOperations;
+	@Mock
+	ProductDocumentRepository productDocumentRepository;
+	@Mock
 	ProductRepository productRepository;
 	@Mock
 	ProductQueryRepository productQueryRepository;
-	@Mock
-	SearchingQueryRepository searchingQueryRepository;
 	@Mock
 	ProductViewCountIncreaseService productViewCountIncreaseService;
 	@Mock
@@ -55,9 +58,11 @@ public class ProductInternalServiceTest {
 	public void init() {
 
 		productInternalService = new ProductInternalService(
+			elasticsearchOperations,
+
 			productRepository,
+			productDocumentRepository,
 			productQueryRepository,
-			searchingQueryRepository,
 			productMapper,
 			productViewCountIncreaseService,
 

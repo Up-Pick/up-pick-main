@@ -2,6 +2,7 @@ package org.oneog.uppick.auction.domain.product.dto.request;
 
 import java.time.LocalDate;
 
+import org.oneog.uppick.auction.domain.product.enums.ProductSearchSortType;
 import org.oneog.uppick.common.constants.FormatConstants;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -19,26 +20,26 @@ import lombok.NoArgsConstructor;
 public class SearchProductRequest {
 
 	private String keyword;
-	private Long categoryId = 1L;
-	private Boolean onlyNotSold = false;
-	private String sortBy = "end_at";
-	private Integer page = 0;
-	private Integer size = 10;
+
+	private long categoryId = 1L;
+	private boolean onlyNotSold = false;
+	private int page = 0;
+	private int size = 20;
+
+	private ProductSearchSortType sortBy = ProductSearchSortType.REGISTERED_AT_DESC;
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = FormatConstants.JSON_DATE_FORMAT)
 	private LocalDate endAtFrom;
 
+	private SearchProductRequest(String keyword, LocalDate endAtFrom) {
+
+		this.keyword = keyword;
+		this.endAtFrom = endAtFrom;
+	}
+
 	public static SearchProductRequest ofDefault() {
 
-		return SearchProductRequest.builder()
-			.keyword(null)
-			.categoryId(null)
-			.onlyNotSold(null)
-			.sortBy(null)
-			.page(0)
-			.size(20)
-			.endAtFrom(null)
-			.build();
+		return new SearchProductRequest(null, null);
 	}
 
 }
