@@ -16,6 +16,7 @@ import org.oneog.uppick.auction.domain.member.service.MemberInnerService;
 import org.oneog.uppick.auction.domain.notification.dto.request.SendNotificationRequest;
 import org.oneog.uppick.auction.domain.notification.enums.NotificationType;
 import org.oneog.uppick.auction.domain.notification.service.NotificationInnerService;
+import org.oneog.uppick.auction.domain.product.service.ProductInnerService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +37,7 @@ public class AuctionSchedulerService {
 	// ****** Inner Service API ***** //
 	private final MemberInnerService memberInnerService;
 	private final NotificationInnerService notificationInnerService;
+	private final ProductInnerService productInnerService;
 
 	@Transactional
 	@Scheduled(cron = "0 0 * * * *") // 매 시 정각마다 실행
@@ -121,6 +123,9 @@ public class AuctionSchedulerService {
 
 		// 경매 상태 업데이트 (DB 반영)
 		updateAuctionStatus(auction);
+
+		// 경매 상태 업데이트 (Elasticsearch 반영)
+		productInnerService.updateProductDocumentStatus(auctionId);
 	}
 
 	/**

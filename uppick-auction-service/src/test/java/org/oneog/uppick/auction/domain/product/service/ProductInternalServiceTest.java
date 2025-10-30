@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -16,26 +15,31 @@ import org.oneog.uppick.auction.domain.auction.service.AuctionInnerService;
 import org.oneog.uppick.auction.domain.category.dto.response.CategoryInfoResponse;
 import org.oneog.uppick.auction.domain.category.service.CategoryInnerService;
 import org.oneog.uppick.auction.domain.member.service.MemberInnerService;
+import org.oneog.uppick.auction.domain.product.document.ProductDocument;
 import org.oneog.uppick.auction.domain.product.dto.request.ProductRegisterRequest;
 import org.oneog.uppick.auction.domain.product.entity.Product;
 import org.oneog.uppick.auction.domain.product.mapper.ProductMapper;
+import org.oneog.uppick.auction.domain.product.repository.ProductDocumentRepository;
 import org.oneog.uppick.auction.domain.product.repository.ProductQueryRepository;
 import org.oneog.uppick.auction.domain.product.repository.ProductRepository;
-import org.oneog.uppick.auction.domain.product.repository.SearchingQueryRepository;
 import org.oneog.uppick.auction.domain.searching.service.SearchingInnerService;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 @ExtendWith(MockitoExtension.class)
 public class ProductInternalServiceTest {
 
 	private final ProductMapper productMapper = new ProductMapper();
-	private final ArgumentCaptor<Product> captor = ArgumentCaptor.forClass(Product.class);
+
+	@Mock
+	ElasticsearchOperations elasticsearchOperations;
+	@Mock
+	ProductDocumentRepository productDocumentRepository;
 	@Mock
 	ProductRepository productRepository;
 	@Mock
 	ProductQueryRepository productQueryRepository;
-	@Mock
-	SearchingQueryRepository searchingQueryRepository;
 	@Mock
 	ProductViewCountIncreaseService productViewCountIncreaseService;
 	@Mock
@@ -55,9 +59,11 @@ public class ProductInternalServiceTest {
 	public void init() {
 
 		productInternalService = new ProductInternalService(
+			elasticsearchOperations,
+
 			productRepository,
+			productDocumentRepository,
 			productQueryRepository,
-			searchingQueryRepository,
 			productMapper,
 			productViewCountIncreaseService,
 
@@ -88,16 +94,20 @@ public class ProductInternalServiceTest {
 
 		CategoryInfoResponse categoryInfoResponse = new CategoryInfoResponse("대분류", "소분류");
 
+		Product saved = productMapper.registerToEntity(request, registerId, imageUrl, categoryInfoResponse);
+		ReflectionTestUtils.setField(saved, "id", 1L);
+
 		given(s3FileManager.store(image)).willReturn(imageUrl);
 		given(categoryInnerService.getCategoriesByCategoryId(request.getCategoryId())).willReturn(categoryInfoResponse);
+		given(productRepository.save(any(Product.class))).willReturn(saved);
+		given(productDocumentRepository.save(any(ProductDocument.class))).willReturn(new ProductDocument());
 
 		// when
 		productInternalService.registerProduct(request, image, registerId);
 
 		// then
 		verify(s3FileManager).store(image);
-		verify(productRepository).save(captor.capture());
-		Product saved = captor.getValue();
+		verify(productRepository).save(any(Product.class));
 
 		verify(auctionInnerService).registerAuction(saved.getId(), registerId, request.getStartBid(),
 			saved.getRegisteredAt(), request.getEndAt());

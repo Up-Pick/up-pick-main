@@ -25,6 +25,7 @@ import org.oneog.uppick.auction.domain.member.dto.request.RegisterSellDetailRequ
 import org.oneog.uppick.auction.domain.member.service.MemberInnerService;
 import org.oneog.uppick.auction.domain.notification.dto.request.SendNotificationRequest;
 import org.oneog.uppick.auction.domain.notification.service.NotificationInnerService;
+import org.oneog.uppick.auction.domain.product.service.ProductInnerService;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -41,6 +42,8 @@ class AuctionSchedulerServiceTest {
 	private MemberInnerService memberInnerService;
 	@Mock
 	private NotificationInnerService notificationInnerService;
+	@Mock
+	private ProductInnerService productInnerService;
 
 	@InjectMocks
 	private AuctionSchedulerService auctionSchedulerService;
@@ -51,8 +54,6 @@ class AuctionSchedulerServiceTest {
 	private ArgumentCaptor<RegisterSellDetailRequest> sellCaptor;
 	@Captor
 	private ArgumentCaptor<SendNotificationRequest> notificationCaptor;
-	@Captor
-	private ArgumentCaptor<Auction> auctionCaptor;
 
 	@Test
 	void confirmFinishedAuctions_입찰자가존재하는경우_낙찰처리성공() {
@@ -89,6 +90,7 @@ class AuctionSchedulerServiceTest {
 		willDoNothing().given(memberInnerService).registerPurchaseDetail(any(RegisterPurchaseDetailRequest.class));
 		willDoNothing().given(memberInnerService).registerSellDetail(any(RegisterSellDetailRequest.class));
 		willDoNothing().given(notificationInnerService).sendNotification(any(SendNotificationRequest.class));
+		willDoNothing().given(productInnerService).updateProductDocumentStatus(anyLong());
 
 		// when
 		auctionSchedulerService.confirmFinishedAuctions();
