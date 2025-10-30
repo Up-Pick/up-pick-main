@@ -67,7 +67,7 @@ public class DefaultAuctionTest {
 
 		// 이벤트 전송 검증
 		ArgumentCaptor<AuctionEndedEvent> eventCaptor = ArgumentCaptor.forClass(AuctionEndedEvent.class);
-		verify(rabbitTemplate, times(1)).convertAndSend(eq(RabbitMQConfig.AUCTION_EXCHANGE_NAME), eq(
+		verify(rabbitTemplate, times(1)).convertAndSend(eq(RabbitMQConfig.AUCTION_ENDED_EXCHANGE_NAME), eq(
 			RabbitMQConfig.AUCTION_ENDED_ROUTING_KEY), eventCaptor.capture(), any(MessagePostProcessor.class));
 
 		AuctionEndedEvent sentEvent = eventCaptor.getValue();
