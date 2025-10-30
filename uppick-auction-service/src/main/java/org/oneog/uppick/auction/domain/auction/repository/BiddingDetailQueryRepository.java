@@ -16,13 +16,14 @@ public class BiddingDetailQueryRepository {
 
 	private final JPAQueryFactory jpaQueryFactory;
 
-	public List<Long> findDistinctBidderIdsByAuctionId(Long auctionId) {
+	public List<Long> findDistinctBidderIdsByAuctionExcludeMember(long auctionId, long excludeMemberId) {
 
 		return jpaQueryFactory
 			.select(biddingDetail.memberId)
 			.distinct()
 			.from(biddingDetail)
-			.where(biddingDetail.auctionId.eq(auctionId))
+			.where(biddingDetail.auctionId.eq(auctionId)
+				.and(biddingDetail.memberId.ne(excludeMemberId)))
 			.fetch();
 	}
 
