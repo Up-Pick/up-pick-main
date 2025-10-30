@@ -12,11 +12,16 @@ services:
       - "3307:3306"
     volumes:
       - main_mysql_data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password --innodb-buffer-pool-size=128M --max-connections=50
+    deploy:
+      resources:
+        limits:
+          memory: 512M
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
-      interval: 10s
+      interval: 30s
       timeout: 5s
-      retries: 5
+      retries: 3
 
   auction-mysql:
     image: mysql:8.0
@@ -29,11 +34,16 @@ services:
       - "3308:3306"
     volumes:
       - auction_mysql_data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password --innodb-buffer-pool-size=128M --max-connections=50
+    deploy:
+      resources:
+        limits:
+          memory: 512M
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
-      interval: 10s
+      interval: 30s
       timeout: 5s
-      retries: 5
+      retries: 3
 
   # 추후 Lock과 Cache용 Redis를 분리해야함
   auction-redis:
@@ -42,11 +52,16 @@ services:
       - "6380:6379"
     volumes:
       - auction_redis_data:/data
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru --save ""
+    deploy:
+      resources:
+        limits:
+          memory: 256M
     healthcheck:
       test: [ "CMD", "redis-cli", "ping" ]
-      interval: 10s
+      interval: 30s
       timeout: 5s
-      retries: 5
+      retries: 3
 
   uppick-rabbitmq:
     image: rabbitmq:3.10-management
@@ -58,11 +73,15 @@ services:
       - "15673:15672" # Management UI
     volumes:
       - uppick_rabbitmq_data:/var/lib/rabbitmq
+    deploy:
+      resources:
+        limits:
+          memory: 512M
     healthcheck:
       test: [ "CMD-SHELL", "rabbitmq-diagnostics -q ping || exit 1" ]
-      interval: 10s
+      interval: 30s
       timeout: 5s
-      retries: 10
+      retries: 5
 
   uppick-api-gateway:
     build:
@@ -72,8 +91,13 @@ services:
       SPRING_PROFILES_ACTIVE: local
       AUCTION_SERVICE_URL: http://uppick-auction-service:8080
       MAIN_SERVICE_URL: http://uppick-main-service:8080
+      JAVA_OPTS: "-Xms128m -Xmx256m"
     ports:
       - "8080:8080"
+    deploy:
+      resources:
+        limits:
+          memory: 512M
 
   uppick-auction-service:
     build:
@@ -92,8 +116,13 @@ services:
       RABBITMQ_PORT: 5672
       RABBITMQ_USER: user
       RABBITMQ_PASS: password
+      JAVA_OPTS: "-Xms256m -Xmx512m"
     ports:
       - "8082:8080"
+    deploy:
+      resources:
+        limits:
+          memory: 768M
     depends_on:
       auction-elasticsearch:
         condition: service_healthy
@@ -119,9 +148,14 @@ services:
       RABBITMQ_USER: user
       RABBITMQ_PASS: password
       AUCTION_SERVICE_URL: http://uppick-auction-service:8080
+      JAVA_OPTS: "-Xms256m -Xmx512m"
     ports:
       - "8081:8080"
       - "9090:9090"
+    deploy:
+      resources:
+        limits:
+          memory: 768M
     depends_on:
       main-mysql:
         condition: service_healthy
@@ -141,6 +175,10 @@ services:
       # 메트릭 데이터 보관 기간 (기본 15일 -> 1일로 단축)
       - '--storage.tsdb.retention.time=1d'
       - '--web.enable-remote-write-receiver'
+    deploy:
+      resources:
+        limits:
+          memory: 256M
 
   grafana:
     image: grafana/grafana:latest
@@ -154,6 +192,10 @@ services:
       - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
       - ./monitoring/grafana/dashboards:/etc/grafana/dashboards
       - grafana_data:/var/lib/grafana
+    deploy:
+      resources:
+        limits:
+          memory: 256M
     depends_on:
       - prometheus
 
@@ -164,7 +206,7 @@ services:
       - node.name=es01
       - discovery.type=single-node
       - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - xpack.security.enabled=false # 개발용에서만 false, 운영 서버에서는 true 필요 (보안)
       - ELASTIC_PASSWORD=password
     ulimits:
@@ -175,16 +217,22 @@ services:
       - 9201:9200
     volumes:
       - auction_es_data:/usr/share/elasticsearch/data
+    deploy:
+      resources:
+        limits:
+          memory: 2G
     command: >
       sh -c "
-        bin/elasticsearch-plugin install analysis-nori --batch &&
-        bin/elasticsearch
+        if ! bin/elasticsearch-plugin list | grep -q analysis-nori; then
+          bin/elasticsearch-plugin install analysis-nori --batch;
+        fi;
+        exec bin/elasticsearch
       "
     healthcheck:
       test: [ "CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1" ]
-      interval: 30s
+      interval: 60s
       timeout: 10s
-      retries: 5
+      retries: 3
 
   auction-kibana:
     image: docker.elastic.co/kibana/kibana:8.15.3
@@ -193,15 +241,20 @@ services:
       - auction-elasticsearch
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - NODE_OPTIONS="--max-old-space-size=256"
     ports:
       - 5602:5601
     volumes:
       - auction_kibana_data:/usr/share/kibana/data
+    deploy:
+      resources:
+        limits:
+          memory: 512M
     healthcheck:
       test: [ "CMD-SHELL", "curl -f http://localhost:5601 || exit 1" ]
-      interval: 30s
+      interval: 60s
       timeout: 10s
-      retries: 20
+      retries: 10
 
 volumes:
   main_mysql_data:
