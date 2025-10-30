@@ -4,6 +4,12 @@ spring:
     username: ${DB_USER}
     password: ${DB_PASS}
     driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 10
+      connection-timeout: 30000   # 30초
+      max-lifetime: 1800000       # 30분
+      leak-detection-threshold: 60000  # 누수 감지
   jpa:
     open-in-view: false
     properties:
@@ -11,6 +17,8 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
     hibernate:
       ddl-auto: update
+  elasticsearch:
+    uris: ${ELASTICSEARCH_URL}
   threads:
     virtual:
       enabled: true
@@ -25,6 +33,11 @@ spring:
     redis:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_USER}
+    password: ${RABBITMQ_PASS}
 # Actuator 및 모니터링 설정
 management:
   endpoints:
@@ -35,18 +48,17 @@ management:
   metrics:
     tags:
       application: ${spring.application.name}
-    export:
-      prometheus:
+  prometheus:
+    metrics:
+      export:
         enabled: true
 server:
   port: 8080
 jwt:
   secret:
     key: "VXBwaWNrUHJvamVjdFNlY3JldEtleUZvclRlc3RpbmdQdXJwb3NlczEyMzQ1Njc4OTA="
-
 gateway:
   url: ${GATEWAY_URL}
-
 internal:
   api:
     secret: "jdklsfjksdfjksldfjklsdjfklsdfjsklfjskljafklwejflkjw"

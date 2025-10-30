@@ -47,6 +47,9 @@ dependencies {
 
     // Prometheus
     implementation 'io.micrometer:micrometer-registry-prometheus'
+
+    // RabbitMQ (Spring AMQP)
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
 }
 
 // REST Docs 스니펫 디렉토리 설정

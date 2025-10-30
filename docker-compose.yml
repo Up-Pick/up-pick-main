@@ -12,11 +12,16 @@ services:
       - "3307:3306"
     volumes:
       - main_mysql_data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password --innodb-buffer-pool-size=128M --max-connections=50
+    deploy:
+      resources:
+        limits:
+          memory: 512M
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
-      interval: 10s
+      interval: 30s
       timeout: 5s
-      retries: 5
+      retries: 3
 
   auction-mysql:
     image: mysql:8.0
@@ -29,11 +34,16 @@ services:
       - "3308:3306"
     volumes:
       - auction_mysql_data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password --innodb-buffer-pool-size=128M --max-connections=50
+    deploy:
+      resources:
+        limits:
+          memory: 512M
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
-      interval: 10s
+      interval: 30s
       timeout: 5s
-      retries: 5
+      retries: 3
 
   # 추후 Lock과 Cache용 Redis를 분리해야함
   auction-redis:
@@ -42,9 +52,40 @@ services:
       - "6380:6379"
     volumes:
       - auction_redis_data:/data
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru --save ""
+    deploy:
+      resources:
+        limits:
+          memory: 256M
     healthcheck:
       test: [ "CMD", "redis-cli", "ping" ]
-      interval: 10s
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  uppick-rabbitmq:
+    image: rabbitmq:3.10-management
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
+    ports:
+      - "5673:5672" # AMQP
+      - "15673:15672" # Management UI
+    volumes:
+      - uppick_rabbitmq_data:/var/lib/rabbitmq
+    command: >
+      sh -c "
+        wget -O /opt/rabbitmq/plugins/rabbitmq_delayed_message_exchange.ez https://github.com/rabbitmq/rabbitmq-delayed-message-exchange/releases/download/3.10.2/rabbitmq_delayed_message_exchange-3.10.2.ez;
+        rabbitmq-plugins enable rabbitmq_delayed_message_exchange;
+        rabbitmq-server
+      "
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    healthcheck:
+      test: [ "CMD-SHELL", "rabbitmq-diagnostics -q ping || exit 1" ]
+      interval: 30s
       timeout: 5s
       retries: 5
 
@@ -56,8 +97,13 @@ services:
       SPRING_PROFILES_ACTIVE: local
       AUCTION_SERVICE_URL: http://uppick-auction-service:8080
       MAIN_SERVICE_URL: http://uppick-main-service:8080
+      JAVA_OPTS: "-Xms128m -Xmx256m"
     ports:
       - "8080:8080"
+    deploy:
+      resources:
+        limits:
+          memory: 512M
 
   uppick-auction-service:
     build:
@@ -70,13 +116,27 @@ services:
       DB_PASS: password
       REDIS_HOST: auction-redis
       REDIS_PORT: 6379
+      ELASTICSEARCH_URL: http://auction-elasticsearch:9200
       GATEWAY_URL: http://uppick-api-gateway:8080
+      RABBITMQ_HOST: uppick-rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: user
+      RABBITMQ_PASS: password
+      JAVA_OPTS: "-Xms256m -Xmx512m"
     ports:
       - "8082:8080"
+    deploy:
+      resources:
+        limits:
+          memory: 768M
     depends_on:
+      auction-elasticsearch:
+        condition: service_healthy
       auction-mysql:
         condition: service_healthy
       auction-redis:
+        condition: service_healthy
+      uppick-rabbitmq:
         condition: service_healthy
 
   uppick-main-service:
@@ -88,11 +148,24 @@ services:
       DB_URL: jdbc:mysql://main-mysql:3306/uppick_db
       DB_USER: user
       DB_PASS: password
+      # RabbitMQ 접속 정보 (필요시 사용)
+      RABBITMQ_HOST: uppick-rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: user
+      RABBITMQ_PASS: password
+      AUCTION_SERVICE_URL: http://uppick-auction-service:8080
+      JAVA_OPTS: "-Xms256m -Xmx512m"
     ports:
       - "8081:8080"
       - "9090:9090"
+    deploy:
+      resources:
+        limits:
+          memory: 768M
     depends_on:
       main-mysql:
+        condition: service_healthy
+      uppick-rabbitmq:
         condition: service_healthy
 
   prometheus:
@@ -107,6 +180,11 @@ services:
       - '--storage.tsdb.path=/prometheus'
       # 메트릭 데이터 보관 기간 (기본 15일 -> 1일로 단축)
       - '--storage.tsdb.retention.time=1d'
+      - '--web.enable-remote-write-receiver'
+    deploy:
+      resources:
+        limits:
+          memory: 256M
 
   grafana:
     image: grafana/grafana:latest
@@ -120,12 +198,75 @@ services:
       - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
       - ./monitoring/grafana/dashboards:/etc/grafana/dashboards
       - grafana_data:/var/lib/grafana
+    deploy:
+      resources:
+        limits:
+          memory: 256M
     depends_on:
       - prometheus
+
+  auction-elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.3
+    container_name: elasticsearch
+    environment:
+      - node.name=es01
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.enabled=false # 개발용에서만 false, 운영 서버에서는 true 필요 (보안)
+      - ELASTIC_PASSWORD=password
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - 9201:9200
+    volumes:
+      - auction_es_data:/usr/share/elasticsearch/data
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+    command: >
+      sh -c "
+        if ! bin/elasticsearch-plugin list | grep -q analysis-nori; then
+          bin/elasticsearch-plugin install analysis-nori --batch;
+        fi;
+        exec bin/elasticsearch
+      "
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1" ]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+
+  auction-kibana:
+    image: docker.elastic.co/kibana/kibana:8.15.3
+    container_name: kibana
+    depends_on:
+      - auction-elasticsearch
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - NODE_OPTIONS="--max-old-space-size=256"
+    ports:
+      - 5602:5601
+    volumes:
+      - auction_kibana_data:/usr/share/kibana/data
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:5601 || exit 1" ]
+      interval: 60s
+      timeout: 10s
+      retries: 10
 
 volumes:
   main_mysql_data:
   auction_mysql_data:
   auction_redis_data:
-  # Grafana 설정 및 대시보드만 유지 (Prometheus 데이터는 컨테이너 재시작시 초기화)
+  uppick_rabbitmq_data:
   grafana_data:
+  auction_es_data:
+  auction_kibana_data:

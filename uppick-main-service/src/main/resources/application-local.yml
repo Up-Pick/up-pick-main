@@ -4,6 +4,12 @@ spring:
     username: ${DB_USER}
     password: ${DB_PASS}
     driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 10
+      connection-timeout: 30000   # 30초
+      max-lifetime: 1800000       # 30분
+      leak-detection-threshold: 60000  # 누수 감지
   jpa:
     open-in-view: false
     properties:
@@ -14,6 +20,11 @@ spring:
   threads:
     virtual:
       enabled: true
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_USER}
+    password: ${RABBITMQ_PASS}
 server:
   port: 8080
 # Actuator 및 모니터링 설정
@@ -26,8 +37,9 @@ management:
   metrics:
     tags:
       application: ${spring.application.name}
-    export:
-      prometheus:
+  prometheus:
+    metrics:
+      export:
         enabled: true
 grpc:
   server:
@@ -39,3 +51,5 @@ jwt:
 internal:
   api:
     secret: "jdklsfjksdfjksldfjklsdjfklsdfjsklfjskljafklwejflkjw"
+  auction-service:
+    url: ${AUCTION_SERVICE_URL}

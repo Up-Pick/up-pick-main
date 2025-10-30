@@ -48,6 +48,12 @@ dependencies {
 
     // Prometheus
     implementation 'io.micrometer:micrometer-registry-prometheus'
+
+    // Elastic Search
+    implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+
+    // RabbitMQ (Spring AMQP)
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
 }
 
 // REST Docs 스니펫 디렉토리 설정

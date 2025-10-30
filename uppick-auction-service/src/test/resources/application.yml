@@ -20,6 +20,8 @@ spring:
       s3:
         enabled: false
         bucket: test-bucket
+  elasticsearch:
+    uris: http://localhost:9201
   data:
     redis:
       host: localhost
@@ -27,6 +29,8 @@ spring:
   autoconfigure:
     exclude:
       - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchDataAutoConfiguration
+      - org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchRestClientAutoConfiguration
 jwt:
   secret:
     key: "VXBwaWNrUHJvamVjdFNlY3JldEtleUZvclRlc3RpbmdQdXJwb3NlczEyMzQ1Njc4OTA="

@@ -1,3 +1,11 @@
+## 목차
+
+- [도커 실행](#도커-실행)
+- [도커 종료](#도커-종료)
+- [REST Docs](#rest-docs)
+- [모니터링 대시보드](#모니터링-대시보드)
+- [k6 Load Testing](#k6-load-testing)
+
 ## 도커 실행
 
 ### windows
@@ -136,6 +144,7 @@ Grafana 공식 대시보드를 임포트하여 더 상세한 모니터링이 가
 6. Import 클릭
 
 **대시보드 4701 주요 메트릭:**
+
 - JVM 메모리 상세 분석 (Eden, Survivor, Old Gen)
 - GC (Garbage Collection) 통계
 - 클래스 로딩 정보
@@ -177,3 +186,51 @@ Grafana 공식 대시보드를 임포트하여 더 상세한 모니터링이 가
 
 - 실제 API 요청을 보내야 메트릭이 생성됩니다
 - Postman이나 부하 테스트 도구로 엔드포인트에 요청 전송
+
+# k6 Load Testing
+
+**실행:**
+
+```bash
+k6 run --out experimental-prometheus-rw \
+  -e K6_PROMETHEUS_RW_SERVER_URL=http://localhost:9091/api/v1/write \
+  -e K6_PROMETHEUS_RW_TREND_AS_NATIVE_HISTOGRAM=false \
+  -e K6_PROMETHEUS_RW_PUSH_INTERVAL=5s \
+  k6-tests/find-max-tps-test.js
+```
+
+### 시스템 요구사항
+
+k6를 먼저 설치해야 합니다:
+
+https://github.com/grafana/k6/releases/tag/v1.3.0
+맨 아래 컴퓨터에 맞춰서 k6 설치(설치 후 인텔리제이 재접속 권장)
+
+### 서비스 요구사항
+
+- MAU (월간 활성 사용자): 100,000명
+- DAU (일일 활성 사용자): 10,000명 (MAU의 10%)
+- 최대 동시 접속자: 500명 (DAU의 5%)
+- Think Time: 5초
+- 평균 TPS: 100
+- 목표 TPS: 200
+
+#### Grafana 대시보드 (Simplified):
+
+- 👥 Virtual Users
+- ⚡ P99 Response Time (Max/Avg/Min)
+- 🕐 Request Timing Breakdown
+- 🐌 Top 10 Slowest Endpoints
+
+#### k6 테스트 결과 요약 (콘솔):
+
+- 평균/실제 TPS
+- 총 요청 수
+- 에러율
+- 응답시간 (평균/P95/P99)
+
+# k6의 `experimental-prometheus-rw` 출력은 Trend 메트릭(백분위수)만 전송합니다
+
+- ✅ 사용 가능: VU 수, P99 응답시간, Request Timing
+- ❌ 사용 불가: TPS, Total Requests, Error Rate (Counter 메트릭 미지원)
+- 💡 TPS는 k6 콘솔 출력에서 확인 가능
