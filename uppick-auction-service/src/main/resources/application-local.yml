@@ -16,7 +16,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
   elasticsearch:
     uris: ${ELASTICSEARCH_URL}
   threads:
@@ -38,6 +38,13 @@ spring:
     port: ${RABBITMQ_PORT}
     username: ${RABBITMQ_USER}
     password: ${RABBITMQ_PASS}
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 1
+    locations:
+      - classpath:db/migration
+      - classpath:db/seed
 # Actuator 및 모니터링 설정
 management:
   endpoints:
@@ -57,8 +64,10 @@ server:
 jwt:
   secret:
     key: "VXBwaWNrUHJvamVjdFNlY3JldEtleUZvclRlc3RpbmdQdXJwb3NlczEyMzQ1Njc4OTA="
+
 gateway:
   url: ${GATEWAY_URL}
+
 internal:
   api:
     secret: "jdklsfjksdfjksldfjklsdjfklsdfjsklfjskljafklwejflkjw"
