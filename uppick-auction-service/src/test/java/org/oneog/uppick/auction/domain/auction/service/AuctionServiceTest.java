@@ -14,6 +14,7 @@ import org.oneog.uppick.auction.common.lock.LockManager;
 import org.oneog.uppick.auction.domain.auction.dto.request.AuctionBidRequest;
 import org.oneog.uppick.auction.domain.auction.dto.request.BiddingResultDto;
 import org.oneog.uppick.auction.domain.auction.event.AuctionEventType;
+import org.oneog.uppick.auction.domain.auction.event.BidPlacedEvent;
 import org.oneog.uppick.auction.domain.auction.event.AuctionEndedEvent;
 import org.oneog.uppick.auction.domain.auction.event.AuctionEventProducer;
 import org.oneog.uppick.auction.domain.auction.exception.AuctionErrorCode;
@@ -51,7 +52,7 @@ public class AuctionServiceTest {
 
 		// Then
 		then(lockManager).should().executeWithLock(eq("auction:bidding:1"), any(Supplier.class));
-		then(auctionEventProducer).should().produce(eq(AuctionEventType.BID_PLACED), any(AuctionEndedEvent.class));
+		then(auctionEventProducer).should().produce(eq(AuctionEventType.BID_PLACED), any(BidPlacedEvent.class));
 	}
 
 	@Test
