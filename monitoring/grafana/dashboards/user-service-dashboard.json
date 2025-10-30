@@ -96,7 +96,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(http_server_requests_seconds_sum{application=\"uppick-main-service\"}[1m])) / sum(rate(http_server_requests_seconds_count{application=\"uppick-main-service\"}[1m]))",
+          "expr": "sum(rate(http_server_requests_seconds_sum{application=\"$application\"}[1m])) / sum(rate(http_server_requests_seconds_count{application=\"$application\"}[1m]))",
           "legendFormat": "평균 응답시간",
           "range": true,
           "refId": "A"
@@ -166,7 +166,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{application=\"uppick-main-service\"}[1m])) by (le))",
+          "expr": "histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{application=\"$application\"}[1m])) by (le))",
           "legendFormat": "P95",
           "range": true,
           "refId": "A"
@@ -236,7 +236,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum(rate(http_server_requests_seconds_bucket{application=\"uppick-main-service\"}[1m])) by (le))",
+          "expr": "histogram_quantile(0.99, sum(rate(http_server_requests_seconds_bucket{application=\"$application\"}[1m])) by (le))",
           "legendFormat": "P99",
           "range": true,
           "refId": "A"
@@ -330,7 +330,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(http_server_requests_seconds_count{application=\"uppick-main-service\"}[1m]))",
+          "expr": "sum(rate(http_server_requests_seconds_count{application=\"$application\"}[1m]))",
           "legendFormat": "RPS",
           "range": true,
           "refId": "A"
@@ -479,7 +479,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(http_server_requests_seconds_sum{application=\"uppick-main-service\"}[1m])) / sum(rate(http_server_requests_seconds_count{application=\"uppick-main-service\"}[1m]))",
+          "expr": "sum(rate(http_server_requests_seconds_sum{application=\"$application\"}[1m])) / sum(rate(http_server_requests_seconds_count{application=\"$application\"}[1m]))",
           "legendFormat": "평균",
           "range": true,
           "refId": "A"
@@ -490,7 +490,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{application=\"uppick-main-service\"}[1m])) by (le))",
+          "expr": "histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{application=\"$application\"}[1m])) by (le))",
           "hide": false,
           "legendFormat": "P95",
           "range": true,
@@ -502,7 +502,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum(rate(http_server_requests_seconds_bucket{application=\"uppick-main-service\"}[1m])) by (le))",
+          "expr": "histogram_quantile(0.99, sum(rate(http_server_requests_seconds_bucket{application=\"$application\"}[1m])) by (le))",
           "hide": false,
           "legendFormat": "P99",
           "range": true,
@@ -610,7 +610,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(http_server_requests_seconds_count{application=\"uppick-main-service\"}[1m])) by (uri)",
+          "expr": "sum(rate(http_server_requests_seconds_count{application=\"$application\"}[1m])) by (uri)",
           "legendFormat": "{{uri}}",
           "range": true,
           "refId": "A"
@@ -750,7 +750,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(http_server_requests_seconds_count{application=\"uppick-main-service\"}[1m])) by (status)",
+          "expr": "sum(rate(http_server_requests_seconds_count{application=\"$application\"}[1m])) by (status)",
           "legendFormat": "{{status}}",
           "range": true,
           "refId": "A"
@@ -820,7 +820,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(http_server_requests_seconds_count{application=\"uppick-main-service\"}[30s]))",
+          "expr": "sum(rate(http_server_requests_seconds_count{application=\"$application\"}[30s]))",
           "legendFormat": "현재 RPS",
           "range": true,
           "refId": "A"
@@ -883,7 +883,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(http_server_requests_seconds_count{application=\"uppick-main-service\"})",
+          "expr": "sum(http_server_requests_seconds_count{application=\"$application\"})",
           "legendFormat": "총 요청",
           "range": true,
           "refId": "A"
@@ -955,7 +955,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "100 * (sum(rate(http_server_requests_seconds_count{application=\"uppick-main-service\", outcome=~\"CLIENT_ERROR|SERVER_ERROR\"}[1m])) or sum(rate(http_server_requests_seconds_count{application=\"uppick-main-service\", status=~\"[45].*\"}[1m])) or vector(0)) / (sum(rate(http_server_requests_seconds_count{application=\"uppick-main-service\"}[1m])) or vector(1))",
+          "expr": "100 * (sum(rate(http_server_requests_seconds_count{application=\"$application\", outcome=~\"CLIENT_ERROR|SERVER_ERROR\"}[1m])) or sum(rate(http_server_requests_seconds_count{application=\"$application\", status=~\"[45].*\"}[1m])) or vector(0)) / (sum(rate(http_server_requests_seconds_count{application=\"$application\"}[1m])) or vector(1))",
           "legendFormat": "Error Rate",
           "range": true,
           "refId": "A"
@@ -1027,7 +1027,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "100 * (sum(rate(http_server_requests_seconds_count{application=\"uppick-main-service\"}[1m])) / max_over_time(sum(rate(http_server_requests_seconds_count{application=\"uppick-main-service\"}[1m]))[1h:1m]))",
+          "expr": "100 * (sum(rate(http_server_requests_seconds_count{application=\"$application\"}[1m])) / max_over_time(sum(rate(http_server_requests_seconds_count{application=\"$application\"}[1m]))[1h:1m]))",
           "legendFormat": "피크 대비 부하",
           "range": true,
           "refId": "A"
@@ -1145,7 +1145,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "100 * process_cpu_usage{application=\"uppick-main-service\"}",
+          "expr": "100 * process_cpu_usage{application=\"$application\"}",
           "legendFormat": "Process CPU",
           "range": true,
           "refId": "A"
@@ -1156,7 +1156,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "100 * system_cpu_usage{application=\"uppick-main-service\"}",
+          "expr": "100 * system_cpu_usage{application=\"$application\"}",
           "hide": false,
           "legendFormat": "System CPU",
           "range": true,
@@ -1164,159 +1164,6 @@
         }
       ],
       "title": "CPU 사용률",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "description": "JVM Heap 메모리 사용률",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "Memory",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 20,
-            "gradientMode": "opacity",
-            "hideFrom": {
-              "tooltip": false,
-              "viz": false,
-              "legend": false
-            },
-            "lineInterpolation": "smooth",
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "line"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 750000000
-              },
-              {
-                "color": "red",
-                "value": 900000000
-              }
-            ]
-          },
-          "unit": "bytes"
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Max"
-            },
-            "properties": [
-              {
-                "id": "custom.lineStyle",
-                "value": {
-                  "dash": [
-                    10,
-                    10
-                  ],
-                  "fill": "dash"
-                }
-              },
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "red",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 35
-      },
-      "id": 13,
-      "options": {
-        "legend": {
-          "calcs": [
-            "mean",
-            "lastNotNull",
-            "max"
-          ],
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "9.5.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "editorMode": "code",
-          "expr": "jvm_memory_used_bytes{application=\"uppick-main-service\", area=\"heap\"}",
-          "legendFormat": "Used",
-          "range": true,
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "editorMode": "code",
-          "expr": "jvm_memory_committed_bytes{application=\"uppick-main-service\", area=\"heap\"}",
-          "hide": false,
-          "legendFormat": "Committed",
-          "range": true,
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "editorMode": "code",
-          "expr": "jvm_memory_max_bytes{application=\"uppick-main-service\", area=\"heap\"}",
-          "hide": false,
-          "legendFormat": "Max",
-          "range": true,
-          "refId": "C"
-        }
-      ],
-      "title": "Heap 메모리 사용량",
       "type": "timeseries"
     },
     {
@@ -1382,7 +1229,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "100 * process_cpu_usage{application=\"uppick-main-service\"}",
+          "expr": "100 * process_cpu_usage{application=\"$application\"}",
           "legendFormat": "CPU",
           "range": true,
           "refId": "A"
@@ -1454,7 +1301,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "100 * (jvm_memory_used_bytes{application=\"uppick-main-service\", area=\"heap\"} / jvm_memory_max_bytes{application=\"uppick-main-service\", area=\"heap\"})",
+          "expr": "100 * (sum(jvm_memory_used_bytes{application=\"$application\", area=\"heap\"}) / sum(jvm_memory_max_bytes{application=\"$application\", area=\"heap\"} > 0))",
           "legendFormat": "Heap Usage",
           "range": true,
           "refId": "A"
@@ -1548,7 +1395,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "rate(jvm_gc_pause_seconds_count{application=\"uppick-main-service\"}[1m])",
+          "expr": "rate(jvm_gc_pause_seconds_count{application=\"$application\"}[1m])",
           "legendFormat": "{{action}} - {{cause}}",
           "range": true,
           "refId": "A"
@@ -1659,7 +1506,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "rate(http_server_requests_seconds_sum{application=\"uppick-main-service\"}[1m]) / rate(http_server_requests_seconds_count{application=\"uppick-main-service\"}[1m])",
+          "expr": "rate(http_server_requests_seconds_sum{application=\"$application\"}[1m]) / rate(http_server_requests_seconds_count{application=\"$application\"}[1m])",
           "legendFormat": "{{uri}} - {{method}}",
           "range": true,
           "refId": "A"
@@ -1755,7 +1602,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "topk(10, rate(http_server_requests_seconds_sum{application=\"uppick-main-service\"}[5m]) / rate(http_server_requests_seconds_count{application=\"uppick-main-service\"}[5m]))",
+          "expr": "topk(10, rate(http_server_requests_seconds_sum{application=\"$application\"}[5m]) / rate(http_server_requests_seconds_count{application=\"$application\"}[5m]))",
           "format": "table",
           "instant": true,
           "legendFormat": "__auto",
@@ -1810,7 +1657,36 @@
     "spring-boot"
   ],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "allValue": ".*",
+        "current": {
+          "selected": false,
+          "text": "uppick-main-service",
+          "value": "uppick-main-service"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "definition": "label_values(http_server_requests_seconds_count, application)",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Application",
+        "multi": false,
+        "name": "application",
+        "options": [],
+        "query": {
+          "query": "label_values(http_server_requests_seconds_count, application)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      }
+    ]
   },
   "time": {
     "from": "now-15m",
