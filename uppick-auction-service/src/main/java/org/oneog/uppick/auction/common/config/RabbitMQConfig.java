@@ -37,6 +37,7 @@ public class RabbitMQConfig {
         var converter = new Jackson2JsonMessageConverter(objectMapper);
         var typeMapper = new DefaultJackson2JavaTypeMapper();
         typeMapper.setIdClassMapping(EVENT_TYPE_MAPPINGS);
+        typeMapper.setTypePrecedence(DefaultJackson2JavaTypeMapper.TypePrecedence.TYPE_ID);
         converter.setJavaTypeMapper(typeMapper);
         return converter;
     }

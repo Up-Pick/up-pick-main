@@ -37,7 +37,7 @@ public class NotificationInternalService {
 		// 다른 입찰자에게 알림
 		List<Long> bidderIds = auctionClient.getBiddingMemberIds(event.getAuctionId(), event.getBidderId());
 		bidderIds.forEach(bidderId -> {
-			Notification bidderNotification = notificationMapper.toBidderNotification(event);
+			Notification bidderNotification = notificationMapper.toBidderNotification(event, bidderId);
 			notificationJpaRepository.save(bidderNotification);
 		});
 	}

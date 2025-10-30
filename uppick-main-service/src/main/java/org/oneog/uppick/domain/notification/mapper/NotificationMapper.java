@@ -49,10 +49,10 @@ public class NotificationMapper {
 			.build();
 	}
 
-	public Notification toBidderNotification(BidPlacedEvent event) {
+	public Notification toBidderNotification(BidPlacedEvent event, long bidderId) {
 
 		return Notification.builder()
-			.memberId(event.getSellerId())
+			.memberId(bidderId)
 			.type(NotificationType.BID)
 			.title("현재 입찰가가 갱신되었습니다!")
 			.message("현재 입찰가: " + event.getBiddingPrice())
