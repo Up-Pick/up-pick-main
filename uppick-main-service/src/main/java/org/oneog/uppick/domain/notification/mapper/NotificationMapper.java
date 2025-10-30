@@ -2,9 +2,11 @@ package org.oneog.uppick.domain.notification.mapper;
 
 import java.util.List;
 
+import org.oneog.uppick.domain.auction.event.BidPlacedEvent;
 import org.oneog.uppick.domain.notification.dto.request.SendNotificationRequest;
 import org.oneog.uppick.domain.notification.dto.response.GetUnreadNotificationsResponse;
 import org.oneog.uppick.domain.notification.entity.Notification;
+import org.oneog.uppick.domain.notification.entity.NotificationType;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -20,7 +22,8 @@ public class NotificationMapper {
 					.message(notification.getMessage())
 					.notifiedAt(notification.getNotifiedAt())
 					.build();
-			}).toList();
+			})
+			.toList();
 
 		return new GetUnreadNotificationsResponse(notificationDetails);
 	}
@@ -34,6 +37,26 @@ public class NotificationMapper {
 			.message(request.getString2())
 			.build();
 		return notification;
+	}
+
+	public Notification toSellerNotification(BidPlacedEvent event) {
+
+		return Notification.builder()
+			.memberId(event.getSellerId())
+			.type(NotificationType.BID)
+			.title("현재 입찰가가 갱신되었습니다!")
+			.message("현재 입찰가: " + event.getBiddingPrice())
+			.build();
+	}
+
+	public Notification toBidderNotification(BidPlacedEvent event) {
+
+		return Notification.builder()
+			.memberId(event.getSellerId())
+			.type(NotificationType.BID)
+			.title("현재 입찰가가 갱신되었습니다!")
+			.message("현재 입찰가: " + event.getBiddingPrice())
+			.build();
 	}
 
 }
