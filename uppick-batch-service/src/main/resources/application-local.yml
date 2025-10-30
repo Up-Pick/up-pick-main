@@ -45,10 +45,10 @@ management:
 internal:
   api:
     secret: "jdklsfjksdfjksldfjklsdjfklsdfjsklfjskljafklwejflkjw"
-  auction-service:
-    url: http://localhost:8082
-  main-service:
-    url: http://localhost:8081
+
+jwt:
+  secret:
+    key: "VXBwaWNrUHJvamVjdFNlY3JldEtleUZvclRlc3RpbmdQdXJwb3NlczEyMzQ1Njc4OTA="
 
 logging:
   level:
