@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.oneog.uppick.auction.common.lock.LockManager;
 import org.oneog.uppick.auction.domain.auction.dto.request.AuctionBidRequest;
 import org.oneog.uppick.auction.domain.auction.dto.request.BiddingResultDto;
+import org.oneog.uppick.auction.domain.auction.event.AuctionEventProducer;
 import org.oneog.uppick.auction.domain.auction.event.AuctionEventType;
 import org.oneog.uppick.auction.domain.auction.event.BidPlacedEvent;
 import org.springframework.stereotype.Service;

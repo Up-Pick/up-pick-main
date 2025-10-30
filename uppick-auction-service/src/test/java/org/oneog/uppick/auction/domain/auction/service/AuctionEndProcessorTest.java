@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -29,7 +28,7 @@ import org.oneog.uppick.auction.domain.product.service.ProductInnerService;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
-class AuctionSchedulerServiceTest {
+class AuctionEndProcessorTest {
 
 	@Mock
 	private AuctionRepository auctionRepository;
@@ -46,7 +45,7 @@ class AuctionSchedulerServiceTest {
 	private ProductInnerService productInnerService;
 
 	@InjectMocks
-	private AuctionSchedulerService auctionSchedulerService;
+	private AuctionEndProcessor auctionSchedulerService;
 
 	@Captor
 	private ArgumentCaptor<RegisterPurchaseDetailRequest> purchaseCaptor;
@@ -56,7 +55,8 @@ class AuctionSchedulerServiceTest {
 	private ArgumentCaptor<SendNotificationRequest> notificationCaptor;
 
 	@Test
-	void confirmFinishedAuctions_입찰자가존재하는경우_낙찰처리성공() {
+	void processAuctionWithBids_입찰자가존재하는경우_낙찰처리성공() {
+
 		// given
 		Long auctionId = 1L;
 		Long buyerId = 100L;
@@ -80,8 +80,8 @@ class AuctionSchedulerServiceTest {
 			.bidPrice(bidPrice)
 			.build();
 
-		given(auctionRepository.findAllByEndAtBeforeAndStatus(any(LocalDateTime.class), eq(AuctionStatus.IN_PROGRESS)))
-			.willReturn(List.of(auction));
+		given(auctionRepository.findById(auctionId))
+			.willReturn(Optional.of(auction));
 		given(biddingDetailRepository.findTopByAuctionIdOrderByBidPriceDesc(auctionId))
 			.willReturn(Optional.of(topBid));
 		given(auctionQueryRepository.findProductNameByProductId(productId))
@@ -93,7 +93,7 @@ class AuctionSchedulerServiceTest {
 		willDoNothing().given(productInnerService).updateProductDocumentStatus(anyLong());
 
 		// when
-		auctionSchedulerService.confirmFinishedAuctions();
+		auctionSchedulerService.process(auctionId);
 
 		// then
 		// 1. 경매 상태 변경 확인
@@ -127,7 +127,8 @@ class AuctionSchedulerServiceTest {
 	}
 
 	@Test
-	void confirmFinishedAuctions_입찰자가없는경우_유찰처리() {
+	void processAuctionWithoutBids_입찰자가없는경우_유찰처리() {
+
 		// given
 		Long auctionId = 1L;
 		Long productId = 10L;
@@ -143,13 +144,13 @@ class AuctionSchedulerServiceTest {
 		ReflectionTestUtils.setField(auction, "id", auctionId);
 
 		// 경매는 종료되었지만 입찰자가 없음
-		given(auctionRepository.findAllByEndAtBeforeAndStatus(any(LocalDateTime.class), eq(AuctionStatus.IN_PROGRESS)))
-			.willReturn(List.of(auction));
+		given(auctionRepository.findById(auctionId))
+			.willReturn(Optional.of(auction));
 		given(biddingDetailRepository.findTopByAuctionIdOrderByBidPriceDesc(auctionId))
 			.willReturn(Optional.empty());
 
 		// when
-		auctionSchedulerService.confirmFinishedAuctions();
+		auctionSchedulerService.process(auctionId);
 
 		// then
 		// 1. 경매 상태가 유찰로 변경되었는지 확인

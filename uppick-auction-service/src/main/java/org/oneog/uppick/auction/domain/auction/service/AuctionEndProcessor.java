@@ -1,12 +1,10 @@
 package org.oneog.uppick.auction.domain.auction.service;
 
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 import org.oneog.uppick.auction.domain.auction.entity.Auction;
-import org.oneog.uppick.auction.domain.auction.entity.AuctionStatus;
 import org.oneog.uppick.auction.domain.auction.entity.BiddingDetail;
+import org.oneog.uppick.auction.domain.auction.exception.AuctionErrorCode;
 import org.oneog.uppick.auction.domain.auction.repository.AuctionQueryRepository;
 import org.oneog.uppick.auction.domain.auction.repository.AuctionRepository;
 import org.oneog.uppick.auction.domain.auction.repository.BiddingDetailRepository;
@@ -17,7 +15,7 @@ import org.oneog.uppick.auction.domain.notification.dto.request.SendNotification
 import org.oneog.uppick.auction.domain.notification.enums.NotificationType;
 import org.oneog.uppick.auction.domain.notification.service.NotificationInnerService;
 import org.oneog.uppick.auction.domain.product.service.ProductInnerService;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.oneog.uppick.common.exception.BusinessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class AuctionSchedulerService {
+public class AuctionEndProcessor {
 
 	private final AuctionRepository auctionRepository;
 	private final BiddingDetailRepository biddingDetailRepository;
@@ -40,24 +38,14 @@ public class AuctionSchedulerService {
 	private final ProductInnerService productInnerService;
 
 	@Transactional
-	@Scheduled(cron = "0 0 * * * *") // 매 시 정각마다 실행
-	public void confirmFinishedAuctions() {
-
-		LocalDateTime now = LocalDateTime.now();
+	public void process(long auctionId) {
 
 		// 종료 시간이 현재 시간 이전인 '진행 중' 경매 조회
-		List<Auction> endedAuctions = auctionRepository.findAllByEndAtBeforeAndStatus(now,
-			AuctionStatus.IN_PROGRESS);
+		Auction auction = auctionRepository.findById(auctionId)
+			.orElseThrow(() -> new BusinessException(AuctionErrorCode.AUCTION_NOT_FOUND));
 
-		// 확인용
-		log.info("[Scheduler] 종료된 경매 {}건 처리 시작...", endedAuctions.size());
-
-		// 각 경매별 구매 확정 처리
-		for (Auction auction : endedAuctions) {
-			processAuctionResult(auction);
-		}
-
-		log.info("[Scheduler] 경매 마감 처리 완료.");
+		// 구매 확정 처리
+		processAuctionResult(auction);
 	}
 
 	private void processAuctionResult(Auction auction) {

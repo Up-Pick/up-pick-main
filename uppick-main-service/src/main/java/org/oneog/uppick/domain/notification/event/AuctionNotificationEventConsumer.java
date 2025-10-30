@@ -1,8 +1,9 @@
-package org.oneog.uppick.domain.notification.service;
+package org.oneog.uppick.domain.notification.event;
 
 import org.oneog.uppick.common.config.RabbitMQConfig;
 import org.oneog.uppick.common.event.DomainEvent;
 import org.oneog.uppick.domain.auction.event.BidPlacedEvent;
+import org.oneog.uppick.domain.notification.service.NotificationInternalService;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
