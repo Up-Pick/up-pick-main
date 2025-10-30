@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: uppick-batch-service
+
+
+  profiles:
+    active: local
+
+  batch:
+    job:
+      enabled: false  # 애플리케이션 시작 시 자동으로 Job을 실행하지 않음
+    jdbc:
+      initialize-schema: always  # Batch 메타데이터 테이블 자동 생성
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DB_URL:jdbc:mysql://localhost:3306/uppick?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:password}
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        default_batch_fetch_size: 100
+    open-in-view: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus,metrics
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+logging:
+  level:
+    org.oneog.uppick: INFO
+    org.springframework.batch: INFO
