@@ -44,7 +44,10 @@ public class RabbitMQConfig {
     @Bean
     public Queue auctionNotificationQueue() {
 
-        return new Queue(AUCTION_NOTIFICATION_QUEUE, true);
+        Map<String, Object> arguments = new HashMap<>();
+        arguments.put("x-dead-letter-exchange", NOTIFICATION_DLX_EXCHANGE_NAME);
+        arguments.put("x-dead-letter-routing-key", NOTIFICATION_DLQ_ROUTING_KEY);
+        return new Queue(AUCTION_NOTIFICATION_QUEUE, true, false, false, arguments);
     }
 
     @Bean

@@ -1,7 +1,6 @@
-package org.oneog.uppick.auction.domain.auction.service;
+package org.oneog.uppick.auction.domain.auction.event;
 
 import org.oneog.uppick.auction.common.config.RabbitMQConfig;
-import org.oneog.uppick.auction.domain.auction.event.AuctionEventType;
 import org.oneog.uppick.common.event.DomainEvent;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
