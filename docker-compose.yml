@@ -73,6 +73,12 @@ services:
       - "15673:15672" # Management UI
     volumes:
       - uppick_rabbitmq_data:/var/lib/rabbitmq
+    command: >
+      sh -c "
+        wget -O /opt/rabbitmq/plugins/rabbitmq_delayed_message_exchange.ez https://github.com/rabbitmq/rabbitmq-delayed-message-exchange/releases/download/3.10.2/rabbitmq_delayed_message_exchange-3.10.2.ez;
+        rabbitmq-plugins enable rabbitmq_delayed_message_exchange;
+        rabbitmq-server
+      "
     deploy:
       resources:
         limits:

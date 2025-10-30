@@ -1,4 +1,4 @@
-package org.oneog.uppick.domain.notification.service;
+package org.oneog.uppick.domain.notification.event;
 
 import org.oneog.uppick.common.config.RabbitMQConfig;
 import org.springframework.amqp.core.Message;
@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
-public class AuctionNotificationDLQConsumer {
+public class NotificationDLQConsumer {
 
     @RabbitListener(queues = RabbitMQConfig.NOTIFICATION_DLQ_QUEUE)
     public void consumeMessage(Message message) {
