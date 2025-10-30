@@ -54,6 +54,10 @@ dependencies {
 
     // RabbitMQ (Spring AMQP)
     implementation 'org.springframework.boot:spring-boot-starter-amqp'
+
+    // flyway
+    implementation 'org.flywaydb:flyway-core'
+    implementation 'org.flywaydb:flyway-mysql'
 }
 
 // REST Docs 스니펫 디렉토리 설정
