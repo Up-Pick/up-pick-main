@@ -48,6 +48,22 @@ services:
       timeout: 5s
       retries: 5
 
+  uppick-rabbitmq:
+    image: rabbitmq:3.10-management
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
+    ports:
+      - "5673:5672" # AMQP
+      - "15673:15672" # Management UI
+    volumes:
+      - uppick_rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: [ "CMD-SHELL", "rabbitmq-diagnostics -q ping || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
   uppick-api-gateway:
     build:
       context: .
@@ -72,6 +88,10 @@ services:
       REDIS_PORT: 6379
       ELASTICSEARCH_URL: http://auction-elasticsearch:9200
       GATEWAY_URL: http://uppick-api-gateway:8080
+      RABBITMQ_HOST: uppick-rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: user
+      RABBITMQ_PASS: password
     ports:
       - "8082:8080"
     depends_on:
@@ -80,6 +100,8 @@ services:
       auction-mysql:
         condition: service_healthy
       auction-redis:
+        condition: service_healthy
+      uppick-rabbitmq:
         condition: service_healthy
 
   uppick-main-service:
@@ -91,11 +113,19 @@ services:
       DB_URL: jdbc:mysql://main-mysql:3306/uppick_db
       DB_USER: user
       DB_PASS: password
+      # RabbitMQ 접속 정보 (필요시 사용)
+      RABBITMQ_HOST: uppick-rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: user
+      RABBITMQ_PASS: password
+      AUCTION_SERVICE_URL: http://uppick-auction-service:8080
     ports:
       - "8081:8080"
       - "9090:9090"
     depends_on:
       main-mysql:
+        condition: service_healthy
+      uppick-rabbitmq:
         condition: service_healthy
 
   prometheus:
@@ -177,7 +207,7 @@ volumes:
   main_mysql_data:
   auction_mysql_data:
   auction_redis_data:
-  # Grafana 설정 및 대시보드만 유지 (Prometheus 데이터는 컨테이너 재시작시 초기화)
+  uppick_rabbitmq_data:
   grafana_data:
   auction_es_data:
   auction_kibana_data:
