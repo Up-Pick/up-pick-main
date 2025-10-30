@@ -30,9 +30,8 @@ export const options = {
 
 // 🧠 테스트 로직
 export default function () {
-    const productId = Math.floor(Math.random() * 100) + 1;
 
-    const res = http.get(`${BASE_URL}/auction/api/v1/products/${productId}`, {
+    const res = http.get(`http://localhost:8080/auction/api/v1/products/1`, {
         headers: {'Content-Type': 'application/json'},
         timeout: '30s',
     });
@@ -55,7 +54,7 @@ export function handleSummary(data) {
     console.log('\n========================================');
     console.log('📊 점진 부하 테스트 결과 요약');
     console.log('========================================');
-    console.log(`API 엔드포인트: ${BASE_URL}/auction/api/v1/products/{id}`);
+    console.log(`API 엔드포인트: http://localhost:8080/auction/api/v1/products/1`);
     console.log(`테스트 시간: ${testDuration.toFixed(2)}초`);
     console.log(`최대 동시 접속자(VU): ${MAX_VUS}명`);
     console.log('----------------------------------------');

@@ -196,7 +196,6 @@ k6 run --out experimental-prometheus-rw \
   -e K6_PROMETHEUS_RW_SERVER_URL=http://localhost:9091/api/v1/write \
   -e K6_PROMETHEUS_RW_TREND_AS_NATIVE_HISTOGRAM=false \
   -e K6_PROMETHEUS_RW_PUSH_INTERVAL=5s \
-  -e BASE_URL=http://localhost:8080 \
   k6-tests/find-max-tps-test.js
 ```
 
