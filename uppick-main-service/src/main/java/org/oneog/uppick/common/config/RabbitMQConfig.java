@@ -6,6 +6,7 @@ import java.util.Map;
 import org.oneog.uppick.domain.auction.event.BidPlacedEvent;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.support.converter.DefaultJackson2JavaTypeMapper;
@@ -24,6 +25,10 @@ public class RabbitMQConfig {
     public static final String AUCTION_EXCHANGE_NAME = "auction.exchange";
     public static final String AUCTION_NOTIFICATION_QUEUE = "auction.notification.queue";
     public static final String AUCTION_EVENT_ROUTING_KEY = "auction.#";
+
+    public static final String NOTIFICATION_DLX_EXCHANGE_NAME = "auction.notification.dlx.exchange";
+    public static final String NOTIFICATION_DLQ_QUEUE = "auction.notification.dlq.queue";
+    public static final String NOTIFICATION_DLQ_ROUTING_KEY = "auction.notification.dlq.routing.key";
 
     public RabbitMQConfig() {
 
@@ -46,6 +51,24 @@ public class RabbitMQConfig {
     public Binding auctionNotificationBinding(Queue auctionNotificationQueue, TopicExchange auctionExchange) {
 
         return BindingBuilder.bind(auctionNotificationQueue).to(auctionExchange).with(AUCTION_EVENT_ROUTING_KEY);
+    }
+
+    @Bean
+    public DirectExchange notificationDLXExchange() {
+
+        return new DirectExchange(NOTIFICATION_DLX_EXCHANGE_NAME);
+    }
+
+    @Bean
+    public Queue notificationDLQQueue() {
+
+        return new Queue(NOTIFICATION_DLQ_QUEUE, true);
+    }
+
+    @Bean
+    public Binding notificationDLQBinding(Queue notificationDLQQueue, DirectExchange notificationDLXExchange) {
+
+        return BindingBuilder.bind(notificationDLQQueue).to(notificationDLXExchange).with(NOTIFICATION_DLQ_ROUTING_KEY);
     }
 
     @Bean
