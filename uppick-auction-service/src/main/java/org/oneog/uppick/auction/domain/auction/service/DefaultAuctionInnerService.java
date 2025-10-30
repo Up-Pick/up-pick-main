@@ -44,7 +44,8 @@ public class DefaultAuctionInnerService implements AuctionInnerService {
 			.occurredAt(LocalDateTime.now())
 			.build();
 
-		rabbitTemplate.convertAndSend(RabbitMQConfig.AUCTION_EXCHANGE_NAME, RabbitMQConfig.AUCTION_ENDED_ROUTING_KEY,
+		rabbitTemplate.convertAndSend(RabbitMQConfig.AUCTION_ENDED_EXCHANGE_NAME,
+			RabbitMQConfig.AUCTION_ENDED_ROUTING_KEY,
 			auctionEndedEvent, msg -> {
 				long delay = Duration.between(LocalDateTime.now(), endAt.plus(1L, ChronoUnit.MILLIS)).toMillis();
 				msg.getMessageProperties().setDelayLong(delay);
