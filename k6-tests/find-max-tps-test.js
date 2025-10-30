@@ -2,7 +2,6 @@ import http from 'k6/http';
 import {check, sleep} from 'k6';
 
 // ⚙️ 환경 변수 (기본값 포함)
-const BASE_URL = __ENV.BASE_URL || 'http://localhost:8080';  // 테스트 대상 API
 const MAX_VUS = Number(__ENV.MAX_VUS) || 500;                // 최대 동시 접속자 수
 const RAMP_DURATION = __ENV.RAMP_DURATION || '2m';           // 증가 시간 (2분)
 const HOLD_DURATION = __ENV.HOLD_DURATION || '3m';           // 유지 시간 (3분)
