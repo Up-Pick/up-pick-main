@@ -44,13 +44,13 @@ management:
   metrics:
     tags:
       application: ${spring.application.name}
+      distribution:
+        percentiles-histogram:
+          http.server.requests: true   # 요청시간 분포 (P95, P99 계산용)
   prometheus:
     metrics:
       export:
         enabled: true
-grpc:
-  server:
-    port: 9090
 jwt:
   secret:
     key: "VXBwaWNrUHJvamVjdFNlY3JldEtleUZvclRlc3RpbmdQdXJwb3NlczEyMzQ1Njc4OTA="
