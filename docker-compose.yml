@@ -110,6 +110,7 @@ services:
       - '--storage.tsdb.path=/prometheus'
       # 메트릭 데이터 보관 기간 (기본 15일 -> 1일로 단축)
       - '--storage.tsdb.retention.time=1d'
+      - '--web.enable-remote-write-receiver'
 
   grafana:
     image: grafana/grafana:latest
