@@ -20,7 +20,7 @@ public class AuctionRedisRepository {
     public Long findCurrentBidPrice(long auctionId) {
 
         String bidPrice = stringRedisTemplate.opsForValue().get(auctionRedisConstant.getCurrentBidPriceKey(auctionId));
-        return Long.parseLong(bidPrice);
+        return bidPrice != null ? Long.parseLong(bidPrice) : null;
     }
 
     public Long findLastBidderId(long auctionId) {

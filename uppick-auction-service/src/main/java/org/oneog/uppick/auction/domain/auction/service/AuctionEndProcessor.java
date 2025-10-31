@@ -6,6 +6,7 @@ import org.oneog.uppick.auction.domain.auction.entity.Auction;
 import org.oneog.uppick.auction.domain.auction.entity.BiddingDetail;
 import org.oneog.uppick.auction.domain.auction.exception.AuctionErrorCode;
 import org.oneog.uppick.auction.domain.auction.repository.AuctionQueryRepository;
+import org.oneog.uppick.auction.domain.auction.repository.AuctionRedisRepository;
 import org.oneog.uppick.auction.domain.auction.repository.AuctionRepository;
 import org.oneog.uppick.auction.domain.auction.repository.BiddingDetailRepository;
 import org.oneog.uppick.auction.domain.member.dto.request.RegisterPurchaseDetailRequest;
@@ -37,6 +38,8 @@ public class AuctionEndProcessor {
 	private final NotificationInnerService notificationInnerService;
 	private final ProductInnerService productInnerService;
 
+	private final AuctionRedisRepository auctionRedisRepository;
+
 	@Transactional
 	public void process(long auctionId) {
 
@@ -51,9 +54,19 @@ public class AuctionEndProcessor {
 	private void processAuctionResult(Auction auction) {
 
 		Long auctionId = auction.getId();
+		Long lastBidderId = auctionRedisRepository.findLastBidderId(auctionId);
+		Long currentBidPrice = auctionRedisRepository.findCurrentBidPrice(auctionId);
+
+		if (lastBidderId == null || currentBidPrice == null) {
+			// 입찰자가 없을 경우: 유찰 처리
+			handleExpiredAuction(auction);
+			log.info("[Auction:{}] 유찰 처리 (입찰자 없음)", auctionId);
+			return;
+		}
 
 		// 최고가 입찰 내역 1건 조회 (가격 기준 내림차순)
-		Optional<BiddingDetail> topBid = biddingDetailRepository.findTopByAuctionIdOrderByBidPriceDesc(auctionId);
+		Optional<BiddingDetail> topBid = biddingDetailRepository.findTopByAuctionIdAndBidderIdAndBidPrice(auctionId,
+			lastBidderId, currentBidPrice);
 
 		if (topBid.isEmpty()) {
 			// 입찰자가 없을 경우: 유찰 처리
