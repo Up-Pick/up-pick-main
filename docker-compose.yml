@@ -247,7 +247,7 @@ services:
       - auction-elasticsearch
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-      - NODE_OPTIONS="--max-old-space-size=256"
+      - NODE_OPTIONS="--max-old-space-size=512"
     ports:
       - 5602:5601
     volumes:
