@@ -12,11 +12,11 @@ import org.oneog.uppick.auction.domain.auction.entity.AuctionStatus;
 import org.oneog.uppick.auction.domain.auction.entity.QAuction;
 import org.oneog.uppick.auction.domain.auction.entity.QBiddingDetail;
 import org.oneog.uppick.auction.domain.product.dto.projection.ProductDetailProjection;
+import org.oneog.uppick.auction.domain.product.dto.projection.ProductSimpleInfoProjection;
 import org.oneog.uppick.auction.domain.product.dto.projection.PurchasedProductInfoProjection;
 import org.oneog.uppick.auction.domain.product.dto.projection.SoldProductInfoProjection;
 import org.oneog.uppick.auction.domain.product.dto.response.ProductBiddingInfoResponse;
 import org.oneog.uppick.auction.domain.product.dto.response.ProductSellingInfoResponse;
-import org.oneog.uppick.auction.domain.product.dto.response.ProductSimpleInfoResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -63,17 +63,17 @@ public class ProductQueryRepository {
 		return Optional.ofNullable(qResponse);
 	}
 
-	public Optional<ProductSimpleInfoResponse> getProductSimpleInfoById(Long productId) {
+	public Optional<ProductSimpleInfoProjection> getProductSimpleInfoById(Long productId) {
 
 		return Optional.ofNullable(
 			queryFactory
 				.select(
 					Projections.constructor(
-						ProductSimpleInfoResponse.class,
+						ProductSimpleInfoProjection.class,
 						product.name,
 						product.image,
 						auction.minPrice,
-						auction.currentPrice))
+						auction.id))
 				.from(product)
 				.join(auction)
 				.on(product.id.eq(auction.productId))
