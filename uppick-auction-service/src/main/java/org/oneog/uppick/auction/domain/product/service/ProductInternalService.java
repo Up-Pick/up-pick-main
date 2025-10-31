@@ -12,6 +12,7 @@ import org.oneog.uppick.auction.domain.category.service.CategoryInnerService;
 import org.oneog.uppick.auction.domain.member.service.MemberInnerService;
 import org.oneog.uppick.auction.domain.product.document.ProductDocument;
 import org.oneog.uppick.auction.domain.product.dto.projection.ProductDetailProjection;
+import org.oneog.uppick.auction.domain.product.dto.projection.ProductSimpleInfoProjection;
 import org.oneog.uppick.auction.domain.product.dto.projection.PurchasedProductInfoProjection;
 import org.oneog.uppick.auction.domain.product.dto.projection.SoldProductInfoProjection;
 import org.oneog.uppick.auction.domain.product.dto.request.ProductRegisterRequest;
@@ -122,8 +123,13 @@ public class ProductInternalService {
 
 	public ProductSimpleInfoResponse getProductSimpleInfoById(Long productId) {
 
-		return productQueryRepository.getProductSimpleInfoById(productId)
-			.orElseThrow(() -> new BusinessException(ProductErrorCode.CANNOT_READ_PRODUCT_SIMPLE_INFO));
+		ProductSimpleInfoProjection projection = productQueryRepository.getProductSimpleInfoById(
+				productId)
+			.orElseThrow(() -> new BusinessException(ProductErrorCode.CANNOT_READ_PRODUCT_INFO));
+
+		Long currentPrice = auctionRedisRepository.findCurrentBidPrice(projection.getAuctionId());
+
+		return productMapper.combineProductSimpleInfoResponseWithCurrentPrice(projection, currentPrice);
 	}
 
 	public Page<SoldProductInfoResponse> getSoldProductInfosByMemberId(Long memberId, Pageable pageable) {

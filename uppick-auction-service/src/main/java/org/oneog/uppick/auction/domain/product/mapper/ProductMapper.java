@@ -3,12 +3,14 @@ package org.oneog.uppick.auction.domain.product.mapper;
 import org.oneog.uppick.auction.domain.category.dto.response.CategoryInfoResponse;
 import org.oneog.uppick.auction.domain.product.document.ProductDocument;
 import org.oneog.uppick.auction.domain.product.dto.projection.ProductDetailProjection;
+import org.oneog.uppick.auction.domain.product.dto.projection.ProductSimpleInfoProjection;
 import org.oneog.uppick.auction.domain.product.dto.projection.PurchasedProductInfoProjection;
 import org.oneog.uppick.auction.domain.product.dto.projection.SoldProductInfoProjection;
 import org.oneog.uppick.auction.domain.product.dto.request.ProductRegisterRequest;
 import org.oneog.uppick.auction.domain.product.dto.response.ProductBuyAtResponse;
 import org.oneog.uppick.auction.domain.product.dto.response.ProductDetailResponse;
 import org.oneog.uppick.auction.domain.product.dto.response.ProductSellAtResponse;
+import org.oneog.uppick.auction.domain.product.dto.response.ProductSimpleInfoResponse;
 import org.oneog.uppick.auction.domain.product.dto.response.PurchasedProductInfoResponse;
 import org.oneog.uppick.auction.domain.product.dto.response.SearchProductInfoResponse;
 import org.oneog.uppick.auction.domain.product.dto.response.SoldProductInfoResponse;
@@ -102,6 +104,17 @@ public class ProductMapper {
 			.minBidPrice(request.getStartBid())
 			.categoryId(product.getCategoryId())
 			.isSold(false)
+			.build();
+	}
+
+	public ProductSimpleInfoResponse combineProductSimpleInfoResponseWithCurrentPrice(
+		ProductSimpleInfoProjection product, Long currentPrice) {
+
+		return ProductSimpleInfoResponse.builder()
+			.name(product.getName())
+			.image(product.getImage())
+			.minBidPrice(product.getMinBidPrice())
+			.currentBidPrice(currentPrice)
 			.build();
 	}
 
