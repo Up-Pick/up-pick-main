@@ -21,8 +21,8 @@ public class ProductDetailProjection {
 
 	private String categoryName;
 	private Long minPrice;
-	private Long currentBid;
 	private LocalDateTime endAt;
 	private Long sellerId;
+	private Long auctionId;
 
 }

@@ -9,14 +9,14 @@ import java.util.List;
 import java.util.Optional;
 
 import org.oneog.uppick.auction.domain.auction.entity.AuctionStatus;
+import org.oneog.uppick.auction.domain.auction.entity.QAuction;
+import org.oneog.uppick.auction.domain.auction.entity.QBiddingDetail;
 import org.oneog.uppick.auction.domain.product.dto.projection.ProductDetailProjection;
 import org.oneog.uppick.auction.domain.product.dto.projection.PurchasedProductInfoProjection;
 import org.oneog.uppick.auction.domain.product.dto.projection.SoldProductInfoProjection;
 import org.oneog.uppick.auction.domain.product.dto.response.ProductBiddingInfoResponse;
 import org.oneog.uppick.auction.domain.product.dto.response.ProductSellingInfoResponse;
 import org.oneog.uppick.auction.domain.product.dto.response.ProductSimpleInfoResponse;
-import org.oneog.uppick.auction.domain.auction.entity.QAuction;
-import org.oneog.uppick.auction.domain.auction.entity.QBiddingDetail;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -49,9 +49,9 @@ public class ProductQueryRepository {
 					product.image,
 					Expressions.stringTemplate("CONCAT({0}, '/', {1})", product.bigCategory, product.smallCategory),
 					auction.minPrice,
-					auction.currentPrice,
 					auction.endAt,
-					auction.registerId))
+					auction.registerId,
+					auction.id))
 			.from(product)
 			.join(category)
 			.on(product.categoryId.eq(category.id))
@@ -103,14 +103,14 @@ public class ProductQueryRepository {
 			.fetch();
 
 		Long total = Optional.ofNullable(
-			queryFactory
-				.select(product.count())
-				.from(product)
-				.join(auction)
-				.on(auction.productId.eq(product.id))
-				.where(memberId != null ? auction.registerId.eq(memberId)
-					.and(auction.status.eq(AuctionStatus.FINISHED)) : null)
-				.fetchOne())
+				queryFactory
+					.select(product.count())
+					.from(product)
+					.join(auction)
+					.on(auction.productId.eq(product.id))
+					.where(memberId != null ? auction.registerId.eq(memberId)
+						.and(auction.status.eq(AuctionStatus.FINISHED)) : null)
+					.fetchOne())
 			.orElse(0L);
 
 		return new PageImpl<>(qResponseList, pageable, total);
@@ -139,14 +139,14 @@ public class ProductQueryRepository {
 			.fetch();
 
 		Long total = Optional.ofNullable(
-			queryFactory
-				.select(product.count())
-				.from(product)
-				.join(auction)
-				.on(auction.productId.eq(product.id))
-				.where(memberId != null ? auction.lastBidderId.eq(memberId)
-					.and(auction.status.eq(AuctionStatus.FINISHED)) : null)
-				.fetchOne())
+				queryFactory
+					.select(product.count())
+					.from(product)
+					.join(auction)
+					.on(auction.productId.eq(product.id))
+					.where(memberId != null ? auction.lastBidderId.eq(memberId)
+						.and(auction.status.eq(AuctionStatus.FINISHED)) : null)
+					.fetchOne())
 			.orElse(0L);
 
 		return new PageImpl<>(qResponseList, pageable, total);
