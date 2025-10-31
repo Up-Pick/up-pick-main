@@ -21,11 +21,15 @@ public class SearchProductRequest {
 
 	private String keyword;
 
+	@Builder.Default
 	private long categoryId = 1L;
+	@Builder.Default
 	private boolean onlyNotSold = false;
+	@Builder.Default
 	private int page = 0;
+	@Builder.Default
 	private int size = 20;
-
+	@Builder.Default
 	private ProductSearchSortType sortBy = ProductSearchSortType.REGISTERED_AT_DESC;
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = FormatConstants.JSON_DATE_FORMAT)
