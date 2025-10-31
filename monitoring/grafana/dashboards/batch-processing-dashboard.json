@@ -121,37 +121,13 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "rate(spring_batch_item_read_seconds_count{application=\"uppick-main-service\"}[1m])",
-          "legendFormat": "{{job_name}} - Read",
+          "expr": "rate(spring_batch_job_seconds_count{application=\"up-pick\"}[1m])",
+          "legendFormat": "{{job_name}} - {{status}}",
           "range": true,
           "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "editorMode": "code",
-          "expr": "rate(spring_batch_item_process_seconds_count{application=\"uppick-main-service\"}[1m])",
-          "hide": false,
-          "legendFormat": "{{job_name}} - Process",
-          "range": true,
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "editorMode": "code",
-          "expr": "rate(spring_batch_item_write_seconds_count{application=\"uppick-main-service\"}[1m])",
-          "hide": false,
-          "legendFormat": "{{job_name}} - Write",
-          "range": true,
-          "refId": "C"
         }
       ],
-      "title": "배치 처리량 (Throughput)",
+      "title": "배치 작업 실행 빈도 (Throughput)",
       "type": "timeseries"
     },
     {
@@ -215,7 +191,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(spring_batch_item_process_seconds_count{application=\"uppick-main-service\"}[30s]))",
+          "expr": "sum(rate(spring_batch_job_seconds_count{application=\"up-pick\", status=\"COMPLETED\"}[30s]))",
           "legendFormat": "현재 처리량",
           "range": true,
           "refId": "A"
@@ -278,8 +254,8 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(spring_batch_item_process_seconds_count{application=\"uppick-main-service\"})",
-          "legendFormat": "총 처리 건수",
+          "expr": "sum(spring_batch_job_seconds_count{application=\"up-pick\", status=\"COMPLETED\"})",
+          "legendFormat": "총 성공 건수",
           "range": true,
           "refId": "A"
         }
@@ -373,7 +349,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "rate(spring_batch_job_seconds_sum{application=\"uppick-main-service\"}[1m]) / rate(spring_batch_job_seconds_count{application=\"uppick-main-service\"}[1m])",
+          "expr": "rate(spring_batch_job_seconds_sum{application=\"up-pick\"}[1m]) / rate(spring_batch_job_seconds_count{application=\"up-pick\"}[1m])",
           "legendFormat": "{{job_name}} - {{status}}",
           "range": true,
           "refId": "A"
@@ -491,7 +467,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "100 * process_cpu_usage{application=\"uppick-main-service\"}",
+          "expr": "100 * process_cpu_usage{application=\"up-pick\"}",
           "legendFormat": "Process CPU",
           "range": true,
           "refId": "A"
@@ -502,7 +478,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "100 * system_cpu_usage{application=\"uppick-main-service\"}",
+          "expr": "100 * system_cpu_usage{application=\"up-pick\"}",
           "hide": false,
           "legendFormat": "System CPU",
           "range": true,
@@ -632,7 +608,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_used_bytes{application=\"uppick-main-service\", area=\"heap\"}",
+          "expr": "jvm_memory_used_bytes{application=\"up-pick\", area=\"heap\"}",
           "legendFormat": "Used",
           "range": true,
           "refId": "A"
@@ -643,7 +619,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_committed_bytes{application=\"uppick-main-service\", area=\"heap\"}",
+          "expr": "jvm_memory_committed_bytes{application=\"up-pick\", area=\"heap\"}",
           "hide": false,
           "legendFormat": "Committed",
           "range": true,
@@ -655,7 +631,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_max_bytes{application=\"uppick-main-service\", area=\"heap\"}",
+          "expr": "jvm_memory_max_bytes{application=\"up-pick\", area=\"heap\"}",
           "hide": false,
           "legendFormat": "Max",
           "range": true,
@@ -728,7 +704,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "100 * process_cpu_usage{application=\"uppick-main-service\"}",
+          "expr": "100 * process_cpu_usage{application=\"up-pick\"}",
           "legendFormat": "CPU",
           "range": true,
           "refId": "A"
@@ -800,7 +776,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "100 * (jvm_memory_used_bytes{application=\"uppick-main-service\", area=\"heap\"} / jvm_memory_max_bytes{application=\"uppick-main-service\", area=\"heap\"})",
+          "expr": "100 * (jvm_memory_used_bytes{application=\"up-pick\", area=\"heap\"} / jvm_memory_max_bytes{application=\"up-pick\", area=\"heap\"})",
           "legendFormat": "Heap Usage",
           "range": true,
           "refId": "A"
@@ -895,7 +871,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_used_bytes{application=\"uppick-main-service\", area=\"nonheap\"}",
+          "expr": "jvm_memory_used_bytes{application=\"up-pick\", area=\"nonheap\"}",
           "legendFormat": "Used",
           "range": true,
           "refId": "A"
@@ -906,7 +882,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_committed_bytes{application=\"uppick-main-service\", area=\"nonheap\"}",
+          "expr": "jvm_memory_committed_bytes{application=\"up-pick\", area=\"nonheap\"}",
           "hide": false,
           "legendFormat": "Committed",
           "range": true,
@@ -918,7 +894,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_max_bytes{application=\"uppick-main-service\", area=\"nonheap\"}",
+          "expr": "jvm_memory_max_bytes{application=\"up-pick\", area=\"nonheap\"}",
           "hide": false,
           "legendFormat": "Max",
           "range": true,
@@ -1026,7 +1002,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "rate(jvm_gc_pause_seconds_count{application=\"uppick-main-service\"}[1m])",
+          "expr": "rate(jvm_gc_pause_seconds_count{application=\"up-pick\"}[1m])",
           "legendFormat": "{{action}} - {{cause}}",
           "range": true,
           "refId": "A"
@@ -1129,7 +1105,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "rate(jvm_gc_pause_seconds_sum{application=\"uppick-main-service\"}[1m]) / rate(jvm_gc_pause_seconds_count{application=\"uppick-main-service\"}[1m])",
+          "expr": "rate(jvm_gc_pause_seconds_sum{application=\"up-pick\"}[1m]) / rate(jvm_gc_pause_seconds_count{application=\"up-pick\"}[1m])",
           "legendFormat": "{{action}} - {{cause}}",
           "range": true,
           "refId": "A"
@@ -1201,7 +1177,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "100 * rate(jvm_gc_pause_seconds_sum{application=\"uppick-main-service\"}[1m])",
+          "expr": "100 * rate(jvm_gc_pause_seconds_sum{application=\"up-pick\"}[1m])",
           "legendFormat": "GC Time %",
           "range": true,
           "refId": "A"
@@ -1296,7 +1272,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "rate(jvm_gc_memory_allocated_bytes_total{application=\"uppick-main-service\"}[1m])",
+          "expr": "rate(jvm_gc_memory_allocated_bytes_total{application=\"up-pick\"}[1m])",
           "legendFormat": "Allocated",
           "range": true,
           "refId": "A"
@@ -1307,7 +1283,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "rate(jvm_gc_memory_promoted_bytes_total{application=\"uppick-main-service\"}[1m])",
+          "expr": "rate(jvm_gc_memory_promoted_bytes_total{application=\"up-pick\"}[1m])",
           "hide": false,
           "legendFormat": "Promoted to Old Gen",
           "range": true,
@@ -1442,7 +1418,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "hikaricp_connections_active{application=\"uppick-main-service\"}",
+          "expr": "hikaricp_connections_active{application=\"up-pick\"}",
           "legendFormat": "Active",
           "range": true,
           "refId": "A"
@@ -1453,7 +1429,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "hikaricp_connections_idle{application=\"uppick-main-service\"}",
+          "expr": "hikaricp_connections_idle{application=\"up-pick\"}",
           "hide": false,
           "legendFormat": "Idle",
           "range": true,
@@ -1465,7 +1441,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "hikaricp_connections{application=\"uppick-main-service\"}",
+          "expr": "hikaricp_connections{application=\"up-pick\"}",
           "hide": false,
           "legendFormat": "Total",
           "range": true,
@@ -1477,7 +1453,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "hikaricp_connections_max{application=\"uppick-main-service\"}",
+          "expr": "hikaricp_connections_max{application=\"up-pick\"}",
           "hide": false,
           "legendFormat": "Max",
           "range": true,
@@ -1581,7 +1557,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "rate(hikaricp_connections_acquire_seconds_sum{application=\"uppick-main-service\"}[1m]) / rate(hikaricp_connections_acquire_seconds_count{application=\"uppick-main-service\"}[1m])",
+          "expr": "rate(hikaricp_connections_acquire_seconds_sum{application=\"up-pick\"}[1m]) / rate(hikaricp_connections_acquire_seconds_count{application=\"up-pick\"}[1m])",
           "legendFormat": "{{pool}} - Avg Wait",
           "range": true,
           "refId": "A"
@@ -1592,7 +1568,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, rate(hikaricp_connections_acquire_seconds_bucket{application=\"uppick-main-service\"}[1m]))",
+          "expr": "histogram_quantile(0.95, rate(hikaricp_connections_acquire_seconds_bucket{application=\"up-pick\"}[1m]))",
           "hide": false,
           "legendFormat": "{{pool}} - P95",
           "range": true,
@@ -1698,7 +1674,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "100 * rate(process_cpu_seconds_total{application=\"uppick-main-service\"}[1m])",
+          "expr": "100 * rate(process_cpu_seconds_total{application=\"up-pick\"}[1m])",
           "legendFormat": "CPU Time",
           "range": true,
           "refId": "A"
@@ -1819,7 +1795,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "process_files_open_files{application=\"uppick-main-service\"}",
+          "expr": "process_files_open_files{application=\"up-pick\"}",
           "legendFormat": "Open",
           "range": true,
           "refId": "A"
@@ -1830,7 +1806,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "process_files_max_files{application=\"uppick-main-service\"}",
+          "expr": "process_files_max_files{application=\"up-pick\"}",
           "hide": false,
           "legendFormat": "Max",
           "range": true,
@@ -1939,7 +1915,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "jvm_threads_live_threads{application=\"uppick-main-service\"}",
+          "expr": "jvm_threads_live_threads{application=\"up-pick\"}",
           "legendFormat": "Live",
           "range": true,
           "refId": "A"
@@ -1950,7 +1926,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "jvm_threads_daemon_threads{application=\"uppick-main-service\"}",
+          "expr": "jvm_threads_daemon_threads{application=\"up-pick\"}",
           "hide": false,
           "legendFormat": "Daemon",
           "range": true,
@@ -1962,7 +1938,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "jvm_threads_peak_threads{application=\"uppick-main-service\"}",
+          "expr": "jvm_threads_peak_threads{application=\"up-pick\"}",
           "hide": false,
           "legendFormat": "Peak",
           "range": true,
@@ -2058,7 +2034,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "jvm_threads_states_threads{application=\"uppick-main-service\"}",
+          "expr": "jvm_threads_states_threads{application=\"up-pick\"}",
           "legendFormat": "{{state}}",
           "range": true,
           "refId": "A"
@@ -2128,7 +2104,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "jvm_threads_live_threads{application=\"uppick-main-service\"}",
+          "expr": "jvm_threads_live_threads{application=\"up-pick\"}",
           "legendFormat": "Live Threads",
           "range": true,
           "refId": "A"
@@ -2195,7 +2171,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "jvm_threads_deadlocked_threads{application=\"uppick-main-service\"}",
+          "expr": "jvm_threads_deadlocked_threads{application=\"up-pick\"}",
           "legendFormat": "Deadlocked",
           "range": true,
           "refId": "A"
@@ -2316,7 +2292,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "tomcat_threads_current_threads{application=\"uppick-main-service\"}",
+          "expr": "tomcat_threads_current_threads{application=\"up-pick\"}",
           "legendFormat": "Current",
           "range": true,
           "refId": "A"
@@ -2327,7 +2303,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "tomcat_threads_busy_threads{application=\"uppick-main-service\"}",
+          "expr": "tomcat_threads_busy_threads{application=\"up-pick\"}",
           "hide": false,
           "legendFormat": "Busy",
           "range": true,
@@ -2339,7 +2315,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "tomcat_threads_config_max_threads{application=\"uppick-main-service\"}",
+          "expr": "tomcat_threads_config_max_threads{application=\"up-pick\"}",
           "hide": false,
           "legendFormat": "Max",
           "range": true,
@@ -2478,7 +2454,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "rate(spring_batch_job_seconds_count{application=\"uppick-main-service\"}[1m])",
+          "expr": "rate(spring_batch_job_seconds_count{application=\"up-pick\"}[1m])",
           "legendFormat": "{{job_name}} - {{status}}",
           "range": true,
           "refId": "A"
@@ -2552,7 +2528,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "100 * (sum(rate(spring_batch_job_seconds_count{application=\"uppick-main-service\", status=\"FAILED\"}[5m])) by (job_name) / sum(rate(spring_batch_job_seconds_count{application=\"uppick-main-service\"}[5m])) by (job_name))",
+          "expr": "100 * (sum(rate(spring_batch_job_seconds_count{application=\"up-pick\", status=\"FAILED\"}[5m])) by (job_name) / sum(rate(spring_batch_job_seconds_count{application=\"up-pick\"}[5m])) by (job_name))",
           "legendFormat": "{{job_name}}",
           "range": true,
           "refId": "A"
@@ -2652,7 +2628,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "topk(20, rate(spring_batch_item_process_seconds_count{application=\"uppick-main-service\"}[5m]))",
+          "expr": "topk(20, rate(spring_batch_step_seconds_count{application=\"up-pick\"}[5m]))",
           "format": "table",
           "instant": true,
           "legendFormat": "__auto",
