@@ -45,10 +45,6 @@ management:
 internal:
   api:
     secret: "jdklsfjksdfjksldfjklsdjfklsdfjsklfjskljafklwejflkjw"
-    auction-service:
-      url: ${AUCTION_SERVICE_URL}
-    main-service:
-      url: ${MAIN_SERVICE_URL}
 
 jwt:
   secret:
