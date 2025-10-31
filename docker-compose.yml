@@ -45,6 +45,28 @@ services:
       timeout: 5s
       retries: 3
 
+  batch-mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: uppick_batch_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3309:3306"
+    volumes:
+      - batch_mysql_data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password --innodb-buffer-pool-size=128M --max-connections=50
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
   # 추후 Lock과 Cache용 Redis를 분리해야함
   auction-redis:
     image: redis:8.2.2
@@ -164,6 +186,28 @@ services:
       uppick-rabbitmq:
         condition: service_healthy
 
+  uppick-batch-service:
+    build:
+      context: .
+      dockerfile: uppick-batch-service/Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      DB_URL: jdbc:mysql://batch-mysql:3306/uppick_batch_db
+      DB_USERNAME: user
+      DB_PASSWORD: password
+      AUCTION_SERVICE_URL: http://uppick-auction-service:8080
+      MAIN_SERVICE_URL: http://uppick-main-service:8080
+      JAVA_OPTS: "-Xms256m -Xmx512m"
+    ports:
+      - "8083:8080"
+    deploy:
+      resources:
+        limits:
+          memory: 768M
+    depends_on:
+      batch-mysql:
+        condition: service_healthy
+
   prometheus:
     image: prom/prometheus:latest
     ports:
@@ -261,6 +305,7 @@ services:
 volumes:
   main_mysql_data:
   auction_mysql_data:
+  batch_mysql_data:
   auction_redis_data:
   uppick_rabbitmq_data:
   grafana_data:
