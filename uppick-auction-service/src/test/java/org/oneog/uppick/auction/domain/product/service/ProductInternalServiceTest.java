@@ -11,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.oneog.uppick.auction.domain.auction.repository.AuctionRedisRepository;
 import org.oneog.uppick.auction.domain.auction.service.AuctionInnerService;
 import org.oneog.uppick.auction.domain.category.dto.response.CategoryInfoResponse;
 import org.oneog.uppick.auction.domain.category.service.CategoryInnerService;
@@ -54,6 +55,8 @@ public class ProductInternalServiceTest {
 	CategoryInnerService categoryInnerService;
 	@InjectMocks
 	ProductInternalService productInternalService;
+	@Mock
+	private AuctionRedisRepository auctionRedisRepository;
 
 	@BeforeEach
 	public void init() {
@@ -72,7 +75,8 @@ public class ProductInternalServiceTest {
 			auctionInnerService,
 			memberInnerService,
 			searchingInnerService,
-			categoryInnerService);
+			categoryInnerService,
+			auctionRedisRepository);
 	}
 
 	/* ---------- Service Test ---------- */

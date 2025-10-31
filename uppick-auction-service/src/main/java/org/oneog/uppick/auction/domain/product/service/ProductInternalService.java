@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.oneog.uppick.auction.domain.auction.repository.AuctionRedisRepository;
 import org.oneog.uppick.auction.domain.auction.service.AuctionInnerService;
 import org.oneog.uppick.auction.domain.category.dto.response.CategoryInfoResponse;
 import org.oneog.uppick.auction.domain.category.service.CategoryInnerService;
@@ -75,6 +76,8 @@ public class ProductInternalService {
 	private final SearchingInnerService searchingInnerService;
 	private final CategoryInnerService categoryInnerService;
 
+	private final AuctionRedisRepository auctionRedisRepository;
+
 	// ***** Internal Service Method ***** //
 	@Transactional
 	public void registerProduct(ProductRegisterRequest request, MultipartFile image, Long registerId) {
@@ -104,16 +107,17 @@ public class ProductInternalService {
 	@Transactional
 	public ProductDetailResponse getProductInfoById(Long productId, AuthMember authMember) {
 
-		if (authMember != null && productRepository.existsById(productId)) {
-			productViewCountIncreaseService.increaseProductViewCount(productId);
-		}
-
 		ProductDetailProjection projection = productQueryRepository.getProductInfoById(productId)
 			.orElseThrow(() -> new BusinessException(ProductErrorCode.CANNOT_READ_PRODUCT_INFO));
 
-		String sellerName = memberInnerService.getMemberNickname(projection.getSellerId());
+		if (authMember != null) {
+			productViewCountIncreaseService.increaseProductViewCount(productId);
+		}
 
-		return productMapper.combineProductDetailWithSeller(projection, sellerName);
+		String sellerName = memberInnerService.getMemberNickname(projection.getSellerId());
+		Long currentPrice = auctionRedisRepository.findCurrentBidPrice(projection.getAuctionId());
+
+		return productMapper.combineProductDetailWithSellerAndCurrentPrice(projection, sellerName, currentPrice);
 	}
 
 	public ProductSimpleInfoResponse getProductSimpleInfoById(Long productId) {

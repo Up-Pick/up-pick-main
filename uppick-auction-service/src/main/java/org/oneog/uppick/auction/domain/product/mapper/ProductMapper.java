@@ -71,7 +71,9 @@ public class ProductMapper {
 			.build();
 	}
 
-	public ProductDetailResponse combineProductDetailWithSeller(ProductDetailProjection projection, String sellerName) {
+	public ProductDetailResponse combineProductDetailWithSellerAndCurrentPrice(ProductDetailProjection projection,
+		String sellerName,
+		Long currentPrice) {
 
 		return ProductDetailResponse.builder()
 			.id(projection.getId())
@@ -82,7 +84,7 @@ public class ProductMapper {
 			.image(projection.getImage())
 			.categoryName(projection.getCategoryName())
 			.minPrice(projection.getMinPrice())
-			.currentBid(projection.getCurrentBid())
+			.currentBid(currentPrice)
 			.endAt(projection.getEndAt())
 			.sellerName(sellerName)
 			.build();
