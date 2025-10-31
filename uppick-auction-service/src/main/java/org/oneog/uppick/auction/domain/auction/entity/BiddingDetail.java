@@ -31,7 +31,7 @@ public class BiddingDetail {
 	private Long auctionId;
 
 	@Column(name = "bidder_id", nullable = false)
-	private Long memberId;
+	private Long bidderId;
 
 	@Column(name = "bid_price", nullable = false)
 	private Long bidPrice;
@@ -44,7 +44,7 @@ public class BiddingDetail {
 	private BiddingDetail(Long auctionId, Long memberId, Long bidPrice) {
 
 		this.auctionId = auctionId;
-		this.memberId = memberId;
+		this.bidderId = memberId;
 		this.bidPrice = bidPrice;
 	}
 

@@ -173,7 +173,7 @@ public class ProductQueryRepository {
 			.join(biddingDetail)
 			.on(biddingDetail.auctionId.eq(auction.id))
 			.where(
-				biddingDetail.memberId.eq(memberId)
+				biddingDetail.bidderId.eq(memberId)
 					.and(auction.status.eq(AuctionStatus.IN_PROGRESS))
 					.and(biddingDetail.bidAt.eq(
 						JPAExpressions.select(biddingDetailSub.bidAt.max())
@@ -181,7 +181,7 @@ public class ProductQueryRepository {
 							.join(auctionSub)
 							.on(biddingDetailSub.auctionId.eq(auctionSub.id))
 							.where(
-								biddingDetailSub.memberId.eq(memberId)
+								biddingDetailSub.bidderId.eq(memberId)
 									.and(auctionSub.productId.eq(product.id))))))
 			.orderBy(biddingDetail.bidAt.desc())
 			.offset(pageable.getOffset())
@@ -194,7 +194,7 @@ public class ProductQueryRepository {
 			.join(biddingDetail)
 			.on(biddingDetail.auctionId.eq(auction.id))
 			.where(
-				biddingDetail.memberId.eq(memberId)
+				biddingDetail.bidderId.eq(memberId)
 					.and(auction.status.eq(AuctionStatus.IN_PROGRESS)))
 			.fetchOne()).orElse(0L);
 

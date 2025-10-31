@@ -107,7 +107,7 @@ public class AuctionEndProcessor {
 	 */
 	private void handleAuctionCompletion(Auction auction, BiddingDetail winner) {
 
-		Long buyerId = winner.getMemberId(); //상품을 구매한사람
+		Long buyerId = winner.getBidderId(); //상품을 구매한사람
 		Long productId = auction.getProductId();
 		Long finalPrice = winner.getBidPrice();
 		Long auctionId = auction.getId();
