@@ -15,8 +15,6 @@ import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -27,10 +25,10 @@ import org.oneog.uppick.auction.domain.auction.entity.BiddingDetail;
 import org.oneog.uppick.auction.domain.auction.exception.AuctionErrorCode;
 import org.oneog.uppick.auction.domain.auction.mapper.AuctionMapper;
 import org.oneog.uppick.auction.domain.auction.repository.AuctionRepository;
-import org.oneog.uppick.auction.domain.auction.repository.BiddingDetailQueryRepository;
 import org.oneog.uppick.auction.domain.auction.repository.BiddingDetailRepository;
+import org.oneog.uppick.auction.domain.auction.repository.AuctionRedisRepository;
 import org.oneog.uppick.auction.domain.member.service.MemberInnerService;
-import org.oneog.uppick.auction.domain.notification.dto.request.SendNotificationRequest;
+import org.oneog.uppick.auction.domain.auction.dto.request.BiddingResultDto;
 import org.oneog.uppick.common.exception.BusinessException;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -44,15 +42,14 @@ public class BiddingProcessorTest {
     @Mock
     private BiddingDetailRepository biddingDetailRepository;
     @Mock
-    private BiddingDetailQueryRepository biddingDetailQueryRepository;
+    private AuctionRedisRepository auctionRedisRepository;
     @Mock
     private MemberInnerService memberInnerService;
 
     @InjectMocks
     private BiddingProcessor biddingProcessor;
 
-    @Captor
-    private ArgumentCaptor<SendNotificationRequest> notificationCaptor;
+    // no notifications sent by BiddingProcessor currently
 
     @Test
     @DisplayName("입찰 시도 성공")
@@ -80,6 +77,10 @@ public class BiddingProcessorTest {
         given(auctionRepository.findById(auctionId)).willReturn(Optional.of(auction));
         given(memberInnerService.getMemberCredit(anyLong())).willReturn(999999L);
 
+        // Redis에 현재 입찰가/마지막 입찰자 없음
+        given(auctionRedisRepository.findCurrentBidPrice(auctionId)).willReturn(null);
+        given(auctionRedisRepository.findLastBidderId(auctionId)).willReturn(null);
+
         willDoNothing().given(memberInnerService).updateMemberCredit(anyLong(), anyLong());
 
         BiddingDetail biddingDetail = BiddingDetail.builder()
@@ -92,17 +93,21 @@ public class BiddingProcessorTest {
             .willReturn(biddingDetail);
 
         // when
-        biddingProcessor.process(request, auctionId, memberId);
+        BiddingResultDto result = biddingProcessor.process(request, auctionId, memberId);
 
-        // then
-        assertThat(auction.getCurrentPrice()).isEqualTo(newBidPrice);
-        assertThat(auction.getLastBidderId()).isEqualTo(memberId);
+        // then: 결과 DTO 검증
+        assertThat(result).isNotNull();
+        assertThat(result.getSellerId()).isEqualTo(sellerId);
+        assertThat(result.getBiddingPrice()).isEqualTo(newBidPrice);
 
         // DB에 입찰 내역 저장 호출
         then(biddingDetailRepository).should().save(biddingDetail);
 
         // 크레딧이 차감 호출
         then(memberInnerService).should().updateMemberCredit(memberId, -newBidPrice);
+
+        // Redis 상태 갱신 호출
+        then(auctionRedisRepository).should().updateBidStatus(auctionId, newBidPrice, memberId);
     }
 
     @Test
@@ -126,6 +131,9 @@ public class BiddingProcessorTest {
 
         given(auctionRepository.findById(auctionId)).willReturn(Optional.of(auction));
         given(memberInnerService.getMemberCredit(anyLong())).willReturn(999999L);
+
+        // 현재 입찰가가 이미 2000
+        given(auctionRedisRepository.findCurrentBidPrice(auctionId)).willReturn(2000L);
 
         // when/then
         assertThatThrownBy(() -> biddingProcessor.process(request, auctionId, memberId))
