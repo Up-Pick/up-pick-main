@@ -6,7 +6,6 @@ import org.oneog.uppick.domain.ranking.dto.projection.HotKeywordProjection;
 import org.oneog.uppick.domain.ranking.entity.HotKeyword;
 import org.oneog.uppick.domain.ranking.repository.HotKeywordRepository;
 import org.oneog.uppick.domain.ranking.repository.RankingQueryRepository;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,11 +20,10 @@ public class RankingSchedulerService {
 	private final HotKeywordRepository hotKeywordRepository;
 	private final RankingQueryRepository rankingQueryRepository;
 
-	@Scheduled(cron = "0 0 0 * * *") // 매일 자정 업데이트
 	@Transactional
 	public void updateWeeklyTop10HotKeywords() {
 
-		log.info("[Scheduler] 키워드 랭킹 업데이트 시작");
+		log.info("[Batch] 키워드 랭킹 업데이트 시작");
 
 		//이전 내용 삭제
 		hotKeywordRepository.deleteAll();
@@ -40,7 +38,7 @@ public class RankingSchedulerService {
 			hotKeywordRepository.save(hotKeyword);
 		}
 
-		log.info("[Scheduler] 키워드 랭킹 업데이트 종료");
+		log.info("[Batch] 키워드 랭킹 업데이트 종료");
 	}
 
 }
