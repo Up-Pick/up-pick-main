@@ -1,18 +1,16 @@
 spring:
-  datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-    driver-class-name: com.mysql.cj.jdbc.Driver
-  jpa:
-    open-in-view: false
-    hibernate:
-      ddl-auto: none
   batch:
     job:
       enabled: false
     jdbc:
       initialize-schema: never
+# Batch DataSource - Batch DB (Spring Batch 메타데이터)
+batch:
+  datasource:
+    jdbc-url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
   threads:
     virtual:
       enabled: true
@@ -29,6 +27,11 @@ management:
 internal:
   api:
     secret: ${INTERNAL_API_SECRET}
+
+# JWT 설정 (uppick-common의 JwtUtil Bean 생성을 위해 필요, 실제 사용하지 않음)
+jwt:
+  secret:
+    key: ${JWT_SECRET_KEY}
 
 logging:
   level:
