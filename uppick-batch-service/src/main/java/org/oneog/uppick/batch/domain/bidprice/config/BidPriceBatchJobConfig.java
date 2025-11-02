@@ -1,5 +1,6 @@
 package org.oneog.uppick.batch.domain.bidprice.config;
 
+import org.oneog.uppick.batch.common.listener.ChunkStepExecutionListener;
 import org.oneog.uppick.batch.domain.bidprice.dto.BidPriceDto;
 import org.oneog.uppick.batch.domain.bidprice.processor.BidPriceItemProcessor;
 import org.oneog.uppick.batch.domain.bidprice.reader.BidPriceItemReader;
@@ -67,26 +68,7 @@ public class BidPriceBatchJobConfig {
 			.reader(bidPriceItemReader)
 			.processor(bidPriceItemProcessor)
 			.writer(bidPriceItemWriter)
-			.listener(new org.springframework.batch.core.StepExecutionListener() {
-
-				@Override
-				public void beforeStep(org.springframework.batch.core.StepExecution stepExecution) {
-
-					log.info("입찰가 배치 Step 시작");
-					bidPriceItemReader.init(); // Reader 초기화
-				}
-
-				@Override
-				public org.springframework.batch.core.ExitStatus afterStep(
-					org.springframework.batch.core.StepExecution stepExecution) {
-
-					log.info("입찰가 배치 Step 완료 - 읽은 데이터: {}, 처리된 데이터: {}, 쓰여진 데이터: {}",
-						stepExecution.getReadCount(),
-						stepExecution.getFilterCount(),
-						stepExecution.getWriteCount());
-					return stepExecution.getExitStatus();
-				}
-			})
+			.listener(new ChunkStepExecutionListener("입찰가", bidPriceItemReader::init))
 			.build();
 	}
 
