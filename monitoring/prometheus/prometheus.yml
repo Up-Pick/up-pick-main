@@ -25,3 +25,11 @@ scrape_configs:
       - targets: [ 'uppick-auction-service:8080' ]
         labels:
           application: 'uppick-auction-service'
+
+  # Batch Service 모니터링
+  - job_name: 'uppick-batch-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'uppick-batch-service:8080' ]
+        labels:
+          application: 'uppick-batch-service'

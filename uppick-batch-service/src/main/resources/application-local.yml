@@ -1,26 +1,22 @@
 spring:
+  batch:
+    job:
+      enabled: false  # 애플리케이션 시작 시 자동 실행 방지
+    jdbc:
+      initialize-schema: always    # Batch 메타데이터 테이블 자동 생성
+
+# Batch DataSource - Batch DB (Spring Batch 메타데이터)
+batch:
   datasource:
-    url: ${DB_URL}
+    jdbc-url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
-      maximum-pool-size: 20
-      minimum-idle: 10
-      connection-timeout: 30000   # 30초
-      max-lifetime: 1800000       # 30분
-      leak-detection-threshold: 60000  # 누수 감지
-  jpa:
-    open-in-view: false
-    hibernate:
-      ddl-auto: none
-
-  batch:
-    job:
-      enabled: false  # 애플리케이션 시작 시 자동 실행 방지
-
-    jdbc:
-      initialize-schema: always    # Batch 메타데이터 테이블 자동 생성
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      max-lifetime: 1800000
   threads:
     virtual:
       enabled: true
@@ -46,6 +42,7 @@ internal:
   api:
     secret: "jdklsfjksdfjksldfjklsdjfklsdfjsklfjskljafklwejflkjw"
 
+# JWT 설정 (uppick-common의 JwtUtil Bean 생성을 위해 필요, 실제 사용하지 않음)
 jwt:
   secret:
     key: "VXBwaWNrUHJvamVjdFNlY3JldEtleUZvclRlc3RpbmdQdXJwb3NlczEyMzQ1Njc4OTA="
