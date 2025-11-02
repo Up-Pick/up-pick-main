@@ -40,16 +40,6 @@ public class BatchConfig extends DefaultBatchConfiguration {
 	}
 
 	/**
-	 * Batch 메타데이터용 TransactionManager 지정
-	 */
-	@Override
-	protected PlatformTransactionManager getTransactionManager() {
-
-		log.info("Batch TransactionManager 설정 ");
-		return new JdbcTransactionManager(batchDataSource);
-	}
-
-	/**
 	 * Batch TransactionManager Bean
 	 * Step에서 트랜잭션 관리를 위해 Bean으로 노출
 	 */
