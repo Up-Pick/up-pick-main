@@ -40,14 +40,25 @@ public class BatchConfig extends DefaultBatchConfiguration {
 	}
 
 	/**
+	 * Batch 메타데이터용 TransactionManager 지정
+	 * DefaultBatchConfiguration이 JobRepository 생성 시 사용
+	 */
+	@Override
+	protected PlatformTransactionManager getTransactionManager() {
+
+		log.info("Batch TransactionManager 설정 (DefaultBatchConfiguration용)");
+		return new JdbcTransactionManager(batchDataSource);
+	}
+
+	/**
 	 * Batch TransactionManager Bean
-	 * Step에서 트랜잭션 관리를 위해 Bean으로 노출
+	 * Step에서 @Qualifier로 주입받기 위해 Bean으로 노출
 	 */
 	@Bean(name = "batchTransactionManager")
 	public PlatformTransactionManager batchTransactionManager() {
 
 		log.info("Batch TransactionManager Bean 생성");
-		return new JdbcTransactionManager(batchDataSource);
+		return getTransactionManager(); // 동일한 TransactionManager 반환
 	}
 
 }
