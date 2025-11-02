@@ -198,6 +198,7 @@ services:
       AUCTION_DB_PASSWORD: password
       REDIS_HOST: auction-redis
       REDIS_PORT: 6379
+      ELASTICSEARCH_URL: http://auction-elasticsearch:9200
       AUCTION_SERVICE_URL: http://uppick-auction-service:8080
       MAIN_SERVICE_URL: http://uppick-main-service:8080
       JAVA_OPTS: "-Xms256m -Xmx512m"
@@ -213,6 +214,8 @@ services:
       auction-mysql:
         condition: service_healthy
       auction-redis:
+        condition: service_healthy
+      auction-elasticsearch:
         condition: service_healthy
 
   prometheus:

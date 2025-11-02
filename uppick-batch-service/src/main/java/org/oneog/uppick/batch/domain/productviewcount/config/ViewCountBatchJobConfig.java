@@ -1,5 +1,6 @@
 package org.oneog.uppick.batch.domain.productviewcount.config;
 
+import org.oneog.uppick.batch.common.listener.ChunkStepExecutionListener;
 import org.oneog.uppick.batch.domain.productviewcount.dto.ViewCountDto;
 import org.oneog.uppick.batch.domain.productviewcount.processor.ViewCountItemProcessor;
 import org.oneog.uppick.batch.domain.productviewcount.reader.ViewCountItemReader;
@@ -67,26 +68,7 @@ public class ViewCountBatchJobConfig {
 			.reader(viewCountItemReader)
 			.processor(viewCountItemProcessor)
 			.writer(viewCountItemWriter)
-			.listener(new org.springframework.batch.core.StepExecutionListener() {
-
-				@Override
-				public void beforeStep(org.springframework.batch.core.StepExecution stepExecution) {
-
-					log.info("조회수 배치 Step 시작");
-					viewCountItemReader.init(); // Reader 초기화
-				}
-
-				@Override
-				public org.springframework.batch.core.ExitStatus afterStep(
-					org.springframework.batch.core.StepExecution stepExecution) {
-
-					log.info("조회수 배치 Step 완료 - 읽은 데이터: {}, 처리된 데이터: {}, 쓰여진 데이터: {}",
-						stepExecution.getReadCount(),
-						stepExecution.getFilterCount(),
-						stepExecution.getWriteCount());
-					return stepExecution.getExitStatus();
-				}
-			})
+			.listener(new ChunkStepExecutionListener("조회수", viewCountItemReader::init))
 			.build();
 	}
 

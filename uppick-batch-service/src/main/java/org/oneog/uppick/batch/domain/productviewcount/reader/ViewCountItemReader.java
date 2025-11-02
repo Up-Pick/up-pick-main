@@ -49,41 +49,43 @@ public class ViewCountItemReader implements ItemReader<ViewCountDto> {
 	@Override
 	public ViewCountDto read() throws Exception {
 
+		// while 루프로 변경하여 재귀 호출 제거 (StackOverflowError 방지)
+		while (keyIterator != null && keyIterator.hasNext()) {
+
+			String key = keyIterator.next();
+
+			try {
+				// Redis 키에서 productId 추출: product:view:123 -> 123
+				Long productId = Long.parseLong(key.replace(REDIS_KEY_PREFIX, ""));
+
+				// Redis에서 조회수 값 가져오기
+				String viewCountStr = stringRedisTemplate.opsForValue().get(key);
+
+				if (viewCountStr == null) {
+					log.warn("Redis 키 {}에 대한 값이 없습니다. 스킵합니다.", key);
+					continue; // 다음 키로 이동
+				}
+
+				Long viewCount = Long.parseLong(viewCountStr);
+
+				// 조회수가 0 이하면 스킵
+				if (viewCount <= 0) {
+					log.debug("productId {}의 조회수가 {}이므로 스킵합니다.", productId, viewCount);
+					continue; // 다음 키로 이동
+				}
+
+				log.debug("조회수 데이터 읽기 완료 - productId: {}, viewCount: {}", productId, viewCount);
+
+				return new ViewCountDto(productId, viewCount);
+
+			} catch (NumberFormatException e) {
+				log.error("잘못된 형식의 Redis 데이터 - key: {}, error: {}", key, e.getMessage());
+				// 다음 키로 이동
+			}
+		}
+
 		// 더 이상 읽을 데이터가 없으면 null 반환 (Chunk 처리 종료)
-		if (keyIterator == null || !keyIterator.hasNext()) {
-			return null;
-		}
-
-		String key = keyIterator.next();
-
-		try {
-			// Redis 키에서 productId 추출: product:view:123 -> 123
-			Long productId = Long.parseLong(key.replace(REDIS_KEY_PREFIX, ""));
-
-			// Redis에서 조회수 값 가져오기
-			String viewCountStr = stringRedisTemplate.opsForValue().get(key);
-
-			if (viewCountStr == null) {
-				log.warn("Redis 키 {}에 대한 값이 없습니다. 스킵합니다.", key);
-				return read(); // 다음 키로 재귀 호출
-			}
-
-			Long viewCount = Long.parseLong(viewCountStr);
-
-			// 조회수가 0 이하면 스킵
-			if (viewCount <= 0) {
-				log.debug("productId {}의 조회수가 {}이므로 스킵합니다.", productId, viewCount);
-				return read(); // 다음 키로 재귀 호출
-			}
-
-			log.debug("조회수 데이터 읽기 완료 - productId: {}, viewCount: {}", productId, viewCount);
-
-			return new ViewCountDto(productId, viewCount);
-
-		} catch (NumberFormatException e) {
-			log.error("잘못된 형식의 Redis 데이터 - key: {}, error: {}", key, e.getMessage());
-			return read(); // 다음 키로 재귀 호출
-		}
+		return null;
 	}
 
 }
