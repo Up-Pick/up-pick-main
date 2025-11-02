@@ -4,6 +4,10 @@ spring:
       enabled: false  # 애플리케이션 시작 시 자동 실행 방지
     jdbc:
       initialize-schema: always    # Batch 메타데이터 테이블 자동 생성
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
 
 # Batch DataSource - Batch DB (Spring Batch 메타데이터)
 batch:
@@ -20,6 +24,19 @@ batch:
   threads:
     virtual:
       enabled: true
+
+# Auction DataSource - 조회수 배치용
+auction:
+  datasource:
+    jdbc-url: ${AUCTION_DB_URL}
+    username: ${AUCTION_DB_USERNAME}
+    password: ${AUCTION_DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+      max-lifetime: 1800000
 
 server:
   port: 8080
