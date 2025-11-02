@@ -3,7 +3,13 @@ package org.oneog.uppick.batch.common.config;
 import javax.sql.DataSource;
 
 import org.springframework.batch.core.configuration.support.DefaultBatchConfiguration;
+import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.batch.BatchDataSource;
+import org.springframework.boot.autoconfigure.batch.BatchDataSourceScriptDatabaseInitializer;
+import org.springframework.boot.autoconfigure.batch.BatchProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.support.JdbcTransactionManager;
@@ -19,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Configuration
+@EnableConfigurationProperties(BatchProperties.class)
 public class BatchConfig extends DefaultBatchConfiguration {
 
 	private final DataSource batchDataSource;
@@ -59,6 +66,20 @@ public class BatchConfig extends DefaultBatchConfiguration {
 
 		log.info("Batch TransactionManager Bean 생성");
 		return getTransactionManager(); // 동일한 TransactionManager 반환
+	}
+
+	/**
+	 * Batch 메타데이터 테이블 자동 생성
+	 * spring.batch.jdbc.initialize-schema 설정을 읽어서 스키마 초기화
+	 */
+	@Bean
+	public BatchDataSourceScriptDatabaseInitializer batchDataSourceScriptDatabaseInitializer(
+		@Qualifier("batchDataSource") DataSource dataSource,
+		BatchProperties properties
+	) {
+
+		log.info("Batch 스키마 초기화 설정: {}", properties.getJdbc().getInitializeSchema());
+		return new BatchDataSourceScriptDatabaseInitializer(dataSource, properties.getJdbc());
 	}
 
 }
