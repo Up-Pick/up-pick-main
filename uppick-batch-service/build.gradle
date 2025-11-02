@@ -25,6 +25,9 @@ dependencies {
     // Redis - 조회수 배치용
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+    // Elasticsearch - 입찰가 배치용
+    implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+
     // Open Feign
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 
