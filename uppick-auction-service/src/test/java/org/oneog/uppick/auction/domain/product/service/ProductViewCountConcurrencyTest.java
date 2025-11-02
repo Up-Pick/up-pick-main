@@ -67,12 +67,14 @@ public class ProductViewCountConcurrencyTest {
 		long endTime = System.currentTimeMillis();
 		double durationSeconds = (endTime - startTime) / 1000.0;
 
-		productViewCountIncreaseService.syncToDb();
+		// DB 동기화는 batch-service에서 자동으로 처리됨
+		// productViewCountIncreaseService.syncToDb(); // 제거됨
 
 		System.out.println("테스트 실행 시간: " + durationSeconds + "초");
 		System.out.println("테스트 횟수: " + testcase);
 		System.out.println("실패 횟수: " + failureCount.get());
-		System.out.println("상품 조회수: " + productRepository.findById(productId).get().getViewCount());
+		// 조회수는 Redis에만 저장되므로 DB에서 조회할 수 없음
+		// System.out.println("상품 조회수: " + productRepository.findById(productId).get().getViewCount());
 	}
 
 }

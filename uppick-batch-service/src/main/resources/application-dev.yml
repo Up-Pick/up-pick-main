@@ -4,6 +4,11 @@ spring:
       enabled: false
     jdbc:
       initialize-schema: never
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+
 # Batch DataSource - Batch DB (Spring Batch 메타데이터)
 batch:
   datasource:
@@ -11,9 +16,27 @@ batch:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      max-lifetime: 1800000
   threads:
     virtual:
       enabled: true
+
+# Auction DataSource - 조회수 배치용
+auction:
+  datasource:
+    jdbc-url: ${AUCTION_DB_URL}
+    username: ${AUCTION_DB_USERNAME}
+    password: ${AUCTION_DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+      max-lifetime: 1800000
 
 server:
   port: 8080
