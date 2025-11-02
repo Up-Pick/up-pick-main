@@ -1,4 +1,4 @@
-package org.oneog.uppick.batch.client;
+package org.oneog.uppick.batch.domain.ranking.client;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;

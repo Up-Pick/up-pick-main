@@ -1,6 +1,6 @@
-package org.oneog.uppick.batch.job.ranking;
+package org.oneog.uppick.batch.domain.ranking.job;
 
-import org.oneog.uppick.batch.client.RankClient;
+import org.oneog.uppick.batch.domain.ranking.client.RankClient;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;

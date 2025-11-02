@@ -1,4 +1,4 @@
-package org.oneog.uppick.batch.scheduler;
+package org.oneog.uppick.batch.domain.ranking.scheduler;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;

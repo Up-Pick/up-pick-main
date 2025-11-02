@@ -1,6 +1,6 @@
-package org.oneog.uppick.batch.common.config;
+package org.oneog.uppick.batch.domain.ranking.config;
 
-import org.oneog.uppick.batch.job.ranking.RankingUpdateTasklet;
+import org.oneog.uppick.batch.domain.ranking.job.RankingUpdateTasklet;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
