@@ -193,6 +193,11 @@ services:
       DB_URL: jdbc:mysql://batch-mysql:3306/uppick_batch_db
       DB_USERNAME: user
       DB_PASSWORD: password
+      AUCTION_DB_URL: jdbc:mysql://auction-mysql:3306/uppick_db
+      AUCTION_DB_USERNAME: user
+      AUCTION_DB_PASSWORD: password
+      REDIS_HOST: auction-redis
+      REDIS_PORT: 6379
       AUCTION_SERVICE_URL: http://uppick-auction-service:8080
       MAIN_SERVICE_URL: http://uppick-main-service:8080
       JAVA_OPTS: "-Xms256m -Xmx512m"
@@ -204,6 +209,10 @@ services:
           memory: 768M
     depends_on:
       batch-mysql:
+        condition: service_healthy
+      auction-mysql:
+        condition: service_healthy
+      auction-redis:
         condition: service_healthy
 
   prometheus:
