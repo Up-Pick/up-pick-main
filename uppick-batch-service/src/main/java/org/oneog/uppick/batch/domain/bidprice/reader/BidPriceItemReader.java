@@ -63,50 +63,53 @@ public class BidPriceItemReader implements ItemReader<BidPriceDto> {
 	@Override
 	public BidPriceDto read() throws Exception {
 
+		// while 루프로 변경하여 재귀 호출 제거 (StackOverflowError 방지)
+		while (keyIterator != null && keyIterator.hasNext()) {
+
+			String key = keyIterator.next();
+
+			try {
+				// Redis 키에서 auctionId 추출: auction:123:current-bid-price -> 123
+				String auctionIdStr = key.replace(REDIS_KEY_PREFIX, "").replace(REDIS_KEY_SUFFIX, "");
+				Long auctionId = Long.parseLong(auctionIdStr);
+
+				// Redis에서 입찰가 값 가져오기
+				String bidPriceStr = stringRedisTemplate.opsForValue().get(key);
+
+				if (bidPriceStr == null) {
+					log.warn("Redis 키 {}에 대한 값이 없습니다. 스킵합니다.", key);
+					continue; // 다음 키로 이동
+				}
+
+				Long bidPrice = Long.parseLong(bidPriceStr);
+
+				// 입찰가가 0 이하면 스킵
+				if (bidPrice <= 0) {
+					log.debug("auctionId {}의 입찰가가 {}이므로 스킵합니다.", auctionId, bidPrice);
+					continue; // 다음 키로 이동
+				}
+
+				// auction 테이블에서 productId 조회
+				Long productId = auctionJdbcTemplate.queryForObject(QUERY_PRODUCT_ID, Long.class, auctionId);
+
+				if (productId == null) {
+					log.warn("auctionId {}에 대한 productId를 찾을 수 없습니다. 스킵합니다.", auctionId);
+					continue; // 다음 키로 이동
+				}
+
+				log.debug("입찰가 데이터 읽기 완료 - auctionId: {}, productId: {}, bidPrice: {}", auctionId, productId,
+					bidPrice);
+
+				return new BidPriceDto(auctionId, productId, bidPrice);
+
+			} catch (NumberFormatException e) {
+				log.error("잘못된 형식의 Redis 데이터 - key: {}, error: {}", key, e.getMessage());
+				// 다음 키로 이동
+			}
+		}
+
 		// 더 이상 읽을 데이터가 없으면 null 반환 (Chunk 처리 종료)
-		if (keyIterator == null || !keyIterator.hasNext()) {
-			return null;
-		}
-
-		String key = keyIterator.next();
-
-		try {
-			// Redis 키에서 auctionId 추출: auction:123:current-bid-price -> 123
-			String auctionIdStr = key.replace(REDIS_KEY_PREFIX, "").replace(REDIS_KEY_SUFFIX, "");
-			Long auctionId = Long.parseLong(auctionIdStr);
-
-			// Redis에서 입찰가 값 가져오기
-			String bidPriceStr = stringRedisTemplate.opsForValue().get(key);
-
-			if (bidPriceStr == null) {
-				log.warn("Redis 키 {}에 대한 값이 없습니다. 스킵합니다.", key);
-				return read(); // 다음 키로 재귀 호출
-			}
-
-			Long bidPrice = Long.parseLong(bidPriceStr);
-
-			// 입찰가가 0 이하면 스킵
-			if (bidPrice <= 0) {
-				log.debug("auctionId {}의 입찰가가 {}이므로 스킵합니다.", auctionId, bidPrice);
-				return read(); // 다음 키로 재귀 호출
-			}
-
-			// auction 테이블에서 productId 조회
-			Long productId = auctionJdbcTemplate.queryForObject(QUERY_PRODUCT_ID, Long.class, auctionId);
-
-			if (productId == null) {
-				log.warn("auctionId {}에 대한 productId를 찾을 수 없습니다. 스킵합니다.", auctionId);
-				return read(); // 다음 키로 재귀 호출
-			}
-
-			log.debug("입찰가 데이터 읽기 완료 - auctionId: {}, productId: {}, bidPrice: {}", auctionId, productId, bidPrice);
-
-			return new BidPriceDto(auctionId, productId, bidPrice);
-
-		} catch (NumberFormatException e) {
-			log.error("잘못된 형식의 Redis 데이터 - key: {}, error: {}", key, e.getMessage());
-			return read(); // 다음 키로 재귀 호출
-		}
+		return null;
 	}
 
 }
