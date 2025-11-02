@@ -22,6 +22,8 @@ dependencies {
     // Database - Spring Batch 메타데이터용
     runtimeOnly 'com.mysql:mysql-connector-j'
 
+    // Redis - 조회수 배치용
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
     // Open Feign
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
