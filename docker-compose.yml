@@ -43,6 +43,21 @@ services:
       timeout: 5s
       retries: 3
 
+  auction-mysql-exporter:
+    image: prom/mysqld-exporter:latest
+    command:
+      - "--mysqld.username=user:password"
+      - "--mysqld.address=auction-mysql:3306"
+    ports:
+      - "9104:9104"
+    depends_on:
+      auction-mysql:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+
   batch-mysql:
     image: mysql:8.0
     environment:
