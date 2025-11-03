@@ -10,7 +10,7 @@ public class AuctionRedisConstant {
     public static final String CURRENT_BID_PRICE_KEY = "auction:%d:current-bid-price";
     public static final String LAST_BIDDER_ID_KEY = "auction:%d:last-bidder-id";
 
-    public final DefaultRedisScript<Long> biddingScript;
+    public final DefaultRedisScript<Void> biddingScript;
 
     public AuctionRedisConstant() {
 
@@ -18,7 +18,7 @@ public class AuctionRedisConstant {
 
         biddingScript.setLocation(
             new ClassPathResource("redis/bidding.lua"));
-        biddingScript.setResultType(Long.class);
+        biddingScript.setResultType(Void.class);
     }
 
     public String getCurrentBidPriceKey(long auctionId) {
