@@ -173,7 +173,6 @@ services:
       JAVA_OPTS: "-Xms256m -Xmx512m"
     ports:
       - "8081:8080"
-      - "9090:9090"
     deploy:
       resources:
         limits:
