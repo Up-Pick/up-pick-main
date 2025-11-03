@@ -20,7 +20,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -34,49 +36,85 @@ public class MemberInternalService {
 
 	public String getMemberNicknameByMemberId(Long memberId) {
 
-		Member member = memberRepository.findById(memberId)
-			.orElseThrow(() -> new BusinessException(MemberErrorCode.MEMBER_NOT_FOUND));
+		log.info("MemberInternalService - 닉네임 조회 시도 ⏳");
 
-		return member.getNickname();
+		Member member = findMemberByIdOrElseThrow(memberId);
+		String nickname = member.getNickname();
+
+		log.info("MemberInternalService - 닉네임 조회 성공 ✅");
+
+		return nickname;
 	}
 
 	public List<SoldProductSellAtResponse> findSellAtByProductIds(List<Long> productIds) {
 
-		return memberQueryRepository.findSellAtByProductIds(productIds);
+		log.info("MemberInternalService - sellAt 조회 시도 ⏳");
+
+		List<SoldProductSellAtResponse> responses = memberQueryRepository.findSellAtByProductIds(productIds);
+
+		log.info("MemberInternalService - sellAt 조회 성공 ✅");
+
+		return responses;
 	}
 
 	public List<PurchasedProductBuyAtResponse> findBuyAtByProductIds(List<Long> productIds) {
 
-		return memberQueryRepository.findBuyAtByProductIds(productIds);
+		log.info("MemberInternalService - buyAt 조회 시도 ⏳");
+
+		List<PurchasedProductBuyAtResponse> responses = memberQueryRepository.findBuyAtByProductIds(productIds);
+
+		log.info("MemberInternalService - buyAt 조회 성공 ✅");
+
+		return responses;
 	}
 
 	public long getMemberCreditByMemberId(long memberId) {
 
-		Member member = memberRepository.findById(memberId)
-			.orElseThrow(() -> new BusinessException(MemberErrorCode.MEMBER_NOT_FOUND));
+		log.info("MemberInternalService - 크레딧 조회 시도 ⏳");
 
-		return member.getCredit();
+		Member member = findMemberByIdOrElseThrow(memberId);
+		long credit = member.getCredit();
+
+		log.info("MemberInternalService - 크레딧 조회 성공 ✅");
+
+		return credit;
 	}
 
 	@Transactional
 	public void updateMemberCredit(long memberId, long amount) {
 
-		Member member = memberRepository.findById(memberId)
-			.orElseThrow(() -> new BusinessException(MemberErrorCode.MEMBER_NOT_FOUND));
+		log.info("MemberInternalService - 크레딧 업데이트 시도 ⏳");
 
+		Member member = findMemberByIdOrElseThrow(memberId);
 		member.calculateCredit(amount);
+
+		log.info("MemberInternalService - 크레딧 업데이트 성공 ✅");
 	}
 
 	public void registerPurchaseDetail(RegisterPurchaseDetailRequest request) {
 
+		log.info("MemberInternalService - purchaseDetail 데이터 저장 시도 ⏳");
+
 		PurchaseDetail purchaseDetail = memberMapper.purchaseDetailToEntity(request);
 		purchaseDetailRepository.save(purchaseDetail);
+
+		log.info("MemberInternalService - purchaseDetail 데이터 저장 성공 ✅");
 	}
 
 	public void registerSellDetail(RegisterSellDetailRequest request) {
 
+		log.info("MemberInternalService - sellDetail 데이터 저장 시도 ⏳");
+
 		SellDetail sellDetail = memberMapper.sellDetailToEntity(request);
 		sellDetailRepository.save(sellDetail);
+
+		log.info("MemberInternalService - sellDetail 데이터 저장 성공 ✅");
+	}
+
+	private Member findMemberByIdOrElseThrow(Long memberId) {
+
+		return memberRepository.findById(memberId)
+			.orElseThrow(() -> new BusinessException(MemberErrorCode.MEMBER_NOT_FOUND));
 	}
 
 }

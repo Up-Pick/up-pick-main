@@ -50,7 +50,8 @@ public class MemberInternalController {
 	}
 
 	@PostMapping("/members/{memberId}/credit")
-	public void updateMemberCredit(@PathVariable long memberId,
+	public void updateMemberCredit(
+		@PathVariable long memberId,
 		@RequestBody UpdateMemberCreditRequest updateMemberCreditRequest) {
 
 		memberInternalService.updateMemberCredit(memberId, updateMemberCreditRequest.getAmount());

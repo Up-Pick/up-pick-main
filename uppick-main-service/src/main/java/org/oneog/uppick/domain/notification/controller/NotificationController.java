@@ -21,8 +21,8 @@ public class NotificationController {
 
 	@GetMapping("/me")
 	@PreAuthorize("isAuthenticated()")
-	public GlobalApiResponse<GetUnreadNotificationsResponse> getUnreadNotifications(@AuthenticationPrincipal
-	AuthMember authMember) {
+	public GlobalApiResponse<GetUnreadNotificationsResponse> getUnreadNotifications(
+		@AuthenticationPrincipal AuthMember authMember) {
 
 		return GlobalApiResponse.ok(notificationService.getUnreadNotifications(authMember.getMemberId()));
 	}

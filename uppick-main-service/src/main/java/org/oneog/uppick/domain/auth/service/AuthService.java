@@ -13,7 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -26,6 +28,8 @@ public class AuthService {
 	@Transactional
 	public void signup(SignupRequest signupRequest) {
 
+		log.info("AuthService - 회원가입 시도 ⏳");
+
 		// 이메일 중복 체크
 		if (memberExternalService.existsByEmail(signupRequest.getEmail())) {
 			throw new BusinessException(AuthErrorCode.DUPLICATE_EMAIL);
@@ -37,11 +41,14 @@ public class AuthService {
 		}
 
 		String encodedPassword = passwordEncoder.encode(signupRequest.getPassword());
-
 		memberExternalService.createUser(signupRequest, encodedPassword);
+
+		log.info("AuthService - 회원가입 성공 ✅");
 	}
 
 	public LoginResponse login(LoginRequest loginRequest) {
+
+		log.info("AuthService - 로그인 시도 ⏳");
 
 		Member member = memberExternalService.findByEmail(loginRequest.getEmail());
 
@@ -51,9 +58,11 @@ public class AuthService {
 
 		// 3. JWT 생성
 		String token = jwtUtil.createToken(member.getId(), member.getNickname());
+		LoginResponse response = new LoginResponse(token);
 
-		return new LoginResponse(token);
+		log.info("AuthService - 로그인 성공 ✅");
 
+		return response;
 	}
 
 }

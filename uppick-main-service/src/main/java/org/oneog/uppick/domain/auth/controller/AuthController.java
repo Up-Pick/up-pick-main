@@ -21,20 +21,15 @@ public class AuthController {
 	private final AuthService authService;
 
 	@PostMapping("/signup")
-	public GlobalApiResponse<Void> signup(
-		@Valid @RequestBody
-		SignupRequest signupRequest) {
+	public GlobalApiResponse<Void> signup(@Valid @RequestBody SignupRequest signupRequest) {
 
 		authService.signup(signupRequest);
-
 		return GlobalApiResponse.ok(null);
 
 	}
 
 	@PostMapping("/login")
-	public GlobalApiResponse<LoginResponse> login(
-		@Valid @RequestBody
-		LoginRequest loginRequest) {
+	public GlobalApiResponse<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
 
 		LoginResponse loginResponse = authService.login(loginRequest);
 		return GlobalApiResponse.ok(loginResponse);
