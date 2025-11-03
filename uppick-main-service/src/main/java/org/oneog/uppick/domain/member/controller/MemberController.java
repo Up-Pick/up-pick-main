@@ -27,10 +27,8 @@ public class MemberController {
 	@PreAuthorize("isAuthenticated()")
 	@PostMapping("/me/credit/charge")
 	public GlobalApiResponse<CreditChargeResponse> creditCharge(
-		@Valid @RequestBody
-		CreditChargeRequest creditChargeRequest,
-		@AuthenticationPrincipal
-		AuthMember authMember) {
+		@Valid @RequestBody CreditChargeRequest creditChargeRequest,
+		@AuthenticationPrincipal AuthMember authMember) {
 
 		CreditChargeResponse response = memberService.chargeCredit(creditChargeRequest, authMember);
 		return GlobalApiResponse.ok(response);
@@ -38,9 +36,7 @@ public class MemberController {
 
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/me/credit")
-	public GlobalApiResponse<CreditGetResponse> getCredit(
-		@AuthenticationPrincipal
-		AuthMember authMember) {
+	public GlobalApiResponse<CreditGetResponse> getCredit(@AuthenticationPrincipal AuthMember authMember) {
 
 		CreditGetResponse response = memberService.getCredit(authMember);
 		return GlobalApiResponse.ok(response);
