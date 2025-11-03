@@ -58,10 +58,11 @@ public class AuthService {
 
 		// 3. JWT 생성
 		String token = jwtUtil.createToken(member.getId(), member.getNickname());
+		LoginResponse response = new LoginResponse(token);
 
 		log.info("AuthService - 로그인 성공 ✅");
 
-		return new LoginResponse(token);
+		return response;
 	}
 
 }

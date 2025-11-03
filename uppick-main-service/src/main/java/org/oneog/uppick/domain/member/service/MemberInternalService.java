@@ -40,10 +40,11 @@ public class MemberInternalService {
 
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new BusinessException(MemberErrorCode.MEMBER_NOT_FOUND));
+		String nickname = member.getNickname();
 
 		log.info("MemberInternalService - 닉네임 조회 성공 ✅");
 
-		return member.getNickname();
+		return nickname;
 	}
 
 	public List<SoldProductSellAtResponse> findSellAtByProductIds(List<Long> productIds) {
@@ -74,10 +75,11 @@ public class MemberInternalService {
 
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new BusinessException(MemberErrorCode.MEMBER_NOT_FOUND));
+		long credit = member.getCredit();
 
 		log.info("MemberInternalService - 크레딧 조회 성공 ✅");
 
-		return member.getCredit();
+		return credit;
 	}
 
 	@Transactional

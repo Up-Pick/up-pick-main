@@ -29,9 +29,11 @@ public class NotificationService {
 		List<Notification> unreadNotifications = notificationJpaRepository.findAllByMemberIdAndIsReadFalse(memberId);
 		unreadNotifications.forEach(Notification::markAsRead);
 
+		GetUnreadNotificationsResponse response = notificationMapper.toResponse(unreadNotifications);
+
 		log.info("NotificationService - 읽지 않은 알림 조회 성공 ✅");
 
-		return notificationMapper.toResponse(unreadNotifications);
+		return response;
 	}
 
 }

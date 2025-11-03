@@ -25,10 +25,11 @@ public class RankingService {
 		log.info("RankingService - 핫 키워드 TOP10 조회 시도 ⏳");
 
 		List<HotKeyword> hotKeywords = hotKeywordRepository.findAllByOrderByRankNoAsc();
+		List<HotKeywordResponse> responses = toHotKeywordResponseList(hotKeywords);
 
 		log.info("RankingService - 핫 키워드 TOP10 조회 성공 ✅");
 
-		return toHotKeywordResponseList(hotKeywords);
+		return responses;
 	}
 
 	private List<HotKeywordResponse> toHotKeywordResponseList(List<HotKeyword> hotKeywords) {

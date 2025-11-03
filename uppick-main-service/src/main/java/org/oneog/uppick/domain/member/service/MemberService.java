@@ -31,10 +31,11 @@ public class MemberService {
 			.orElseThrow(() -> new BusinessException(MemberErrorCode.MEMBER_NOT_FOUND));
 
 		member.addCredit(creditChargeRequest.getAmount());
+		CreditChargeResponse response = new CreditChargeResponse(member.getCredit());
 
 		log.info("MemberService - 크레딧 충전 성공 ✅");
 
-		return new CreditChargeResponse(member.getCredit());
+		return response;
 	}
 
 	public CreditGetResponse getCredit(AuthMember authMember) {
@@ -44,9 +45,11 @@ public class MemberService {
 		Member member = memberRepository.findById(authMember.getMemberId())
 			.orElseThrow(() -> new BusinessException(MemberErrorCode.MEMBER_NOT_FOUND));
 
+		CreditGetResponse response = new CreditGetResponse(member.getCredit());
+
 		log.info("MemberService - 크레딧 조회 성공 ✅");
 
-		return new CreditGetResponse(member.getCredit());
+		return response;
 	}
 
 }
