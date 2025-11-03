@@ -19,6 +19,7 @@ import org.oneog.uppick.auction.domain.auction.entity.BiddingDetail;
 import org.oneog.uppick.auction.domain.auction.repository.AuctionQueryRepository;
 import org.oneog.uppick.auction.domain.auction.repository.AuctionRepository;
 import org.oneog.uppick.auction.domain.auction.repository.BiddingDetailRepository;
+import org.oneog.uppick.auction.domain.auction.repository.AuctionRedisRepository;
 import org.oneog.uppick.auction.domain.member.dto.request.RegisterPurchaseDetailRequest;
 import org.oneog.uppick.auction.domain.member.dto.request.RegisterSellDetailRequest;
 import org.oneog.uppick.auction.domain.member.service.MemberInnerService;
@@ -36,6 +37,8 @@ class AuctionEndProcessorTest {
 	private BiddingDetailRepository biddingDetailRepository;
 	@Mock
 	private AuctionQueryRepository auctionQueryRepository;
+	@Mock
+	private AuctionRedisRepository auctionRedisRepository;
 
 	@Mock
 	private MemberInnerService memberInnerService;
@@ -82,7 +85,11 @@ class AuctionEndProcessorTest {
 
 		given(auctionRepository.findById(auctionId))
 			.willReturn(Optional.of(auction));
-		given(biddingDetailRepository.findTopByAuctionIdOrderByBidPriceDesc(auctionId))
+		given(auctionRedisRepository.findLastBidderId(auctionId))
+			.willReturn(buyerId);
+		given(auctionRedisRepository.findCurrentBidPrice(auctionId))
+			.willReturn(bidPrice);
+		given(biddingDetailRepository.findTopByAuctionIdAndBidderIdAndBidPrice(auctionId, buyerId, bidPrice))
 			.willReturn(Optional.of(topBid));
 		given(auctionQueryRepository.findProductNameByProductId(productId))
 			.willReturn(productName);
@@ -146,8 +153,11 @@ class AuctionEndProcessorTest {
 		// 경매는 종료되었지만 입찰자가 없음
 		given(auctionRepository.findById(auctionId))
 			.willReturn(Optional.of(auction));
-		given(biddingDetailRepository.findTopByAuctionIdOrderByBidPriceDesc(auctionId))
-			.willReturn(Optional.empty());
+		// Redis에 입찰 정보가 없도록 설정 (유찰)
+		given(auctionRedisRepository.findLastBidderId(auctionId))
+			.willReturn(null);
+		given(auctionRedisRepository.findCurrentBidPrice(auctionId))
+			.willReturn(null);
 
 		// when
 		auctionSchedulerService.process(auctionId);

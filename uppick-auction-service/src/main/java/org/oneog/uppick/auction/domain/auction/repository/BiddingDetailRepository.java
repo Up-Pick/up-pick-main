@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface BiddingDetailRepository extends JpaRepository<BiddingDetail, Long> {
 
-	Optional<BiddingDetail> findTopByAuctionIdOrderByBidPriceDesc(Long auctionId);
+	Optional<BiddingDetail> findTopByAuctionIdAndBidderIdAndBidPrice(long auctionId, Long bidderId, Long bidPrice);
 
 }

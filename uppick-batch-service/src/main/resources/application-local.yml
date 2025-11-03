@@ -1,0 +1,72 @@
+spring:
+  batch:
+    job:
+      enabled: false  # 애플리케이션 시작 시 자동 실행 방지
+    jdbc:
+      initialize-schema: always    # Batch 메타데이터 테이블 자동 생성
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+  elasticsearch:
+    uris: ${ELASTICSEARCH_URL}
+
+# Batch DataSource - Batch DB (Spring Batch 메타데이터)
+batch:
+  datasource:
+    jdbc-url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      max-lifetime: 1800000
+  threads:
+    virtual:
+      enabled: true
+
+# Auction DataSource - 조회수 배치용
+auction:
+  datasource:
+    jdbc-url: ${AUCTION_DB_URL}
+    username: ${AUCTION_DB_USERNAME}
+    password: ${AUCTION_DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+      max-lifetime: 1800000
+
+server:
+  port: 8080
+
+# Actuator 및 모니터링 설정
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+internal:
+  api:
+    secret: "jdklsfjksdfjksldfjklsdjfklsdfjsklfjskljafklwejflkjw"
+
+# JWT 설정 (uppick-common의 JwtUtil Bean 생성을 위해 필요, 실제 사용하지 않음)
+jwt:
+  secret:
+    key: "VXBwaWNrUHJvamVjdFNlY3JldEtleUZvclRlc3RpbmdQdXJwb3NlczEyMzQ1Njc4OTA="
+
+logging:
+  level:
+    org.oneog.uppick: DEBUG
+    org.springframework.batch: DEBUG

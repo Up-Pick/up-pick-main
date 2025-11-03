@@ -6,6 +6,7 @@ import org.oneog.uppick.auction.domain.auction.entity.Auction;
 import org.oneog.uppick.auction.domain.auction.entity.BiddingDetail;
 import org.oneog.uppick.auction.domain.auction.exception.AuctionErrorCode;
 import org.oneog.uppick.auction.domain.auction.mapper.AuctionMapper;
+import org.oneog.uppick.auction.domain.auction.repository.AuctionRedisRepository;
 import org.oneog.uppick.auction.domain.auction.repository.AuctionRepository;
 import org.oneog.uppick.auction.domain.auction.repository.BiddingDetailRepository;
 import org.oneog.uppick.auction.domain.member.service.MemberInnerService;
@@ -27,6 +28,7 @@ public class BiddingProcessor {
     private final MemberInnerService memberInnerService;
     private final AuctionMapper auctionMapper;
     private final BiddingDetailRepository biddingDetailRepository;
+    private final AuctionRedisRepository auctionRedisRepository;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public BiddingResultDto process(@Valid AuctionBidRequest request, long auctionId, long memberId) {
@@ -40,8 +42,8 @@ public class BiddingProcessor {
                 throw new BusinessException(AuctionErrorCode.CANNOT_BID_OWN_AUCTION);
             }
 
-            Long biddingPrice = request.getBiddingPrice();
-            Long currentPrice = auction.getCurrentPrice();
+            long biddingPrice = request.getBiddingPrice();
+            Long currentPrice = auctionRedisRepository.findCurrentBidPrice(auctionId);
             Long minPrice = auction.getMinPrice();
 
             // 포인트 잔액 확인
@@ -59,7 +61,7 @@ public class BiddingProcessor {
             }
 
             // 이전 최고 입찰자 조회
-            Long previousBidderId = auction.getLastBidderId();
+            Long previousBidderId = auctionRedisRepository.findLastBidderId(auctionId);
             Long previousBidPrice = currentPrice;
 
             //  본인 재입찰 or 신규 입찰 처리
@@ -80,7 +82,7 @@ public class BiddingProcessor {
             }
 
             // 입찰가 갱신 및 기록 저장
-            auction.updateCurrentPrice(biddingPrice, memberId);
+            auctionRedisRepository.updateBidStatus(auctionId, biddingPrice, memberId);
 
             BiddingDetail biddingDetail = auctionMapper.toEntity(
                 auctionId,

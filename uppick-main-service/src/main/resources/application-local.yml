@@ -16,7 +16,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
   threads:
     virtual:
       enabled: true
@@ -25,6 +25,13 @@ spring:
     port: ${RABBITMQ_PORT}
     username: ${RABBITMQ_USER}
     password: ${RABBITMQ_PASS}
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 1
+    locations:
+      - classpath:db/migration
+      - classpath:db/seed
 server:
   port: 8080
 # Actuator 및 모니터링 설정
@@ -37,13 +44,13 @@ management:
   metrics:
     tags:
       application: ${spring.application.name}
+      distribution:
+        percentiles-histogram:
+          http.server.requests: true   # 요청시간 분포 (P95, P99 계산용)
   prometheus:
     metrics:
       export:
         enabled: true
-grpc:
-  server:
-    port: 9090
 jwt:
   secret:
     key: "VXBwaWNrUHJvamVjdFNlY3JldEtleUZvclRlc3RpbmdQdXJwb3NlczEyMzQ1Njc4OTA="
