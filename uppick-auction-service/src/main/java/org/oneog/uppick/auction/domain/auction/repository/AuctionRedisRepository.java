@@ -2,9 +2,7 @@ package org.oneog.uppick.auction.domain.auction.repository;
 
 import java.util.Arrays;
 
-import org.oneog.uppick.auction.domain.auction.exception.AuctionErrorCode;
 import org.oneog.uppick.auction.domain.auction.redis.AuctionRedisConstant;
-import org.oneog.uppick.common.exception.BusinessException;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -33,12 +31,9 @@ public class AuctionRedisRepository {
 
         String currentBidPriceKey = auctionRedisConstant.getCurrentBidPriceKey(auctionId);
         String lastBidderIdKey = auctionRedisConstant.getLastBidderIdKey(auctionId);
-        Long result = stringRedisTemplate.execute(auctionRedisConstant.biddingScript,
+        stringRedisTemplate.execute(auctionRedisConstant.biddingScript,
             Arrays.asList(currentBidPriceKey, lastBidderIdKey),
             String.valueOf(bidPrice), String.valueOf(bidderId));
-        if (result == null || result == 0L) {
-            throw new BusinessException(AuctionErrorCode.WRONG_BIDDING_PRICE);
-        }
     }
 
 }
