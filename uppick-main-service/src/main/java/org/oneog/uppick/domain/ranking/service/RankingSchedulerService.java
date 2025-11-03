@@ -23,7 +23,7 @@ public class RankingSchedulerService {
 	@Transactional
 	public void updateWeeklyTop10HotKeywords() {
 
-		log.info("[Batch] 키워드 랭킹 업데이트 시작");
+		log.info("RankingSchedulerService.updateWeeklyTop10HotKeywords : [Batch] 키워드 랭킹 업데이트 시작");
 
 		//이전 내용 삭제
 		hotKeywordRepository.deleteAll();
@@ -38,7 +38,7 @@ public class RankingSchedulerService {
 			hotKeywordRepository.save(hotKeyword);
 		}
 
-		log.info("[Batch] 키워드 랭킹 업데이트 종료");
+		log.info("RankingSchedulerService.updateWeeklyTop10HotKeywords : [Batch] 키워드 랭킹 업데이트 종료 ✅");
 	}
 
 }

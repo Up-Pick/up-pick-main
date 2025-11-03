@@ -9,7 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -20,19 +22,19 @@ public class RankingService {
 	//핫 키워드 TOP10 조회
 	public List<HotKeywordResponse> getHotKeywords() {
 
+		log.info("RankingService.getHotKeywords : 핫 키워드 TOP10 조회 시도");
+
 		List<HotKeyword> hotKeywords = hotKeywordRepository.findAllByOrderByRankNoAsc();
+
+		log.info("RankingService.getHotKeywords : 핫 키워드 TOP10 조회 성공 ✅");
+
 		return toHotKeywordResponseList(hotKeywords);
-	}
-
-	private HotKeywordResponse toResponse(HotKeyword hotKeyword) {
-
-		return new HotKeywordResponse(hotKeyword.getKeyword(), hotKeyword.getRankNo());
 	}
 
 	private List<HotKeywordResponse> toHotKeywordResponseList(List<HotKeyword> hotKeywords) {
 
 		return hotKeywords.stream()
-			.map(this::toResponse)
+			.map(keyword -> new HotKeywordResponse(keyword.getKeyword(), keyword.getRankNo()))
 			.toList();
 	}
 
