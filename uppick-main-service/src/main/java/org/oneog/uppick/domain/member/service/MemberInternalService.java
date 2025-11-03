@@ -38,8 +38,7 @@ public class MemberInternalService {
 
 		log.info("MemberInternalService - 닉네임 조회 시도 ⏳");
 
-		Member member = memberRepository.findById(memberId)
-			.orElseThrow(() -> new BusinessException(MemberErrorCode.MEMBER_NOT_FOUND));
+		Member member = findMemberByIdOrElseThrow(memberId);
 		String nickname = member.getNickname();
 
 		log.info("MemberInternalService - 닉네임 조회 성공 ✅");
@@ -73,8 +72,7 @@ public class MemberInternalService {
 
 		log.info("MemberInternalService - 크레딧 조회 시도 ⏳");
 
-		Member member = memberRepository.findById(memberId)
-			.orElseThrow(() -> new BusinessException(MemberErrorCode.MEMBER_NOT_FOUND));
+		Member member = findMemberByIdOrElseThrow(memberId);
 		long credit = member.getCredit();
 
 		log.info("MemberInternalService - 크레딧 조회 성공 ✅");
@@ -87,9 +85,7 @@ public class MemberInternalService {
 
 		log.info("MemberInternalService - 크레딧 업데이트 시도 ⏳");
 
-		Member member = memberRepository.findById(memberId)
-			.orElseThrow(() -> new BusinessException(MemberErrorCode.MEMBER_NOT_FOUND));
-
+		Member member = findMemberByIdOrElseThrow(memberId);
 		member.calculateCredit(amount);
 
 		log.info("MemberInternalService - 크레딧 업데이트 성공 ✅");
@@ -113,6 +109,12 @@ public class MemberInternalService {
 		sellDetailRepository.save(sellDetail);
 
 		log.info("MemberInternalService - sellDetail 데이터 저장 성공 ✅");
+	}
+
+	private Member findMemberByIdOrElseThrow(Long memberId) {
+
+		return memberRepository.findById(memberId)
+			.orElseThrow(() -> new BusinessException(MemberErrorCode.MEMBER_NOT_FOUND));
 	}
 
 }
