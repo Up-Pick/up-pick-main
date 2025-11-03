@@ -28,7 +28,7 @@ public class AuthService {
 	@Transactional
 	public void signup(SignupRequest signupRequest) {
 
-		log.info("AuthService.signup : 회원가입 시도");
+		log.info("AuthService - 회원가입 시도 ⏳");
 
 		// 이메일 중복 체크
 		if (memberExternalService.existsByEmail(signupRequest.getEmail())) {
@@ -43,12 +43,12 @@ public class AuthService {
 		String encodedPassword = passwordEncoder.encode(signupRequest.getPassword());
 		memberExternalService.createUser(signupRequest, encodedPassword);
 
-		log.info("AuthService.signup : 회원가입 성공 ✅");
+		log.info("AuthService - 회원가입 성공 ✅");
 	}
 
 	public LoginResponse login(LoginRequest loginRequest) {
 
-		log.info("AuthService.login : 로그인 시도");
+		log.info("AuthService - 로그인 시도 ⏳");
 
 		Member member = memberExternalService.findByEmail(loginRequest.getEmail());
 
@@ -59,7 +59,7 @@ public class AuthService {
 		// 3. JWT 생성
 		String token = jwtUtil.createToken(member.getId(), member.getNickname());
 
-		log.info("AuthService.login : 로그인 성공 ✅");
+		log.info("AuthService - 로그인 성공 ✅");
 
 		return new LoginResponse(token);
 	}

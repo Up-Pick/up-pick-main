@@ -20,14 +20,14 @@ public class SearchingService {
 	@Transactional
 	public void saveSearchingHistories(List<String> keywords) {
 
-		log.info("SearchingService.saveSearchingHistories : 검색 키워드 저장 시도");
+		log.info("SearchingService - 검색 키워드 저장 시도 ⏳");
 
 		keywords.forEach(keyword -> {
 			SearchHistory history = new SearchHistory(keyword);
 			repository.save(history);
 		});
 
-		log.info("SearchingService.saveSearchingHistories : 검색 키워드 저장 성공 ✅");
+		log.info("SearchingService - 검색 키워드 저장 성공 ✅");
 	}
 
 }

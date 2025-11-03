@@ -25,26 +25,26 @@ public class MemberService {
 	@Transactional
 	public CreditChargeResponse chargeCredit(CreditChargeRequest creditChargeRequest, AuthMember authMember) {
 
-		log.info("MemberService.chargeCredit : 크레딧 충전 시도");
+		log.info("MemberService - 크레딧 충전 시도 ⏳");
 
 		Member member = memberRepository.findById(authMember.getMemberId())
 			.orElseThrow(() -> new BusinessException(MemberErrorCode.MEMBER_NOT_FOUND));
 
 		member.addCredit(creditChargeRequest.getAmount());
 
-		log.info("MemberService.chargeCredit : 크레딧 충전 성공 ✅");
+		log.info("MemberService - 크레딧 충전 성공 ✅");
 
 		return new CreditChargeResponse(member.getCredit());
 	}
 
 	public CreditGetResponse getCredit(AuthMember authMember) {
 
-		log.info("MemberService.getCredit : 크레딧 조회 시도");
+		log.info("MemberService - 크레딧 조회 시도 ⏳");
 
 		Member member = memberRepository.findById(authMember.getMemberId())
 			.orElseThrow(() -> new BusinessException(MemberErrorCode.MEMBER_NOT_FOUND));
 
-		log.info("MemberService.getCredit : 크레딧 조회 성공 ✅");
+		log.info("MemberService - 크레딧 조회 성공 ✅");
 
 		return new CreditGetResponse(member.getCredit());
 	}

@@ -36,46 +36,46 @@ public class MemberInternalService {
 
 	public String getMemberNicknameByMemberId(Long memberId) {
 
-		log.info("MemberInternalService.getMemberNicknameByMemberId : 닉네임 조회 시도");
+		log.info("MemberInternalService - 닉네임 조회 시도 ⏳");
 
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new BusinessException(MemberErrorCode.MEMBER_NOT_FOUND));
 
-		log.info("MemberInternalService.getMemberNicknameByMemberId : 닉네임 조회 성공 ✅");
+		log.info("MemberInternalService - 닉네임 조회 성공 ✅");
 
 		return member.getNickname();
 	}
 
 	public List<SoldProductSellAtResponse> findSellAtByProductIds(List<Long> productIds) {
 
-		log.info("MemberInternalService.SoldProductSellAtResponse : sellAt 조회 시도");
+		log.info("MemberInternalService - sellAt 조회 시도 ⏳");
 
 		List<SoldProductSellAtResponse> responses = memberQueryRepository.findSellAtByProductIds(productIds);
 
-		log.info("MemberInternalService.SoldProductSellAtResponse : sellAt 조회 성공 ✅");
+		log.info("MemberInternalService - sellAt 조회 성공 ✅");
 
 		return responses;
 	}
 
 	public List<PurchasedProductBuyAtResponse> findBuyAtByProductIds(List<Long> productIds) {
 
-		log.info("MemberInternalService.PurchasedProductBuyAtResponse : buyAt 조회 시도");
+		log.info("MemberInternalService - buyAt 조회 시도 ⏳");
 
 		List<PurchasedProductBuyAtResponse> responses = memberQueryRepository.findBuyAtByProductIds(productIds);
 
-		log.info("MemberInternalService.PurchasedProductBuyAtResponse : buyAt 조회 성공 ✅");
+		log.info("MemberInternalService - buyAt 조회 성공 ✅");
 
 		return responses;
 	}
 
 	public long getMemberCreditByMemberId(long memberId) {
 
-		log.info("MemberInternalService.getMemberCreditByMemberId : 크레딧 조회 시도");
+		log.info("MemberInternalService - 크레딧 조회 시도 ⏳");
 
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new BusinessException(MemberErrorCode.MEMBER_NOT_FOUND));
 
-		log.info("MemberInternalService.getMemberCreditByMemberId : 크레딧 조회 성공 ✅");
+		log.info("MemberInternalService - 크레딧 조회 성공 ✅");
 
 		return member.getCredit();
 	}
@@ -83,34 +83,34 @@ public class MemberInternalService {
 	@Transactional
 	public void updateMemberCredit(long memberId, long amount) {
 
-		log.info("MemberInternalService.updateMemberCredit : 크레딧 업데이트 시도");
+		log.info("MemberInternalService - 크레딧 업데이트 시도 ⏳");
 
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new BusinessException(MemberErrorCode.MEMBER_NOT_FOUND));
 
 		member.calculateCredit(amount);
 
-		log.info("MemberInternalService.updateMemberCredit : 크레딧 업데이트 성공 ✅");
+		log.info("MemberInternalService - 크레딧 업데이트 성공 ✅");
 	}
 
 	public void registerPurchaseDetail(RegisterPurchaseDetailRequest request) {
 
-		log.info("MemberInternalService.registerPurchaseDetail : purchaseDetail 데이터 저장 시도");
+		log.info("MemberInternalService - purchaseDetail 데이터 저장 시도 ⏳");
 
 		PurchaseDetail purchaseDetail = memberMapper.purchaseDetailToEntity(request);
 		purchaseDetailRepository.save(purchaseDetail);
 
-		log.info("MemberInternalService.registerPurchaseDetail : purchaseDetail 데이터 저장 성공 ✅");
+		log.info("MemberInternalService - purchaseDetail 데이터 저장 성공 ✅");
 	}
 
 	public void registerSellDetail(RegisterSellDetailRequest request) {
 
-		log.info("MemberInternalService.registerSellDetail : sellDetail 데이터 저장 시도");
+		log.info("MemberInternalService - sellDetail 데이터 저장 시도 ⏳");
 
 		SellDetail sellDetail = memberMapper.sellDetailToEntity(request);
 		sellDetailRepository.save(sellDetail);
 
-		log.info("MemberInternalService.registerSellDetail : sellDetail 데이터 저장 성공 ✅");
+		log.info("MemberInternalService - sellDetail 데이터 저장 성공 ✅");
 	}
 
 }

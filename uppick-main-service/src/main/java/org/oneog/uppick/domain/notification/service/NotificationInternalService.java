@@ -26,17 +26,17 @@ public class NotificationInternalService {
 	@Transactional
 	public void sendNotification(SendNotificationRequest request) {
 
-		log.info("NotificationInternalService.sendNotification : 알림 데이터 저장 시도");
+		log.info("NotificationInternalService - 알림 데이터 저장 시도 ⏳");
 
 		notificationJpaRepository.save(notificationMapper.toEntity(request));
 
-		log.info("NotificationInternalService.sendNotification : 알림 데이터 저장 성공 ✅");
+		log.info("NotificationInternalService - 알림 데이터 저장 성공 ✅");
 	}
 
 	@Transactional
 	public void sendNotification(BidPlacedEvent event) {
 
-		log.info("NotificationInternalService.sendNotification : 알림 시도");
+		log.info("NotificationInternalService - 알림 시도 ⏳");
 
 		// 판매자 알림
 		log.info("-- 판매자 알림 생성");
@@ -51,7 +51,7 @@ public class NotificationInternalService {
 			notificationJpaRepository.save(bidderNotification);
 		});
 
-		log.info("NotificationInternalService.sendNotification : 알림 성공 ✅");
+		log.info("NotificationInternalService - 알림 성공 ✅");
 	}
 
 }
