@@ -14,15 +14,15 @@ public class NotificationMapper {
 
 	public GetUnreadNotificationsResponse toResponse(List<Notification> notifications) {
 
-		List<GetUnreadNotificationsResponse.NotificationDetail> notificationDetails = notifications.stream()
-			.map(notification -> {
-				return GetUnreadNotificationsResponse.NotificationDetail.builder()
+		List<GetUnreadNotificationsResponse.NotificationDetail> notificationDetails = notifications
+			.stream()
+			.map(notification ->
+				GetUnreadNotificationsResponse.NotificationDetail.builder()
 					.type(notification.getType())
 					.title(notification.getTitle())
 					.message(notification.getMessage())
 					.notifiedAt(notification.getNotifiedAt())
-					.build();
-			})
+					.build())
 			.toList();
 
 		return new GetUnreadNotificationsResponse(notificationDetails);
@@ -30,13 +30,12 @@ public class NotificationMapper {
 
 	public Notification toEntity(SendNotificationRequest request) {
 
-		Notification notification = Notification.builder()
+		return Notification.builder()
 			.memberId(request.getMemberId())
 			.type(request.getType())
 			.title(request.getString1())
 			.message(request.getString2())
 			.build();
-		return notification;
 	}
 
 	public Notification toSellerNotification(BidPlacedEvent event) {

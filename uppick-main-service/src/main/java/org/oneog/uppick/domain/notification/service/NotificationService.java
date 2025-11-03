@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
@@ -21,12 +23,13 @@ public class NotificationService {
 	@Transactional
 	public GetUnreadNotificationsResponse getUnreadNotifications(long memberId) {
 
-		List<Notification> unreadNotifications = notificationJpaRepository.findAllByMemberIdAndIsReadFalse(memberId);
+		log.info("NotificationService.getUnreadNotifications : 읽지 않은 알림 조회 시도");
 
 		// 읽음 처리
-		unreadNotifications.forEach(notification -> {
-			notification.markAsRead();
-		});
+		List<Notification> unreadNotifications = notificationJpaRepository.findAllByMemberIdAndIsReadFalse(memberId);
+		unreadNotifications.forEach(Notification::markAsRead);
+
+		log.info("NotificationService.getUnreadNotifications : 읽지 않은 알림 조회 성공 ✅");
 
 		return notificationMapper.toResponse(unreadNotifications);
 	}
