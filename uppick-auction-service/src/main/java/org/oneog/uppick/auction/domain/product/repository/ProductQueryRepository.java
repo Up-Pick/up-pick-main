@@ -2,7 +2,7 @@ package org.oneog.uppick.auction.domain.product.repository;
 
 import static org.oneog.uppick.auction.domain.auction.command.entity.QAuction.*;
 import static org.oneog.uppick.auction.domain.auction.command.entity.QBiddingDetail.*;
-import static org.oneog.uppick.auction.domain.category.entity.QCategory.*;
+import static org.oneog.uppick.auction.domain.category.query.entity.QCategory.*;
 import static org.oneog.uppick.auction.domain.product.entity.QProduct.*;
 
 import java.util.List;

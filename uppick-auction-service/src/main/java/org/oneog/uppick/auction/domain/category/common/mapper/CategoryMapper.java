@@ -1,8 +1,8 @@
-package org.oneog.uppick.auction.domain.category.mapper;
+package org.oneog.uppick.auction.domain.category.common.mapper;
 
-import org.oneog.uppick.auction.domain.category.dto.response.CategoryInfoResponse;
-import org.oneog.uppick.auction.domain.category.dto.response.CategoryResponse;
-import org.oneog.uppick.auction.domain.category.entity.Category;
+import org.oneog.uppick.auction.domain.category.query.entity.Category;
+import org.oneog.uppick.auction.domain.category.query.model.dto.response.CategoryInfoResponse;
+import org.oneog.uppick.auction.domain.category.query.model.dto.response.CategoryResponse;
 import org.springframework.stereotype.Component;
 
 @Component

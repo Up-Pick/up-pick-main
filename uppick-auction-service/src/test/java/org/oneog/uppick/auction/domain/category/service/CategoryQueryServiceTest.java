@@ -10,14 +10,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.oneog.uppick.auction.domain.category.dto.response.CategoryResponse;
-import org.oneog.uppick.auction.domain.category.entity.Category;
-import org.oneog.uppick.auction.domain.category.repository.CategoryRepository;
-import org.oneog.uppick.auction.domain.category.mapper.CategoryMapper;
+import org.oneog.uppick.auction.domain.category.common.mapper.CategoryMapper;
+import org.oneog.uppick.auction.domain.category.query.entity.Category;
+import org.oneog.uppick.auction.domain.category.query.model.dto.response.CategoryResponse;
+import org.oneog.uppick.auction.domain.category.query.repository.CategoryRepository;
+import org.oneog.uppick.auction.domain.category.query.service.CategoryQueryService;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
-public class CategoryServiceTest {
+public class CategoryQueryServiceTest {
 
 	@Mock
 	private CategoryRepository categoryRepository;
@@ -26,7 +27,7 @@ public class CategoryServiceTest {
 	private CategoryMapper categoryMapper;
 
 	@InjectMocks
-	private CategoryService categoryService;
+	private CategoryQueryService categoryQueryService;
 
 	@Test
 	void getAllCategories_실행시_성공() {
@@ -63,7 +64,7 @@ public class CategoryServiceTest {
 				.build());
 
 		// when
-		List<CategoryResponse> responses = categoryService.getAllCategories();
+		List<CategoryResponse> responses = categoryQueryService.getAllCategories();
 
 		// then
 		assertThat(responses).hasSize(2);

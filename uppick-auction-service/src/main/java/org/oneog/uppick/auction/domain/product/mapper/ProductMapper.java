@@ -1,6 +1,6 @@
 package org.oneog.uppick.auction.domain.product.mapper;
 
-import org.oneog.uppick.auction.domain.category.dto.response.CategoryInfoResponse;
+import org.oneog.uppick.auction.domain.category.query.model.dto.response.CategoryInfoResponse;
 import org.oneog.uppick.auction.domain.product.document.ProductDocument;
 import org.oneog.uppick.auction.domain.product.dto.projection.ProductDetailProjection;
 import org.oneog.uppick.auction.domain.product.dto.projection.ProductSimpleInfoProjection;

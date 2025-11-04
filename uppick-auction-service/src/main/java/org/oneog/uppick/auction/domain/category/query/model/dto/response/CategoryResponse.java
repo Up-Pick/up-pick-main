@@ -1,4 +1,4 @@
-package org.oneog.uppick.auction.domain.category.dto.response;
+package org.oneog.uppick.auction.domain.category.query.model.dto.response;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

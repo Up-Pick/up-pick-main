@@ -1,4 +1,4 @@
-package org.oneog.uppick.auction.domain.category.exception;
+package org.oneog.uppick.auction.domain.category.common.exception;
 
 import org.oneog.uppick.common.exception.ErrorCode;
 import org.springframework.http.HttpStatus;

@@ -1,12 +1,13 @@
-package org.oneog.uppick.auction.domain.category.service;
+package org.oneog.uppick.auction.domain.category.query.service;
 
-import org.oneog.uppick.auction.domain.category.dto.response.CategoryInfoResponse;
-import org.oneog.uppick.auction.domain.category.entity.Category;
-import org.oneog.uppick.auction.domain.category.exception.CategoryErrorCode;
-import org.oneog.uppick.auction.domain.category.mapper.CategoryMapper;
-import org.oneog.uppick.auction.domain.category.repository.CategoryRepository;
+import org.oneog.uppick.auction.domain.category.common.exception.CategoryErrorCode;
+import org.oneog.uppick.auction.domain.category.common.mapper.CategoryMapper;
+import org.oneog.uppick.auction.domain.category.query.entity.Category;
+import org.oneog.uppick.auction.domain.category.query.model.dto.response.CategoryInfoResponse;
+import org.oneog.uppick.auction.domain.category.query.repository.CategoryRepository;
 import org.oneog.uppick.common.exception.BusinessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,6 +19,7 @@ public class DefaultCategoryInnerService implements CategoryInnerService {
 	private final CategoryMapper categoryMapper;
 
 	@Override
+	@Transactional(readOnly = true)
 	public CategoryInfoResponse getCategoriesByCategoryId(Long categoryId) {
 
 		Category category = findCategoryByIdOrElseThrow(categoryId);

@@ -1,4 +1,4 @@
-package org.oneog.uppick.auction.domain.category.entity;
+package org.oneog.uppick.auction.domain.category.query.entity;
 
 import java.time.LocalDateTime;
 

@@ -1,6 +1,6 @@
 package org.oneog.uppick.auction.domain.auction.query.repository;
 
-import static org.oneog.uppick.auction.domain.auction.command.entity.QBiddingDetail.*;
+import static org.oneog.uppick.auction.domain.auction.common.entity.QBiddingDetail.*;
 
 import java.util.List;
 
