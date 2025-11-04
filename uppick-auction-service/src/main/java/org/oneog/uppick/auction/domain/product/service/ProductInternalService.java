@@ -6,8 +6,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.oneog.uppick.auction.common.config.datasource.UseMasterDataSource;
-import org.oneog.uppick.auction.domain.auction.repository.AuctionRedisRepository;
-import org.oneog.uppick.auction.domain.auction.service.AuctionInnerService;
+import org.oneog.uppick.auction.domain.auction.command.repository.AuctionRedisRepository;
+import org.oneog.uppick.auction.domain.auction.command.service.AuctionInnerService;
 import org.oneog.uppick.auction.domain.category.dto.response.CategoryInfoResponse;
 import org.oneog.uppick.auction.domain.category.service.CategoryInnerService;
 import org.oneog.uppick.auction.domain.member.service.MemberInnerService;

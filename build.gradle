@@ -73,6 +73,12 @@ subprojects {
         options.annotationProcessorPath = configurations.annotationProcessor
         // QueryDSL이 생성하는 소스 위치
         options.annotationProcessorGeneratedSourcesDirectory = file("$buildDir/generated/querydsl")
+        // 인코딩 설정
+        options.encoding = 'UTF-8'
+    }
+
+    tasks.withType(Test).configureEach {
+        systemProperty 'file.encoding', 'UTF-8'
     }
 
     // Spring Boot BOM을 전역으로 import 해서 하위 모듈들의 버전 관리를 맡깁니다.
