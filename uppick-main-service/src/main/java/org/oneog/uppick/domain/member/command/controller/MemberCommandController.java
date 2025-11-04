@@ -1,0 +1,36 @@
+package org.oneog.uppick.domain.member.command.controller;
+
+import org.oneog.uppick.common.dto.AuthMember;
+import org.oneog.uppick.common.dto.GlobalApiResponse;
+import org.oneog.uppick.domain.member.command.model.dto.request.CreditChargeRequest;
+import org.oneog.uppick.domain.member.command.model.dto.response.CreditChargeResponse;
+import org.oneog.uppick.domain.member.command.service.MemberCommandService;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/v1/members")
+public class MemberCommandController {
+
+	private final MemberCommandService memberCommandService;
+
+	@PreAuthorize("isAuthenticated()")
+	@PostMapping("/me/credit/charge")
+	public GlobalApiResponse<CreditChargeResponse> creditCharge(
+		@Valid @RequestBody CreditChargeRequest creditChargeRequest,
+		@AuthenticationPrincipal AuthMember authMember) {
+
+		CreditChargeResponse response = memberCommandService.chargeCredit(creditChargeRequest, authMember);
+		return GlobalApiResponse.ok(response);
+	}
+
+}
+

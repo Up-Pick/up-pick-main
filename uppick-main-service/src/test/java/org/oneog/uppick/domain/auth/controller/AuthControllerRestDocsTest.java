@@ -10,10 +10,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.oneog.uppick.domain.auth.dto.request.LoginRequest;
-import org.oneog.uppick.domain.auth.dto.request.SignupRequest;
-import org.oneog.uppick.domain.auth.dto.response.LoginResponse;
-import org.oneog.uppick.domain.auth.service.AuthService;
+import org.oneog.uppick.domain.auth.command.controller.AuthCommandController;
+import org.oneog.uppick.domain.auth.command.model.dto.request.LoginRequest;
+import org.oneog.uppick.domain.auth.command.model.dto.request.SignupRequest;
+import org.oneog.uppick.domain.auth.command.model.dto.response.LoginResponse;
+import org.oneog.uppick.domain.auth.command.service.AuthCommandService;
 import org.oneog.uppick.support.restdocs.RestDocsBase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -23,14 +24,14 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@WebMvcTest(AuthController.class)
+@WebMvcTest(AuthCommandController.class)
 class AuthControllerRestDocsTest extends RestDocsBase {
 
 	@Autowired
 	private ObjectMapper objectMapper;
 
 	@MockitoBean
-	private AuthService authService;
+	private AuthCommandService authService;
 
 	@Test
 	@DisplayName("회원가입 API Rest Docs 문서화")
@@ -49,9 +50,9 @@ class AuthControllerRestDocsTest extends RestDocsBase {
 
 		// when & then
 		mockMvc.perform(
-			post("/api/v1/members/signup") // 회원가입 엔드포인트
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(request)))
+				post("/api/v1/members/signup") // 회원가입 엔드포인트
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(objectMapper.writeValueAsString(request)))
 			.andExpect(status().isOk()) // 컨트롤러가 GlobalApiResponse.ok()를 반환하므로 200 OK
 			.andExpect(jsonPath("$.success").value(true))
 			.andExpect(jsonPath("$.message").value("요청에 성공했습니다."))
@@ -87,9 +88,9 @@ class AuthControllerRestDocsTest extends RestDocsBase {
 
 		// when & then
 		mockMvc.perform(
-			post("/api/v1/members/login")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(request)))
+				post("/api/v1/members/login")
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(objectMapper.writeValueAsString(request)))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.success").value(true))
 			.andExpect(jsonPath("$.data.accessToken").value(response.getAccessToken()))
