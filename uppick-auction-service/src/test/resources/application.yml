@@ -7,6 +7,11 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create-drop
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
   h2:
     console:
       enabled: true
