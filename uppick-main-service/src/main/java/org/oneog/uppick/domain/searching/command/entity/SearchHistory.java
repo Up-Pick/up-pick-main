@@ -1,4 +1,4 @@
-package org.oneog.uppick.domain.searching.entity;
+package org.oneog.uppick.domain.searching.command.entity;
 
 import java.time.LocalDateTime;
 

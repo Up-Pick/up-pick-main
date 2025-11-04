@@ -1,7 +1,7 @@
-package org.oneog.uppick.domain.searching.controller;
+package org.oneog.uppick.domain.searching.command.controller;
 
-import org.oneog.uppick.domain.searching.dto.SaveSearchHistoriesRequest;
-import org.oneog.uppick.domain.searching.service.SearchingService;
+import org.oneog.uppick.domain.searching.command.dto.SaveSearchHistoriesRequest;
+import org.oneog.uppick.domain.searching.command.service.SearchingCommandService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,9 +12,9 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/internal/v1/searching")
-public class SearchingInternalController {
+public class SearchingInternalCommandController {
 
-	private final SearchingService searchingService;
+	private final SearchingCommandService searchingService;
 
 	@PostMapping
 	public void saveSearchingHistories(@RequestBody SaveSearchHistoriesRequest request) {

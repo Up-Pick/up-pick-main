@@ -1,9 +1,9 @@
-package org.oneog.uppick.domain.searching.service;
+package org.oneog.uppick.domain.searching.command.service;
 
 import java.util.List;
 
-import org.oneog.uppick.domain.searching.entity.SearchHistory;
-import org.oneog.uppick.domain.searching.repository.SearchHistoryJpaRepository;
+import org.oneog.uppick.domain.searching.command.entity.SearchHistory;
+import org.oneog.uppick.domain.searching.command.repository.SearchHistoryJpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class SearchingService {
+public class SearchingCommandService {
 
 	private final SearchHistoryJpaRepository repository;
 
