@@ -1,11 +1,11 @@
-package org.oneog.uppick.domain.notification.service;
+package org.oneog.uppick.domain.notification.command.service;
 
 import java.util.List;
 
-import org.oneog.uppick.domain.notification.dto.response.GetUnreadNotificationsResponse;
-import org.oneog.uppick.domain.notification.entity.Notification;
-import org.oneog.uppick.domain.notification.mapper.NotificationMapper;
-import org.oneog.uppick.domain.notification.repository.NotificationJpaRepository;
+import org.oneog.uppick.domain.notification.query.model.dto.response.GetUnreadNotificationsResponse;
+import org.oneog.uppick.domain.notification.command.entity.Notification;
+import org.oneog.uppick.domain.notification.common.mapper.NotificationMapper;
+import org.oneog.uppick.domain.notification.command.repository.NotificationJpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class NotificationService {
+public class NotificationCommandService {
 
 	private final NotificationJpaRepository notificationJpaRepository;
 	private final NotificationMapper notificationMapper;
@@ -23,7 +23,7 @@ public class NotificationService {
 	@Transactional
 	public GetUnreadNotificationsResponse getUnreadNotifications(long memberId) {
 
-		log.info("NotificationService - 읽지 않은 알림 조회 시도 ⏳");
+		log.info("NotificationCommandService - 읽지 않은 알림 조회 시도 ⏳");
 
 		// 읽음 처리
 		List<Notification> unreadNotifications = notificationJpaRepository.findAllByMemberIdAndIsReadFalse(memberId);
@@ -31,7 +31,7 @@ public class NotificationService {
 
 		GetUnreadNotificationsResponse response = notificationMapper.toResponse(unreadNotifications);
 
-		log.info("NotificationService - 읽지 않은 알림 조회 성공 ✅");
+		log.info("NotificationCommandService - 읽지 않은 알림 조회 성공 ✅");
 
 		return response;
 	}

@@ -1,4 +1,4 @@
-package org.oneog.uppick.domain.notification.entity;
+package org.oneog.uppick.domain.notification.command.entity;
 
 import java.time.LocalDateTime;
 

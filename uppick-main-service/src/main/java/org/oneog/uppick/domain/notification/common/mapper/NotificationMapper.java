@@ -1,12 +1,12 @@
-package org.oneog.uppick.domain.notification.mapper;
+package org.oneog.uppick.domain.notification.common.mapper;
 
 import java.util.List;
 
 import org.oneog.uppick.domain.auction.event.BidPlacedEvent;
-import org.oneog.uppick.domain.notification.dto.request.SendNotificationRequest;
-import org.oneog.uppick.domain.notification.dto.response.GetUnreadNotificationsResponse;
-import org.oneog.uppick.domain.notification.entity.Notification;
-import org.oneog.uppick.domain.notification.entity.NotificationType;
+import org.oneog.uppick.domain.notification.command.model.dto.request.SendNotificationRequest;
+import org.oneog.uppick.domain.notification.query.model.dto.response.GetUnreadNotificationsResponse;
+import org.oneog.uppick.domain.notification.command.entity.Notification;
+import org.oneog.uppick.domain.notification.command.entity.NotificationType;
 import org.springframework.stereotype.Component;
 
 @Component

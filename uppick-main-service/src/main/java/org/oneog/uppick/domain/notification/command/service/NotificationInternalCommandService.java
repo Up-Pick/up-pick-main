@@ -1,13 +1,13 @@
-package org.oneog.uppick.domain.notification.service;
+package org.oneog.uppick.domain.notification.command.service;
 
 import java.util.List;
 
 import org.oneog.uppick.domain.auction.client.AuctionClient;
 import org.oneog.uppick.domain.auction.event.BidPlacedEvent;
-import org.oneog.uppick.domain.notification.dto.request.SendNotificationRequest;
-import org.oneog.uppick.domain.notification.entity.Notification;
-import org.oneog.uppick.domain.notification.mapper.NotificationMapper;
-import org.oneog.uppick.domain.notification.repository.NotificationJpaRepository;
+import org.oneog.uppick.domain.notification.command.model.dto.request.SendNotificationRequest;
+import org.oneog.uppick.domain.notification.command.entity.Notification;
+import org.oneog.uppick.domain.notification.common.mapper.NotificationMapper;
+import org.oneog.uppick.domain.notification.command.repository.NotificationJpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class NotificationInternalService {
+public class NotificationInternalCommandService {
 
 	private final NotificationJpaRepository notificationJpaRepository;
 	private final NotificationMapper notificationMapper;
@@ -26,17 +26,17 @@ public class NotificationInternalService {
 	@Transactional
 	public void sendNotification(SendNotificationRequest request) {
 
-		log.info("NotificationInternalService - 알림 데이터 저장 시도 ⏳");
+		log.info("NotificationInternalCommandService - 알림 데이터 저장 시도 ⏳");
 
 		notificationJpaRepository.save(notificationMapper.toEntity(request));
 
-		log.info("NotificationInternalService - 알림 데이터 저장 성공 ✅");
+		log.info("NotificationInternalCommandService - 알림 데이터 저장 성공 ✅");
 	}
 
 	@Transactional
 	public void sendNotification(BidPlacedEvent event) {
 
-		log.info("NotificationInternalService - 알림 시도 ⏳");
+		log.info("NotificationInternalCommandService - 알림 시도 ⏳");
 
 		// 판매자 알림
 		log.info("-- 판매자 알림 생성");
@@ -51,7 +51,7 @@ public class NotificationInternalService {
 			notificationJpaRepository.save(bidderNotification);
 		});
 
-		log.info("NotificationInternalService - 알림 성공 ✅");
+		log.info("NotificationInternalCommandService - 알림 성공 ✅");
 	}
 
 }

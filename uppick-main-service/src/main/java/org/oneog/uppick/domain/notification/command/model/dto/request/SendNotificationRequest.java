@@ -1,6 +1,6 @@
-package org.oneog.uppick.domain.notification.dto.request;
+package org.oneog.uppick.domain.notification.command.model.dto.request;
 
-import org.oneog.uppick.domain.notification.entity.NotificationType;
+import org.oneog.uppick.domain.notification.command.entity.NotificationType;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

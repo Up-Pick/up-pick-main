@@ -1,7 +1,7 @@
-package org.oneog.uppick.domain.notification.controller;
+package org.oneog.uppick.domain.notification.command.controller.internal;
 
-import org.oneog.uppick.domain.notification.dto.request.SendNotificationRequest;
-import org.oneog.uppick.domain.notification.service.NotificationInternalService;
+import org.oneog.uppick.domain.notification.command.model.dto.request.SendNotificationRequest;
+import org.oneog.uppick.domain.notification.command.service.NotificationInternalCommandService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,14 +12,14 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/internal/v1")
-public class NotificationInternalController {
+public class NotificationInternalCommandController {
 
-	private final NotificationInternalService notificationInternalService;
+	private final NotificationInternalCommandService notificationInternalCommandService;
 
 	@PostMapping("/notifications")
 	public void sendNotification(@RequestBody SendNotificationRequest request) {
 
-		notificationInternalService.sendNotification(request);
+		notificationInternalCommandService.sendNotification(request);
 	}
 
 }

@@ -1,9 +1,9 @@
-package org.oneog.uppick.domain.notification.dto.response;
+package org.oneog.uppick.domain.notification.query.model.dto.response;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.oneog.uppick.domain.notification.entity.NotificationType;
+import org.oneog.uppick.domain.notification.command.entity.NotificationType;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
