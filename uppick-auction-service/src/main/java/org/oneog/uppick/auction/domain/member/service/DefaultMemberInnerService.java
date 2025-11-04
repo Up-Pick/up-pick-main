@@ -6,8 +6,8 @@ import org.oneog.uppick.auction.domain.member.client.MemberClient;
 import org.oneog.uppick.auction.domain.member.dto.request.RegisterPurchaseDetailRequest;
 import org.oneog.uppick.auction.domain.member.dto.request.RegisterSellDetailRequest;
 import org.oneog.uppick.auction.domain.member.dto.request.UpdateMemberCreditRequest;
-import org.oneog.uppick.auction.domain.product.dto.response.ProductBuyAtResponse;
-import org.oneog.uppick.auction.domain.product.dto.response.ProductSellAtResponse;
+import org.oneog.uppick.auction.domain.product.query.model.dto.response.ProductBuyAtResponse;
+import org.oneog.uppick.auction.domain.product.query.model.dto.response.ProductSellAtResponse;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;

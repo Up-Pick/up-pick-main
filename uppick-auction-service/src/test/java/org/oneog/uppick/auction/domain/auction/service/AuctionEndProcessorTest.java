@@ -13,19 +13,20 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.oneog.uppick.auction.domain.auction.entity.Auction;
-import org.oneog.uppick.auction.domain.auction.entity.AuctionStatus;
-import org.oneog.uppick.auction.domain.auction.entity.BiddingDetail;
-import org.oneog.uppick.auction.domain.auction.repository.AuctionQueryRepository;
-import org.oneog.uppick.auction.domain.auction.repository.AuctionRepository;
-import org.oneog.uppick.auction.domain.auction.repository.BiddingDetailRepository;
-import org.oneog.uppick.auction.domain.auction.repository.AuctionRedisRepository;
+import org.oneog.uppick.auction.domain.auction.command.entity.Auction;
+import org.oneog.uppick.auction.domain.auction.command.entity.AuctionStatus;
+import org.oneog.uppick.auction.domain.auction.command.entity.BiddingDetail;
+import org.oneog.uppick.auction.domain.auction.command.repository.AuctionRedisRepository;
+import org.oneog.uppick.auction.domain.auction.command.repository.AuctionRepository;
+import org.oneog.uppick.auction.domain.auction.command.repository.BiddingDetailRepository;
+import org.oneog.uppick.auction.domain.auction.command.service.AuctionEndProcessor;
+import org.oneog.uppick.auction.domain.auction.query.repository.AuctionQueryRepository;
 import org.oneog.uppick.auction.domain.member.dto.request.RegisterPurchaseDetailRequest;
 import org.oneog.uppick.auction.domain.member.dto.request.RegisterSellDetailRequest;
 import org.oneog.uppick.auction.domain.member.service.MemberInnerService;
 import org.oneog.uppick.auction.domain.notification.dto.request.SendNotificationRequest;
 import org.oneog.uppick.auction.domain.notification.service.NotificationInnerService;
-import org.oneog.uppick.auction.domain.product.service.ProductInnerService;
+import org.oneog.uppick.auction.domain.product.command.service.ProductInnerService;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)

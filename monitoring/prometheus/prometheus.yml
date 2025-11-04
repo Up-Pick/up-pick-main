@@ -33,3 +33,15 @@ scrape_configs:
       - targets: [ 'uppick-batch-service:8080' ]
         labels:
           application: 'uppick-batch-service'
+
+  # MySQL Exporter 모니터링
+  - job_name: 'mysql'
+    static_configs:
+      - targets: [ 'auction-mysql-exporter:9104' ]
+        labels:
+          instance: 'auction-mysql'
+
+  # cAdvisor 모니터링 (컨테이너 리소스)
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: [ 'cadvisor:8080' ]
