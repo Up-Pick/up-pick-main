@@ -1,15 +1,27 @@
 spring:
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USER}
-    password: ${DB_PASS}
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    hikari:
-      maximum-pool-size: 20
-      minimum-idle: 10
-      connection-timeout: 30000   # 30초
-      max-lifetime: 1800000       # 30분
-      leak-detection-threshold: 60000  # 누수 감지
+    master:
+      hikari:
+        jdbc-url: ${DB_MASTER_URL}
+        username: ${DB_USER}
+        password: ${DB_PASS}
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        maximum-pool-size: 20
+        minimum-idle: 10
+        connection-timeout: 30000   # 30초
+        max-lifetime: 1800000       # 30분
+        leak-detection-threshold: 60000  # 누수 감지
+    slave:
+      hikari:
+        jdbc-url: ${DB_SLAVE_URL}
+        username: ${DB_USER}
+        password: ${DB_PASS}
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        maximum-pool-size: 20
+        minimum-idle: 10
+        connection-timeout: 30000   # 30초
+        max-lifetime: 1800000       # 30분
+        leak-detection-threshold: 60000  # 누수 감지
   jpa:
     open-in-view: false
     properties:
@@ -42,6 +54,9 @@ spring:
     enabled: true
     baseline-on-migrate: true
     baseline-version: 1
+    url: ${DB_MASTER_URL}
+    user: ${DB_USER}
+    password: ${DB_PASS}
     locations:
       - classpath:db/migration
       - classpath:db/seed
@@ -62,6 +77,12 @@ management:
     metrics:
       export:
         enabled: true
+
+# 로깅 설정
+logging:
+  level:
+    org.oneog.uppick.auction.common.config.datasource: INFO
+    com.zaxxer.hikari: INFO
 server:
   port: 8080
 jwt:

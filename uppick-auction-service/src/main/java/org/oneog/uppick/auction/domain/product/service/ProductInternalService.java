@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.oneog.uppick.auction.common.config.datasource.UseMasterDataSource;
 import org.oneog.uppick.auction.domain.auction.repository.AuctionRedisRepository;
 import org.oneog.uppick.auction.domain.auction.service.AuctionInnerService;
 import org.oneog.uppick.auction.domain.category.dto.response.CategoryInfoResponse;
@@ -80,7 +81,7 @@ public class ProductInternalService {
 	private final AuctionRedisRepository auctionRedisRepository;
 
 	// ***** Internal Service Method ***** //
-	@Transactional
+	@Transactional(readOnly = false)
 	public void registerProduct(ProductRegisterRequest request, MultipartFile image, Long registerId) {
 
 		// 1. 이미지 검증
@@ -105,7 +106,7 @@ public class ProductInternalService {
 		productDocumentRepository.save(document);
 	}
 
-	@Transactional
+	@Transactional(readOnly = true)
 	public ProductDetailResponse getProductInfoById(Long productId, AuthMember authMember) {
 
 		ProductDetailProjection projection = productQueryRepository.getProductInfoById(productId)
@@ -121,6 +122,7 @@ public class ProductInternalService {
 		return productMapper.combineProductDetailWithSellerAndCurrentPrice(projection, sellerName, currentPrice);
 	}
 
+	@Transactional(readOnly = true)
 	public ProductSimpleInfoResponse getProductSimpleInfoById(Long productId) {
 
 		ProductSimpleInfoProjection projection = productQueryRepository.getProductSimpleInfoById(
@@ -132,6 +134,7 @@ public class ProductInternalService {
 		return productMapper.combineProductSimpleInfoResponseWithCurrentPrice(projection, currentPrice);
 	}
 
+	@Transactional(readOnly = true)
 	public Page<SoldProductInfoResponse> getSoldProductInfosByMemberId(Long memberId, Pageable pageable) {
 
 		// Product Page 조회
@@ -164,6 +167,7 @@ public class ProductInternalService {
 		return new PageImpl<>(contents, productPageInfo.getPageable(), productPageInfo.getTotalElements());
 	}
 
+	@Transactional(readOnly = true)
 	public Page<PurchasedProductInfoResponse> getPurchasedProductInfoByMemberId(Long memberId,
 		Pageable pageable) {
 
@@ -192,16 +196,19 @@ public class ProductInternalService {
 		return new PageImpl<>(contents, productPageInfo.getPageable(), productPageInfo.getTotalElements());
 	}
 
+	@Transactional(readOnly = true)
 	public Page<ProductBiddingInfoResponse> getBiddingProductInfoByMemberId(Long memberId, Pageable pageable) {
 
 		return productQueryRepository.getBiddingProductInfoByMemberId(memberId, pageable);
 	}
 
+	@Transactional(readOnly = true)
 	public Page<ProductSellingInfoResponse> getSellingProductInfoByMemberId(Long memberId, Pageable pageable) {
 
 		return productQueryRepository.getSellingProductInfoMyMemberId(memberId, pageable);
 	}
 
+	@UseMasterDataSource
 	@Transactional
 	public Page<SearchProductInfoResponse> searchProduct(SearchProductRequest searchProductRequest) {
 
