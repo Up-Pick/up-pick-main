@@ -12,12 +12,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.oneog.uppick.common.auth.JwtUtil;
 import org.oneog.uppick.common.exception.BusinessException;
-// import org.oneog.uppick.domain.auth.dto.request.LoginRequest;
-import org.oneog.uppick.domain.auth.dto.request.SignupRequest;
-// import org.oneog.uppick.domain.auth.dto.response.LoginResponse;
-import org.oneog.uppick.domain.auth.exception.AuthErrorCode;
-// import org.oneog.uppick.domain.member.entity.Member;
-import org.oneog.uppick.domain.member.service.DefaultMemberInnerService;
+// import org.oneog.uppick.domain.auth.command.model.dto.request.LoginRequest;
+import org.oneog.uppick.domain.auth.command.model.dto.request.SignupRequest;
+// import org.oneog.uppick.domain.auth.command.model.dto.response.LoginResponse;
+import org.oneog.uppick.domain.auth.common.exception.AuthErrorCode;
+// import org.oneog.uppick.domain.member.command.entity.Member;
+import org.oneog.uppick.domain.member.command.service.DefaultMemberInnerService;
+import org.oneog.uppick.domain.auth.command.service.AuthCommandService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 // import org.springframework.test.util.ReflectionTestUtils;
 
@@ -34,7 +35,7 @@ class AuthServiceTest {
 	private JwtUtil jwtUtil;
 
 	@InjectMocks
-	private AuthService authService;
+	private AuthCommandService authService;
 
 	@Test
 	@DisplayName("회원가입 성공")

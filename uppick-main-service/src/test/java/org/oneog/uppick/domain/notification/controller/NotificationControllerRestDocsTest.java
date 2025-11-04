@@ -11,20 +11,21 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.oneog.uppick.domain.notification.dto.response.GetUnreadNotificationsResponse;
-import org.oneog.uppick.domain.notification.entity.NotificationType;
-import org.oneog.uppick.domain.notification.service.NotificationService;
+import org.oneog.uppick.domain.notification.command.controller.NotificationCommandController;
+import org.oneog.uppick.domain.notification.command.entity.NotificationType;
+import org.oneog.uppick.domain.notification.query.model.dto.response.GetUnreadNotificationsResponse;
+import org.oneog.uppick.domain.notification.command.service.NotificationCommandService;
 import org.oneog.uppick.support.auth.WithMockAuthMember;
 import org.oneog.uppick.support.restdocs.RestDocsBase;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-@WebMvcTest(NotificationController.class)
+@WebMvcTest(NotificationCommandController.class)
 public class NotificationControllerRestDocsTest extends RestDocsBase {
 
 	@MockitoBean
-	private NotificationService notificationInternalService;
+	private NotificationCommandService notificationCommandService;
 
 	@Test
 	@WithMockAuthMember
@@ -38,7 +39,7 @@ public class NotificationControllerRestDocsTest extends RestDocsBase {
 				.notifiedAt(LocalDateTime.now())
 				.build());
 		GetUnreadNotificationsResponse response = new GetUnreadNotificationsResponse(details);
-		when(notificationInternalService.getUnreadNotifications(1L)).thenReturn(response);
+		when(notificationCommandService.getUnreadNotifications(1L)).thenReturn(response);
 
 		// When & Then
 		mockMvc.perform(get("/api/v1/notifications/me")

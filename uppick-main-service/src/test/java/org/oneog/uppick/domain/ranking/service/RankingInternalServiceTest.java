@@ -11,9 +11,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.oneog.uppick.domain.ranking.dto.response.HotKeywordResponse;
-import org.oneog.uppick.domain.ranking.entity.HotKeyword;
-import org.oneog.uppick.domain.ranking.repository.HotKeywordRepository;
+import org.oneog.uppick.domain.ranking.command.entity.HotKeyword;
+import org.oneog.uppick.domain.ranking.command.repository.HotKeywordRepository;
+import org.oneog.uppick.domain.ranking.query.model.dto.response.HotKeywordResponse;
+import org.oneog.uppick.domain.ranking.query.service.RankingQueryService;
 
 @ExtendWith(MockitoExtension.class)
 class RankingInternalServiceTest {
@@ -22,7 +23,7 @@ class RankingInternalServiceTest {
 	private HotKeywordRepository hotKeywordRepository;
 
 	@InjectMocks
-	private RankingService rankingInternalService;
+	private RankingQueryService rankingQueryService;
 
 	// === 주간 키워드 조회 ===
 	@Test
@@ -37,7 +38,7 @@ class RankingInternalServiceTest {
 		given(hotKeywordRepository.findAllByOrderByRankNoAsc()).willReturn(keywords);
 
 		// when
-		List<HotKeywordResponse> result = rankingInternalService.getHotKeywords();
+		List<HotKeywordResponse> result = rankingQueryService.getHotKeywords();
 
 		// then
 		assertThat(result).hasSize(3);
@@ -56,7 +57,7 @@ class RankingInternalServiceTest {
 		given(hotKeywordRepository.findAllByOrderByRankNoAsc()).willReturn(Collections.emptyList());
 
 		// when
-		List<HotKeywordResponse> result = rankingInternalService.getHotKeywords();
+		List<HotKeywordResponse> result = rankingQueryService.getHotKeywords();
 
 		// then
 		assertThat(result).isEmpty();

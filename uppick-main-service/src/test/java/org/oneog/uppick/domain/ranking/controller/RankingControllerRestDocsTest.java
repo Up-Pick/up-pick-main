@@ -9,19 +9,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.oneog.uppick.domain.ranking.dto.response.HotKeywordResponse;
-import org.oneog.uppick.domain.ranking.service.RankingService;
+import org.oneog.uppick.domain.ranking.query.controller.RankingQueryController;
+import org.oneog.uppick.domain.ranking.query.model.dto.response.HotKeywordResponse;
+import org.oneog.uppick.domain.ranking.query.service.RankingQueryService;
 import org.oneog.uppick.support.restdocs.RestDocsBase;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-@WebMvcTest(RankingController.class)
+@WebMvcTest(RankingQueryController.class)
 public class RankingControllerRestDocsTest extends RestDocsBase {
 
 	@MockitoBean
-	private RankingService rankingInternalService;
+	private RankingQueryService rankingQueryService;
 
 	//핫키워드 조회
 	@Test
@@ -34,7 +35,7 @@ public class RankingControllerRestDocsTest extends RestDocsBase {
 			new HotKeywordResponse("백도현", 4),
 			new HotKeywordResponse("박수현", 5));
 
-		given(rankingInternalService.getHotKeywords()).willReturn(responses);
+		given(rankingQueryService.getHotKeywords()).willReturn(responses);
 
 		mockMvc.perform(
 				get("/api/v1/rankings/search-keywords")

@@ -14,12 +14,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.oneog.uppick.common.dto.AuthMember;
 import org.oneog.uppick.common.exception.BusinessException;
-import org.oneog.uppick.domain.member.dto.request.CreditChargeRequest;
-import org.oneog.uppick.domain.member.dto.response.CreditChargeResponse;
-import org.oneog.uppick.domain.member.dto.response.CreditGetResponse;
-import org.oneog.uppick.domain.member.entity.Member;
-import org.oneog.uppick.domain.member.exception.MemberErrorCode;
-import org.oneog.uppick.domain.member.repository.MemberRepository;
+import org.oneog.uppick.domain.member.command.entity.Member;
+import org.oneog.uppick.domain.member.command.model.dto.request.CreditChargeRequest;
+import org.oneog.uppick.domain.member.command.model.dto.response.CreditChargeResponse;
+import org.oneog.uppick.domain.member.command.repository.MemberRepository;
+import org.oneog.uppick.domain.member.command.service.MemberCommandService;
+import org.oneog.uppick.domain.member.common.exception.MemberErrorCode;
+import org.oneog.uppick.domain.member.query.model.dto.response.CreditGetResponse;
+import org.oneog.uppick.domain.member.query.service.MemberQueryService;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -28,7 +30,10 @@ public class MemberInternalServiceTest {
 	private MemberRepository memberRepository;
 
 	@InjectMocks
-	private MemberService memberInternalService;
+	private MemberCommandService memberCommandService;
+
+	@InjectMocks
+	private MemberQueryService memberQueryService;
 
 	private AuthMember authMember;
 	private Member testMember;
@@ -58,7 +63,7 @@ public class MemberInternalServiceTest {
 		when(memberRepository.findById(authMember.getMemberId())).thenReturn(Optional.of(testMember));
 
 		// when
-		CreditChargeResponse response = memberInternalService.chargeCredit(request, authMember);
+		CreditChargeResponse response = memberCommandService.chargeCredit(request, authMember);
 
 		// then
 		assertNotNull(response);
@@ -79,9 +84,9 @@ public class MemberInternalServiceTest {
 		when(memberRepository.findById(anyLong())).thenReturn(Optional.empty());
 
 		// when & then
-		// memberInternalService.chargeCredit 실행 시 BusinessException이 발생하는지 검증
+		// memberCommandService.chargeCredit 실행 시 BusinessException이 발생하는지 검증
 		BusinessException exception = assertThrows(BusinessException.class, () -> {
-			memberInternalService.chargeCredit(request, authMember);
+			memberCommandService.chargeCredit(request, authMember);
 		});
 
 		// 발생한 예외의 ErrorCode가 MEMBER_NOT_FOUND인지 확인
@@ -99,7 +104,7 @@ public class MemberInternalServiceTest {
 		// when & then
 		// Member 엔티티의 addCredit 메소드에서 예외가 발생해야 함
 		BusinessException exception = assertThrows(BusinessException.class, () -> {
-			memberInternalService.chargeCredit(request, authMember);
+			memberCommandService.chargeCredit(request, authMember);
 		});
 
 		// 발생한 예외의 ErrorCode가 INVALID_CHARGE_AMOUNT인지 확인
@@ -115,7 +120,7 @@ public class MemberInternalServiceTest {
 		when(memberRepository.findById(authMember.getMemberId())).thenReturn(Optional.of(testMember));
 
 		// when
-		CreditGetResponse response = memberInternalService.getCredit(authMember);
+		CreditGetResponse response = memberQueryService.getCredit(authMember);
 
 		// then
 		assertNotNull(response);
@@ -135,7 +140,7 @@ public class MemberInternalServiceTest {
 		// when & then
 		// BusinessException이 발생하는지 검증
 		BusinessException exception = assertThrows(BusinessException.class, () -> {
-			memberInternalService.getCredit(authMember);
+			memberQueryService.getCredit(authMember);
 		});
 
 		// MEMBER_NOT_FOUND인지 확인
