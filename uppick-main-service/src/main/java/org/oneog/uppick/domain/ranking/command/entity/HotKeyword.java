@@ -1,4 +1,4 @@
-package org.oneog.uppick.domain.ranking.entity;
+package org.oneog.uppick.domain.ranking.command.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

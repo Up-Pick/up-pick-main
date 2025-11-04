@@ -1,6 +1,6 @@
-package org.oneog.uppick.domain.ranking.controller;
+package org.oneog.uppick.domain.ranking.command.controller.internal;
 
-import org.oneog.uppick.domain.ranking.service.RankingSchedulerService;
+import org.oneog.uppick.domain.ranking.command.service.RankingCommandService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -10,14 +10,14 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/internal/v1/rankings")
-public class RankingInternalController {
+public class RankingInternalCommandController {
 
-	private final RankingSchedulerService rankingSchedulerService;
+	private final RankingCommandService rankingCommandService;
 
 	@PostMapping("/update-hot-keywords")
 	public void updateHotKeywords() {
 
-		rankingSchedulerService.updateWeeklyTop10HotKeywords();
+		rankingCommandService.updateWeeklyTop10HotKeywords();
 	}
 
 }

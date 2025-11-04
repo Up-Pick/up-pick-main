@@ -1,11 +1,11 @@
-package org.oneog.uppick.domain.ranking.repository;
+package org.oneog.uppick.domain.ranking.query.repository;
 
 import static org.oneog.uppick.domain.searching.entity.QSearchHistory.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.oneog.uppick.domain.ranking.dto.projection.HotKeywordProjection;
+import org.oneog.uppick.domain.ranking.command.model.dto.projection.HotKeywordProjection;
 import org.springframework.stereotype.Repository;
 
 import com.querydsl.core.types.Projections;
