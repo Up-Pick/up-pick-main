@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.oneog.uppick.auction.domain.member.dto.request.RegisterPurchaseDetailRequest;
 import org.oneog.uppick.auction.domain.member.dto.request.RegisterSellDetailRequest;
-import org.oneog.uppick.auction.domain.product.dto.response.ProductBuyAtResponse;
-import org.oneog.uppick.auction.domain.product.dto.response.ProductSellAtResponse;
+import org.oneog.uppick.auction.domain.product.query.model.dto.response.ProductBuyAtResponse;
+import org.oneog.uppick.auction.domain.product.query.model.dto.response.ProductSellAtResponse;
 
 public interface MemberInnerService {
 

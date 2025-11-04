@@ -15,7 +15,7 @@ import org.oneog.uppick.auction.domain.member.service.MemberInnerService;
 import org.oneog.uppick.auction.domain.notification.dto.request.SendNotificationRequest;
 import org.oneog.uppick.auction.domain.notification.enums.NotificationType;
 import org.oneog.uppick.auction.domain.notification.service.NotificationInnerService;
-import org.oneog.uppick.auction.domain.product.service.ProductInnerService;
+import org.oneog.uppick.auction.domain.product.command.service.ProductInnerService;
 import org.oneog.uppick.common.exception.BusinessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

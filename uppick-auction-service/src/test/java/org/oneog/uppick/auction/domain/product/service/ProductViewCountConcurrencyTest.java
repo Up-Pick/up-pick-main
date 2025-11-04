@@ -8,8 +8,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.oneog.uppick.auction.domain.product.entity.Product;
-import org.oneog.uppick.auction.domain.product.repository.ProductRepository;
+import org.oneog.uppick.auction.domain.product.command.entity.Product;
+import org.oneog.uppick.auction.domain.product.command.repository.ProductRepository;
+import org.oneog.uppick.auction.domain.product.command.service.ProductViewCountIncreaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 

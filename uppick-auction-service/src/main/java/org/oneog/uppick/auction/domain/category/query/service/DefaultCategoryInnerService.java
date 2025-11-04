@@ -19,7 +19,6 @@ public class DefaultCategoryInnerService implements CategoryInnerService {
 	private final CategoryMapper categoryMapper;
 
 	@Override
-	@Transactional(readOnly = true)
 	public CategoryInfoResponse getCategoriesByCategoryId(Long categoryId) {
 
 		Category category = findCategoryByIdOrElseThrow(categoryId);

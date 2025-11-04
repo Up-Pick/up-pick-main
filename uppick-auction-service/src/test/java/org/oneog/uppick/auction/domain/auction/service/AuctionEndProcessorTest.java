@@ -26,7 +26,7 @@ import org.oneog.uppick.auction.domain.member.dto.request.RegisterSellDetailRequ
 import org.oneog.uppick.auction.domain.member.service.MemberInnerService;
 import org.oneog.uppick.auction.domain.notification.dto.request.SendNotificationRequest;
 import org.oneog.uppick.auction.domain.notification.service.NotificationInnerService;
-import org.oneog.uppick.auction.domain.product.service.ProductInnerService;
+import org.oneog.uppick.auction.domain.product.command.service.ProductInnerService;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
