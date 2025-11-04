@@ -1,8 +1,8 @@
 package org.oneog.uppick.domain.member.command.service;
 
 import org.oneog.uppick.common.exception.BusinessException;
-import org.oneog.uppick.domain.auth.dto.request.SignupRequest;
-import org.oneog.uppick.domain.auth.exception.AuthErrorCode;
+import org.oneog.uppick.domain.auth.command.model.dto.request.SignupRequest;
+import org.oneog.uppick.domain.auth.common.exception.AuthErrorCode;
 import org.oneog.uppick.domain.member.command.entity.Member;
 import org.oneog.uppick.domain.member.command.repository.MemberRepository;
 import org.oneog.uppick.domain.member.common.mapper.MemberMapper;
