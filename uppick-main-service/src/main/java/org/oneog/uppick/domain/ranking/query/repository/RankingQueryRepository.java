@@ -1,6 +1,6 @@
 package org.oneog.uppick.domain.ranking.query.repository;
 
-import static org.oneog.uppick.domain.searching.entity.QSearchHistory.*;
+import static org.oneog.uppick.domain.searching.command.entity.QSearchHistory.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
