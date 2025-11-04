@@ -1,4 +1,4 @@
-package org.oneog.uppick.domain.auth.dto.response;
+package org.oneog.uppick.domain.auth.command.model.dto.response;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

@@ -1,11 +1,11 @@
-package org.oneog.uppick.domain.auth.service;
+package org.oneog.uppick.domain.auth.command.service;
 
 import org.oneog.uppick.common.auth.JwtUtil;
 import org.oneog.uppick.common.exception.BusinessException;
-import org.oneog.uppick.domain.auth.dto.request.LoginRequest;
-import org.oneog.uppick.domain.auth.dto.request.SignupRequest;
-import org.oneog.uppick.domain.auth.dto.response.LoginResponse;
-import org.oneog.uppick.domain.auth.exception.AuthErrorCode;
+import org.oneog.uppick.domain.auth.command.model.dto.request.LoginRequest;
+import org.oneog.uppick.domain.auth.command.model.dto.request.SignupRequest;
+import org.oneog.uppick.domain.auth.command.model.dto.response.LoginResponse;
+import org.oneog.uppick.domain.auth.common.exception.AuthErrorCode;
 import org.oneog.uppick.domain.member.command.entity.Member;
 import org.oneog.uppick.domain.member.command.service.DefaultMemberInnerService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class AuthService {
+public class AuthCommandService {
 
 	private final DefaultMemberInnerService memberExternalService;
 	private final PasswordEncoder passwordEncoder;
@@ -28,7 +28,7 @@ public class AuthService {
 	@Transactional
 	public void signup(SignupRequest signupRequest) {
 
-		log.info("AuthService - 회원가입 시도 ⏳");
+		log.info("AuthCommandService - 회원가입 시도 ⏳");
 
 		// 이메일 중복 체크
 		if (memberExternalService.existsByEmail(signupRequest.getEmail())) {
@@ -43,12 +43,12 @@ public class AuthService {
 		String encodedPassword = passwordEncoder.encode(signupRequest.getPassword());
 		memberExternalService.createUser(signupRequest, encodedPassword);
 
-		log.info("AuthService - 회원가입 성공 ✅");
+		log.info("AuthCommandService - 회원가입 성공 ✅");
 	}
 
 	public LoginResponse login(LoginRequest loginRequest) {
 
-		log.info("AuthService - 로그인 시도 ⏳");
+		log.info("AuthCommandService - 로그인 시도 ⏳");
 
 		Member member = memberExternalService.findByEmail(loginRequest.getEmail());
 
@@ -60,7 +60,7 @@ public class AuthService {
 		String token = jwtUtil.createToken(member.getId(), member.getNickname());
 		LoginResponse response = new LoginResponse(token);
 
-		log.info("AuthService - 로그인 성공 ✅");
+		log.info("AuthCommandService - 로그인 성공 ✅");
 
 		return response;
 	}

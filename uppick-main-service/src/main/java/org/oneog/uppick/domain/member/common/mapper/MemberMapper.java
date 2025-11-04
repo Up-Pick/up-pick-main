@@ -1,6 +1,6 @@
 package org.oneog.uppick.domain.member.common.mapper;
 
-import org.oneog.uppick.domain.auth.dto.request.SignupRequest;
+import org.oneog.uppick.domain.auth.command.model.dto.request.SignupRequest;
 import org.oneog.uppick.domain.member.command.entity.Member;
 import org.oneog.uppick.domain.member.command.entity.PurchaseDetail;
 import org.oneog.uppick.domain.member.command.entity.SellDetail;

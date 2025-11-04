@@ -1,4 +1,4 @@
-package org.oneog.uppick.domain.auth.dto.request;
+package org.oneog.uppick.domain.auth.command.model.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

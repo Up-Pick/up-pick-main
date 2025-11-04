@@ -1,4 +1,4 @@
-package org.oneog.uppick.domain.auth.exception;
+package org.oneog.uppick.domain.auth.common.exception;
 
 import org.oneog.uppick.common.exception.ErrorCode;
 import org.springframework.http.HttpStatus;
