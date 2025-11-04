@@ -1,4 +1,4 @@
-package org.oneog.uppick.auction.domain.product.service;
+package org.oneog.uppick.auction.domain.product.command.service;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
@@ -8,80 +8,51 @@ import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.oneog.uppick.auction.domain.auction.command.repository.AuctionRedisRepository;
 import org.oneog.uppick.auction.domain.auction.command.service.AuctionInnerService;
 import org.oneog.uppick.auction.domain.category.query.model.dto.response.CategoryInfoResponse;
 import org.oneog.uppick.auction.domain.category.query.service.CategoryInnerService;
-import org.oneog.uppick.auction.domain.member.service.MemberInnerService;
 import org.oneog.uppick.auction.domain.product.command.entity.Product;
 import org.oneog.uppick.auction.domain.product.command.model.dto.request.ProductRegisterRequest;
 import org.oneog.uppick.auction.domain.product.command.repository.ProductDocumentRepository;
 import org.oneog.uppick.auction.domain.product.command.repository.ProductRepository;
-import org.oneog.uppick.auction.domain.product.command.service.ProductViewCountIncreaseService;
 import org.oneog.uppick.auction.domain.product.common.S3FileManager;
 import org.oneog.uppick.auction.domain.product.common.document.ProductDocument;
 import org.oneog.uppick.auction.domain.product.common.mapper.ProductMapper;
-import org.oneog.uppick.auction.domain.product.query.repository.ProductQueryRepository;
-import org.oneog.uppick.auction.domain.searching.service.SearchingInnerService;
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 @ExtendWith(MockitoExtension.class)
-public class ProductInternalServiceTest {
+public class ProductCommandServiceTest {
 
 	private final ProductMapper productMapper = new ProductMapper();
 
-	@Mock
-	ElasticsearchOperations elasticsearchOperations;
 	@Mock
 	ProductDocumentRepository productDocumentRepository;
 	@Mock
 	ProductRepository productRepository;
 	@Mock
-	ProductQueryRepository productQueryRepository;
-	@Mock
-	ProductViewCountIncreaseService productViewCountIncreaseService;
-	@Mock
 	S3FileManager s3FileManager;
 	@Mock
 	AuctionInnerService auctionInnerService;
 	@Mock
-	MemberInnerService memberInnerService;
-	@Mock
-	SearchingInnerService searchingInnerService;
-	@Mock
 	CategoryInnerService categoryInnerService;
-	@InjectMocks
-	ProductInternalService productInternalService;
-	@Mock
-	private AuctionRedisRepository auctionRedisRepository;
+
+	ProductCommandService productCommandService;
 
 	@BeforeEach
 	public void init() {
 
-		productInternalService = new ProductInternalService(
-			elasticsearchOperations,
-
+		productCommandService = new ProductCommandService(
 			productRepository,
 			productDocumentRepository,
-			productQueryRepository,
 			productMapper,
-			productViewCountIncreaseService,
-
 			s3FileManager,
-
 			auctionInnerService,
-			memberInnerService,
-			searchingInnerService,
-			categoryInnerService,
-			auctionRedisRepository);
+			categoryInnerService);
 	}
 
-	/* ---------- Service Test ---------- */
 	@Test
 	void 상품이_이미지와_함께_정상적으로_등록됨() {
 
@@ -109,7 +80,7 @@ public class ProductInternalServiceTest {
 		given(productDocumentRepository.save(any(ProductDocument.class))).willReturn(new ProductDocument());
 
 		// when
-		productInternalService.registerProduct(request, image, registerId);
+		productCommandService.registerProduct(request, image, registerId);
 
 		// then
 		verify(s3FileManager).store(image);

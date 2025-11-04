@@ -1,4 +1,4 @@
-package org.oneog.uppick.auction.domain.product.service;
+package org.oneog.uppick.auction.domain.product.query.service;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
