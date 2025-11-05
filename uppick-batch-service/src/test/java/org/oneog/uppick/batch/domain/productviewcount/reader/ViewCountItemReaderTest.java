@@ -63,4 +63,31 @@ class ViewCountItemReaderTest {
 		assertThat(result).isNull();
 	}
 
+	@Test
+	@DisplayName("잘못된 데이터 스킵하고 정상 데이터 반환")
+	void read_skipInvalidData() throws Exception {
+
+		// given
+		String key1 = "product:view:10";
+		String key2 = "product:view:20";
+		when(stringRedisTemplate.keys("product:view:*")).thenReturn(Set.of(key1, key2));
+		when(stringRedisTemplate.opsForValue()).thenReturn(valueOperations);
+		when(valueOperations.get(anyString())).thenAnswer(invocation -> {
+			String key = invocation.getArgument(0);
+			if (key.equals(key1))
+				return "invalid";
+			if (key.equals(key2))
+				return "5";
+			return null;
+		});
+
+		// when
+		reader.init();
+		ViewCountDto result = reader.read();
+
+		// then
+		assertThat(result).isNotNull();
+		assertThat(result.getProductId()).isEqualTo(20L);
+	}
+
 }
