@@ -18,7 +18,7 @@ public class RankingBatchScheduler {
 	private final JobLauncher jobLauncher;
 	private final Job rankingUpdateJob;
 
-	@Scheduled(cron = "0 * * * * *") // 매일 자정 업데이트
+	@Scheduled(cron = "0 0 0 * * *") // 매일 자정 업데이트
 	public void runRankingUpdateBatch() {
 
 		log.debug("핫 키워드 랭킹 배치 Job 실행 시작");
