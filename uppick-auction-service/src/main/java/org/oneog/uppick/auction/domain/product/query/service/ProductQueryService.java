@@ -25,10 +25,12 @@ import org.oneog.uppick.auction.domain.product.query.model.dto.response.ProductS
 import org.oneog.uppick.auction.domain.product.query.model.dto.response.PurchasedProductInfoResponse;
 import org.oneog.uppick.auction.domain.product.query.model.dto.response.SearchProductInfoResponse;
 import org.oneog.uppick.auction.domain.product.query.model.dto.response.SoldProductInfoResponse;
+import org.oneog.uppick.auction.domain.product.query.repository.ProductESRepository;
 import org.oneog.uppick.auction.domain.product.query.repository.ProductQueryRepository;
 import org.oneog.uppick.auction.domain.searching.service.SearchingInnerService;
 import org.oneog.uppick.common.dto.AuthMember;
 import org.oneog.uppick.common.exception.BusinessException;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -38,7 +40,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import org.oneog.uppick.auction.domain.product.query.repository.ProductESRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -56,7 +57,10 @@ public class ProductQueryService {
 	private final SearchingInnerService searchingInnerService;
 
 	@Transactional(readOnly = true)
+	@Cacheable(value = "productDetail", key = "#productId")
 	public ProductDetailResponse getProductInfoById(Long productId, AuthMember authMember) {
+
+		log.info("[캐시 미스] productDetail 캐시 미스 발생 - DB 조회 시작: productId={}", productId);
 
 		ProductDetailProjection projection = productQueryRepository.getProductInfoById(productId)
 			.orElseThrow(() -> new BusinessException(ProductErrorCode.CANNOT_READ_PRODUCT_INFO));
@@ -68,19 +72,30 @@ public class ProductQueryService {
 		String sellerName = memberInnerService.getMemberNickname(projection.getSellerId());
 		Long currentPrice = auctionRedisRepository.findCurrentBidPrice(projection.getAuctionId());
 
-		return productMapper.combineProductDetailWithSellerAndCurrentPrice(projection, sellerName, currentPrice);
+		ProductDetailResponse response = productMapper.combineProductDetailWithSellerAndCurrentPrice(projection,
+			sellerName, currentPrice);
+		log.info("[캐시 저장] productDetail 캐시에 저장 완료: productId={}, currentBid={}", productId, currentPrice);
+
+		return response;
 	}
 
 	@Transactional(readOnly = true)
+	@Cacheable(value = "productSimpleInfo", key = "#productId")
 	public ProductSimpleInfoResponse getProductSimpleInfoById(Long productId) {
 
-		ProductSimpleInfoProjection projection = productQueryRepository.getProductSimpleInfoById(
-			productId)
+		log.info("[캐시 미스] productSimpleInfo 캐시 미스 발생 - DB 조회 시작: productId={}", productId);
+
+		ProductSimpleInfoProjection projection = productQueryRepository.getProductSimpleInfoById(productId)
 			.orElseThrow(() -> new BusinessException(ProductErrorCode.CANNOT_READ_PRODUCT_INFO));
 
 		Long currentPrice = auctionRedisRepository.findCurrentBidPrice(projection.getAuctionId());
 
-		return productMapper.combineProductSimpleInfoResponseWithCurrentPrice(projection, currentPrice);
+		ProductSimpleInfoResponse response = productMapper.combineProductSimpleInfoResponseWithCurrentPrice(projection,
+			currentPrice);
+		log.info("[캐시 저장] productSimpleInfo 캐시에 저장 완료: productId={}, currentBidPrice={}", productId,
+			currentPrice);
+
+		return response;
 	}
 
 	@Transactional(readOnly = true)
