@@ -48,4 +48,19 @@ class ViewCountItemReaderTest {
 		assertThat(result.getViewCount()).isEqualTo(5L);
 	}
 
+	@Test
+	@DisplayName("Redis에 데이터가 없을 때 null 반환")
+	void read_emptyRedis_returnsNull() throws Exception {
+
+		// given
+		when(stringRedisTemplate.keys("product:view:*")).thenReturn(Set.of());
+
+		// when
+		reader.init();
+		ViewCountDto result = reader.read();
+
+		// then
+		assertThat(result).isNull();
+	}
+
 }
