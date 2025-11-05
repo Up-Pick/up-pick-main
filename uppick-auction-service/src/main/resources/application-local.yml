@@ -79,9 +79,9 @@ management:
         enabled: true
 
 # 로깅 설정
-logging:
-  level:
-    root: DEBUG
+# logging:
+#   level:
+#     root: INFO
 
 server:
   port: 8080

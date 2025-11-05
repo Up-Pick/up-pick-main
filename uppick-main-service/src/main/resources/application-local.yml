@@ -56,9 +56,9 @@ management:
       export:
         enabled: true
 
-logging:
-  level:
-    root: DEBUG
+# logging:
+#   level:
+#     root: INFO
 
 jwt:
   secret:

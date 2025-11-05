@@ -8,6 +8,7 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.lang.reflect.Method;
 
@@ -40,7 +41,10 @@ public class DataSourceAspect {
             }
             // 3. 기본: @Transactional의 readOnly 값에 따라 결정
             else {
-                dataSourceType = transactional.readOnly() ? DataSourceType.SLAVE : DataSourceType.MASTER;
+                boolean actualReadOnly = TransactionSynchronizationManager.isActualTransactionActive() ?
+                    TransactionSynchronizationManager.isCurrentTransactionReadOnly() : transactional.readOnly();
+
+                dataSourceType = actualReadOnly ? DataSourceType.SLAVE : DataSourceType.MASTER;
                 log.debug(">>> [AOP] 메서드: {}, @Transactional(readOnly={}) -> {}",
                     method.getName(),
                     transactional.readOnly(),
