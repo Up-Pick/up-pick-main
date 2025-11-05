@@ -92,7 +92,10 @@ public class BiddingProcessor {
 
 			return new BiddingResultDto(auction.getProductId(), auction.getRegisterId(), biddingPrice);
 
-		} catch (Exception e) {
+		}catch(
+
+	Exception e)
+	{
 			log.error("입찰 처리 중 예외 발생", e);
 			throw e;
 		}
