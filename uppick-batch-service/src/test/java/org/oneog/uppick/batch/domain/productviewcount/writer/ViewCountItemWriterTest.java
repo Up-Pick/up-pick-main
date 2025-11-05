@@ -75,4 +75,16 @@ class ViewCountItemWriterTest {
 		verify(stringRedisTemplate, never()).delete(anyString());
 	}
 
+	@Test
+	@DisplayName("빈 Chunk 처리")
+	void write_emptyChunk_noException() throws Exception {
+
+		// given
+		Chunk<ViewCountDto> chunk = new Chunk<>();
+
+		// when & then
+		assertThatCode(() -> writer.write(chunk)).doesNotThrowAnyException();
+		verify(jdbcTemplate, never()).update(anyString(), any(), any());
+	}
+
 }
