@@ -7,6 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class BiddingResultDto {
 
+	private long productId;
 	private long sellerId;
 	private long biddingPrice;
 

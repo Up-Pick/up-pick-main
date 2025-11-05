@@ -6,6 +6,7 @@ import org.oneog.uppick.domain.ranking.command.entity.HotKeyword;
 import org.oneog.uppick.domain.ranking.command.model.dto.projection.HotKeywordProjection;
 import org.oneog.uppick.domain.ranking.command.repository.HotKeywordRepository;
 import org.oneog.uppick.domain.ranking.query.repository.RankingQueryRepository;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ public class RankingCommandService {
 	private final RankingQueryRepository rankingQueryRepository;
 
 	@Transactional
+	@CacheEvict(value = "hotKeywords", allEntries = true)
 	public void updateWeeklyTop10HotKeywords() {
 
 		log.debug("RankingCommandService - [Batch] 키워드 랭킹 업데이트 시작 ⏳");

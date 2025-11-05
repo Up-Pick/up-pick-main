@@ -1,4 +1,4 @@
-package org.oneog.uppick.auction.common.config;
+package org.oneog.uppick.common.config;
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -17,7 +17,6 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -38,17 +37,11 @@ public class RedisConfig {
 
 	@Bean
 	public CacheManager cacheManager(RedisConnectionFactory connectionFactory) {
-		// ObjectMapper 설정
+		// ObjectMapper 설정 (타입 정보 없이 단순 JSON 직렬화)
 		ObjectMapper objectMapper = new ObjectMapper();
 		objectMapper.registerModule(new JavaTimeModule());
 		objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-
-		// 타입 정보 활성화 (역직렬화를 위해)
-		objectMapper.activateDefaultTyping(
-			objectMapper.getPolymorphicTypeValidator(),
-			ObjectMapper.DefaultTyping.NON_FINAL,
-			JsonTypeInfo.As.WRAPPER_OBJECT
-		);
+		// 타입 정보를 저장하지 않음 - 단순 JSON으로만 직렬화
 
 		Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(objectMapper, Object.class);
 
@@ -64,17 +57,9 @@ public class RedisConfig {
 		// 캐시별 맞춤 설정
 		Map<String, RedisCacheConfiguration> cacheConfigurations = new HashMap<>();
 
-		// 카테고리 캐시: TTL 1시간 (카테고리는 거의 변경되지 않음)
-		cacheConfigurations.put("categories",
-			defaultConfig.entryTtl(Duration.ofHours(1)));
-
-		// 상품 상세 정보 캐시: TTL 5분
-		cacheConfigurations.put("productDetail",
-			defaultConfig.entryTtl(Duration.ofMinutes(5)));
-
-		// 상품 간단 정보 캐시: TTL 5분
-		cacheConfigurations.put("productSimpleInfo",
-			defaultConfig.entryTtl(Duration.ofMinutes(5)));
+		// 핫 키워드 캐시: TTL 1주일 (주간 배치로만 업데이트)
+		cacheConfigurations.put("hotKeywords",
+			defaultConfig.entryTtl(Duration.ofDays(7)));
 
 		return RedisCacheManager.builder(connectionFactory)
 			.cacheDefaults(defaultConfig)

@@ -13,6 +13,10 @@ import org.oneog.uppick.auction.domain.auction.command.model.dto.request.Bidding
 import org.oneog.uppick.auction.domain.auction.command.service.component.BiddingProcessor;
 import org.oneog.uppick.auction.domain.auction.common.exception.AuctionErrorCode;
 import org.oneog.uppick.common.exception.BusinessException;
+import org.oneog.uppick.auction.domain.product.command.service.ProductCacheEvictService;
+import org.oneog.uppick.auction.domain.auction.common.exception.AuctionErrorCode;
+import org.oneog.uppick.auction.domain.product.command.service.ProductCacheEvictService;
+import org.oneog.uppick.common.exception.BusinessException;
 import org.springframework.stereotype.Service;
 
 import jakarta.validation.Valid;
@@ -33,9 +37,12 @@ public class AuctionCommandService {
 	private final LockManager lockManager;
 
 	private final AuctionEventProducer auctionEventProducer;
+	private final ProductCacheEvictService productCacheEvictService;
 
 	// 특정 상품에 입찰 시도를 한다
 	public void bid(@Valid AuctionBidRequest request, long auctionId, long memberId) {
+
+		log.info(" [입찰 시작] auctionId={}, memberId={}, biddingPrice={}", auctionId, memberId, request.getBiddingPrice());
 
 		String lockKey = BIDDING_LOCK_KEY_PREFIX + auctionId;
 		BiddingResultDto result;
@@ -50,12 +57,18 @@ public class AuctionCommandService {
 			throw e;
 		}
 
+		log.info(" [입찰 성공] productId={}, auctionId={}, biddingPrice={}", result.getProductId(), auctionId,
+			result.getBiddingPrice());
+
+		// 입찰 성공 시 해당 상품의 조회 캐시 삭제
+		productCacheEvictService.evictProductCache(result.getProductId());
+
 		BidPlacedEvent bidPlacedEvent = BidPlacedEvent.builder()
 			.sellerId(result.getSellerId())
 			.bidderId(memberId)
 			.auctionId(auctionId)
 			.biddingPrice(result.getBiddingPrice())
-			.eventId(UUID.randomUUID() + "-" + auctionId)
+			.eventId(UUID.randomUUID().toString() + "-" + auctionId)
 			.occurredAt(LocalDateTime.now())
 			.build();
 		auctionEventProducer.produce(AuctionEventType.BID_PLACED, bidPlacedEvent);

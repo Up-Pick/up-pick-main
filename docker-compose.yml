@@ -123,7 +123,25 @@ services:
       timeout: 5s
       retries: 3
 
-  # 추후 Lock과 Cache용 Redis를 분리해야함
+  # Main 서비스용 Redis (랭킹 캐시 등)
+  main-redis:
+    image: redis:8.2.2
+    ports:
+      - "6379:6379"
+    volumes:
+      - main_redis_data:/data
+    command: redis-server --maxmemory 256mb --save ""
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # Auction 서비스용 Redis (분산 락, 캐시 등)
   auction-redis:
     image: redis:8.2.2
     ports:
@@ -225,6 +243,8 @@ services:
       DB_URL: jdbc:mysql://main-mysql:3306/uppick_db
       DB_USER: user
       DB_PASS: password
+      REDIS_HOST: main-redis
+      REDIS_PORT: 6379
       # RabbitMQ 접속 정보 (필요시 사용)
       RABBITMQ_HOST: uppick-rabbitmq
       RABBITMQ_PORT: 5672
@@ -240,6 +260,8 @@ services:
           memory: 768M
     depends_on:
       main-mysql:
+        condition: service_healthy
+      main-redis:
         condition: service_healthy
       uppick-rabbitmq:
         condition: service_healthy
@@ -377,6 +399,7 @@ volumes:
   auction_mysql_data:
   auction_mysql_slave_data:
   batch_mysql_data:
+  main_redis_data:
   auction_redis_data:
   uppick_rabbitmq_data:
   grafana_data:
