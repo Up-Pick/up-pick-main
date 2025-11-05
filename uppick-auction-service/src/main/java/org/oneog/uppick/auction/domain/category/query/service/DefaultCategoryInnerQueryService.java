@@ -13,12 +13,13 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class DefaultCategoryInnerService implements CategoryInnerService {
+public class DefaultCategoryInnerQueryService implements CategoryInnerQueryService {
 
 	private final CategoryRepository categoryRepository;
 	private final CategoryMapper categoryMapper;
 
 	@Override
+	@Transactional(readOnly = true)
 	public CategoryInfoResponse getCategoriesByCategoryId(Long categoryId) {
 
 		Category category = findCategoryByIdOrElseThrow(categoryId);

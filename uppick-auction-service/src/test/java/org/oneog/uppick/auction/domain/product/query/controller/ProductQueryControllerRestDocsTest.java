@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.oneog.uppick.auction.domain.product.common.enums.ProductSearchSortType;
+import org.oneog.uppick.auction.domain.product.query.controller.enums.ProductSearchSortType;
 import org.oneog.uppick.auction.domain.product.query.model.dto.request.SearchProductRequest;
 import org.oneog.uppick.auction.domain.product.query.model.dto.response.ProductBiddingInfoResponse;
 import org.oneog.uppick.auction.domain.product.query.model.dto.response.ProductDetailResponse;
@@ -73,8 +73,8 @@ class ProductQueryControllerRestDocsTest extends RestDocsBase {
 			.willReturn(response);
 
 		this.mockMvc.perform(get("/api/v1/products/{productId}", productId)
-				.header("Authorization", "Bearer token")
-				.accept(MediaType.APPLICATION_JSON))
+			.header("Authorization", "Bearer token")
+			.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andDo(document("product-get-product-info",
 				requestHeaders(
@@ -115,7 +115,7 @@ class ProductQueryControllerRestDocsTest extends RestDocsBase {
 			.willReturn(response);
 
 		this.mockMvc.perform(get("/api/v1/products/{productId}/simple-info", productId)
-				.accept(MediaType.APPLICATION_JSON))
+			.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andDo(document("product-get-product-simple-info",
 				pathParameters(
@@ -159,8 +159,8 @@ class ProductQueryControllerRestDocsTest extends RestDocsBase {
 			.willReturn(page);
 
 		this.mockMvc.perform(get("/api/v1/products/sold/me")
-				.header("Authorization", "Bearer token")
-				.accept(MediaType.APPLICATION_JSON))
+			.header("Authorization", "Bearer token")
+			.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andDo(document("product-get-sold-products",
 				requestHeaders(
@@ -205,8 +205,8 @@ class ProductQueryControllerRestDocsTest extends RestDocsBase {
 			.willReturn(page);
 
 		this.mockMvc.perform(get("/api/v1/products/purchased/me")
-				.header("Authorization", "Bearer token")
-				.accept(MediaType.APPLICATION_JSON))
+			.header("Authorization", "Bearer token")
+			.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andDo(document("product-get-purchased-products",
 				requestHeaders(
@@ -251,8 +251,8 @@ class ProductQueryControllerRestDocsTest extends RestDocsBase {
 			.willReturn(page);
 
 		this.mockMvc.perform(get("/api/v1/products/bidding/me")
-				.header("Authorization", "Bearer token")
-				.accept(MediaType.APPLICATION_JSON))
+			.header("Authorization", "Bearer token")
+			.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andDo(document("product-get-bidding-products",
 				requestHeaders(
@@ -298,8 +298,8 @@ class ProductQueryControllerRestDocsTest extends RestDocsBase {
 			.willReturn(page);
 
 		this.mockMvc.perform(get("/api/v1/products/selling/me")
-				.header("Authorization", "Bearer token")
-				.accept(MediaType.APPLICATION_JSON))
+			.header("Authorization", "Bearer token")
+			.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andDo(document("product-get-selling-products",
 				requestHeaders(
@@ -349,9 +349,9 @@ class ProductQueryControllerRestDocsTest extends RestDocsBase {
 
 		// when & then
 		mockMvc.perform(
-				post("/api/v1/products/search")
-					.contentType(MediaType.APPLICATION_JSON)
-					.content(objectMapper.writeValueAsString(request)))
+			post("/api/v1/products/search")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("success").value(true))
 			.andExpect(jsonPath("message").value("요청에 성공했습니다."))

@@ -1,4 +1,4 @@
-package org.oneog.uppick.auction.domain.auction.command.service;
+package org.oneog.uppick.auction.domain.auction.command.service.component;
 
 import java.util.Optional;
 
@@ -15,7 +15,7 @@ import org.oneog.uppick.auction.domain.member.service.MemberInnerService;
 import org.oneog.uppick.auction.domain.notification.dto.request.SendNotificationRequest;
 import org.oneog.uppick.auction.domain.notification.enums.NotificationType;
 import org.oneog.uppick.auction.domain.notification.service.NotificationInnerService;
-import org.oneog.uppick.auction.domain.product.command.service.ProductInnerService;
+import org.oneog.uppick.auction.domain.product.command.service.ProductInnerCommandService;
 import org.oneog.uppick.common.exception.BusinessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +26,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class AuctionEndProcessor {
 
 	private final AuctionRepository auctionRepository;
@@ -36,7 +35,7 @@ public class AuctionEndProcessor {
 	// ****** Inner Service API ***** //
 	private final MemberInnerService memberInnerService;
 	private final NotificationInnerService notificationInnerService;
-	private final ProductInnerService productInnerService;
+	private final ProductInnerCommandService productInnerService;
 
 	private final AuctionRedisRepository auctionRedisRepository;
 
@@ -60,7 +59,7 @@ public class AuctionEndProcessor {
 		if (lastBidderId == null || currentBidPrice == null) {
 			// 입찰자가 없을 경우: 유찰 처리
 			handleExpiredAuction(auction);
-			log.info("[Auction:{}] 유찰 처리 (입찰자 없음)", auctionId);
+			log.debug("[Auction:{}] 유찰 처리 (입찰자 없음)", auctionId);
 			return;
 		}
 
@@ -71,7 +70,7 @@ public class AuctionEndProcessor {
 		if (topBid.isEmpty()) {
 			// 입찰자가 없을 경우: 유찰 처리
 			handleExpiredAuction(auction);
-			log.info("[Auction:{}] 유찰 처리 (입찰자 없음)", auctionId);
+			log.debug("[Auction:{}] 유찰 처리 (입찰자 없음)", auctionId);
 			return;
 		}
 
@@ -89,7 +88,7 @@ public class AuctionEndProcessor {
 			auction.markAsExpired();
 			// 경매 상태변경
 			auctionRepository.save(auction);
-			log.info("[Auction:{}] 유찰 상태로 변경 완료", auctionId);
+			log.debug("[Auction:{}] 유찰 상태로 변경 완료", auctionId);
 
 		} catch (Exception e) {
 			log.error("[Auction:{}] 유찰 처리 중 오류 발생: {}", auctionId, e.getMessage());
@@ -136,7 +135,7 @@ public class AuctionEndProcessor {
 
 		RegisterPurchaseDetailRequest request = new RegisterPurchaseDetailRequest(auctionId, buyerId, productId, price);
 		memberInnerService.registerPurchaseDetail(request);
-		log.info("구매내역 등록: 구매자={}, 상품={}, 금액={}", buyerId, productId, price);
+		log.debug("구매내역 등록: 구매자={}, 상품={}, 금액={}", buyerId, productId, price);
 	}
 
 	/**
@@ -146,7 +145,7 @@ public class AuctionEndProcessor {
 
 		RegisterSellDetailRequest request = new RegisterSellDetailRequest(auctionId, sellerId, productId, price);
 		memberInnerService.registerSellDetail(request);
-		log.info("판매내역 등록: 판매자={}, 상품={}, 금액={}", sellerId, productId, price);
+		log.debug("판매내역 등록: 판매자={}, 상품={}, 금액={}", sellerId, productId, price);
 	}
 
 	/**
@@ -165,7 +164,7 @@ public class AuctionEndProcessor {
 
 		notificationInnerService.sendNotification(request);
 
-		log.info("[Notification] 낙찰자 {}에게 알림 전송 완료", memberId);
+		log.debug("[Notification] 낙찰자 {}에게 알림 전송 완료", memberId);
 	}
 
 	/**
@@ -175,7 +174,7 @@ public class AuctionEndProcessor {
 
 		auction.markAsSold();
 		auctionRepository.save(auction);
-		log.info("경매 {} 상태 저장 완료", auction.getId());
+		log.debug("경매 {} 상태 저장 완료", auction.getId());
 	}
 
 }

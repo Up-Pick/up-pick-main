@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.oneog.uppick.auction.domain.product.command.entity.Product;
 import org.oneog.uppick.auction.domain.product.command.repository.ProductRepository;
-import org.oneog.uppick.auction.domain.product.command.service.ProductViewCountIncreaseService;
+import org.oneog.uppick.auction.domain.product.command.service.component.ProductViewCountIncreaseProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -19,7 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class ProductViewCountConcurrencyTest {
 
 	@Autowired
-	private ProductViewCountIncreaseService productViewCountIncreaseService;
+	private ProductViewCountIncreaseProcessor productViewCountIncreaseService;
 	@Autowired
 	private ProductRepository productRepository;
 
@@ -55,7 +55,7 @@ public class ProductViewCountConcurrencyTest {
 			for (int t = 0; t < testcase; t++) {
 				executor.execute(() -> {
 					try {
-						productViewCountIncreaseService.increaseProductViewCount(productId);
+						productViewCountIncreaseService.process(productId);
 					} finally {
 						latch.countDown();
 					}

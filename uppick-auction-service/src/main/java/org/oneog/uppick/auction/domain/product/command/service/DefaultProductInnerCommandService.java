@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class DefaultProductInnerService implements ProductInnerService {
+public class DefaultProductInnerCommandService implements ProductInnerCommandService {
 
 	ElasticsearchOperations elasticsearchOperations;
 

@@ -1,13 +1,13 @@
 package org.oneog.uppick.auction.domain.product.command.service;
 
-import org.oneog.uppick.auction.domain.auction.command.service.AuctionInnerService;
+import org.oneog.uppick.auction.domain.auction.command.service.AuctionInnerCommandService;
 import org.oneog.uppick.auction.domain.category.query.model.dto.response.CategoryInfoResponse;
-import org.oneog.uppick.auction.domain.category.query.service.CategoryInnerService;
+import org.oneog.uppick.auction.domain.category.query.service.CategoryInnerQueryService;
 import org.oneog.uppick.auction.domain.product.command.entity.Product;
 import org.oneog.uppick.auction.domain.product.command.model.dto.request.ProductRegisterRequest;
 import org.oneog.uppick.auction.domain.product.command.repository.ProductDocumentRepository;
 import org.oneog.uppick.auction.domain.product.command.repository.ProductRepository;
-import org.oneog.uppick.auction.domain.product.common.S3FileManager;
+import org.oneog.uppick.auction.domain.product.command.service.component.ProductImageUploader;
 import org.oneog.uppick.auction.domain.product.common.document.ProductDocument;
 import org.oneog.uppick.auction.domain.product.common.exception.ProductErrorCode;
 import org.oneog.uppick.auction.domain.product.common.mapper.ProductMapper;
@@ -29,11 +29,11 @@ public class ProductCommandService {
 	private final ProductMapper productMapper;
 
 	// ****** S3 ***** //
-	private final S3FileManager s3FileManager;
+	private final ProductImageUploader s3FileManager;
 
 	// ****** External Domain API ***** //
-	private final AuctionInnerService auctionInnerService;
-	private final CategoryInnerService categoryInnerService;
+	private final AuctionInnerCommandService auctionInnerService;
+	private final CategoryInnerQueryService categoryInnerService;
 
 	// ***** Internal Service Method ***** //
 	@Transactional

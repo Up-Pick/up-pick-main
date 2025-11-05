@@ -17,7 +17,7 @@ import org.oneog.uppick.auction.domain.auction.command.event.BidPlacedEvent;
 import org.oneog.uppick.auction.domain.auction.command.model.dto.request.AuctionBidRequest;
 import org.oneog.uppick.auction.domain.auction.command.model.dto.request.BiddingResultDto;
 import org.oneog.uppick.auction.domain.auction.command.service.AuctionCommandService;
-import org.oneog.uppick.auction.domain.auction.command.service.BiddingProcessor;
+import org.oneog.uppick.auction.domain.auction.command.service.component.BiddingProcessor;
 import org.oneog.uppick.auction.domain.auction.common.exception.AuctionErrorCode;
 import org.oneog.uppick.common.exception.BusinessException;
 

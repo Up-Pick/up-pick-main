@@ -20,13 +20,13 @@ public class RankingUpdateTasklet implements Tasklet {
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
-		log.info(" 핫 키워드 랭킹 업데이트 시작");
+		log.debug(" 핫 키워드 랭킹 업데이트 시작");
 
 		try {
 			// Main Service Internal API 호출
 			rankClient.updateHotKeywords();
 
-			log.info("핫 키워드 랭킹 업데이트 완료");
+			log.debug("핫 키워드 랭킹 업데이트 완료");
 
 			return RepeatStatus.FINISHED;
 

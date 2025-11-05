@@ -1,4 +1,4 @@
-package org.oneog.uppick.auction.domain.product.common;
+package org.oneog.uppick.auction.domain.product.command.service.component;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import org.oneog.uppick.auction.domain.product.common.exception.ProductErrorCode;
 import org.oneog.uppick.common.exception.BusinessException;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,8 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 @Service
 @RequiredArgsConstructor
 @Profile({"dev", "prod"})
-public class S3FileStorageService implements S3FileManager {
+@Qualifier("s3ProductImageUploader")
+public class S3ProductImageUploader implements ProductImageUploader {
 
 	private static final List<String> ALLOWED_EXTENSIONS = Arrays.asList(
 		"jpg", "jpeg", "png", "gif", "webp");
@@ -80,7 +82,7 @@ public class S3FileStorageService implements S3FileManager {
 				"https://%s.s3.%s.amazonaws.com/%s",
 				bucketName, region, s3Key);
 
-			log.info("S3 업로드 성공: {}", fileUrl);
+			log.debug("S3 업로드 성공: {}", fileUrl);
 
 			return fileUrl;
 

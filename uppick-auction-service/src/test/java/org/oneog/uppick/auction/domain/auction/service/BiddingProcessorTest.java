@@ -21,7 +21,7 @@ import org.oneog.uppick.auction.domain.auction.command.model.dto.request.Bidding
 import org.oneog.uppick.auction.domain.auction.command.repository.AuctionRedisRepository;
 import org.oneog.uppick.auction.domain.auction.command.repository.AuctionRepository;
 import org.oneog.uppick.auction.domain.auction.command.repository.BiddingDetailRepository;
-import org.oneog.uppick.auction.domain.auction.command.service.BiddingProcessor;
+import org.oneog.uppick.auction.domain.auction.command.service.component.BiddingProcessor;
 import org.oneog.uppick.auction.domain.auction.common.exception.AuctionErrorCode;
 import org.oneog.uppick.auction.domain.auction.common.mapper.AuctionMapper;
 import org.oneog.uppick.auction.domain.member.service.MemberInnerService;

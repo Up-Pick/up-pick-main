@@ -23,7 +23,7 @@ public class RankingCommandService {
 	@Transactional
 	public void updateWeeklyTop10HotKeywords() {
 
-		log.info("RankingCommandService - [Batch] 키워드 랭킹 업데이트 시작 ⏳");
+		log.debug("RankingCommandService - [Batch] 키워드 랭킹 업데이트 시작 ⏳");
 
 		//이전 내용 삭제
 		hotKeywordRepository.deleteAll();
@@ -38,7 +38,7 @@ public class RankingCommandService {
 			hotKeywordRepository.save(hotKeyword);
 		}
 
-		log.info("RankingCommandService - [Batch] 키워드 랭킹 업데이트 종료 ✅");
+		log.debug("RankingCommandService - [Batch] 키워드 랭킹 업데이트 종료 ✅");
 	}
 
 }

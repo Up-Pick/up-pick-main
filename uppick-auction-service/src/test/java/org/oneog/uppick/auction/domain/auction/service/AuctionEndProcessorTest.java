@@ -19,14 +19,14 @@ import org.oneog.uppick.auction.domain.auction.command.entity.BiddingDetail;
 import org.oneog.uppick.auction.domain.auction.command.repository.AuctionRedisRepository;
 import org.oneog.uppick.auction.domain.auction.command.repository.AuctionRepository;
 import org.oneog.uppick.auction.domain.auction.command.repository.BiddingDetailRepository;
-import org.oneog.uppick.auction.domain.auction.command.service.AuctionEndProcessor;
+import org.oneog.uppick.auction.domain.auction.command.service.component.AuctionEndProcessor;
 import org.oneog.uppick.auction.domain.auction.query.repository.AuctionQueryRepository;
 import org.oneog.uppick.auction.domain.member.dto.request.RegisterPurchaseDetailRequest;
 import org.oneog.uppick.auction.domain.member.dto.request.RegisterSellDetailRequest;
 import org.oneog.uppick.auction.domain.member.service.MemberInnerService;
 import org.oneog.uppick.auction.domain.notification.dto.request.SendNotificationRequest;
 import org.oneog.uppick.auction.domain.notification.service.NotificationInnerService;
-import org.oneog.uppick.auction.domain.product.command.service.ProductInnerService;
+import org.oneog.uppick.auction.domain.product.command.service.ProductInnerCommandService;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -46,7 +46,7 @@ class AuctionEndProcessorTest {
 	@Mock
 	private NotificationInnerService notificationInnerService;
 	@Mock
-	private ProductInnerService productInnerService;
+	private ProductInnerCommandService productInnerService;
 
 	@InjectMocks
 	private AuctionEndProcessor auctionSchedulerService;
