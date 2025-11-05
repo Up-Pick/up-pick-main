@@ -1,5 +1,6 @@
 package org.oneog.uppick.batch.domain.bidprice.writer;
 
+import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -42,6 +43,33 @@ class BidPriceItemWriterTest {
 
 		// then
 		verify(elasticsearchOperations, times(1)).update(any(UpdateQuery.class), any(IndexCoordinates.class));
+	}
+
+	@Test
+	@DisplayName("ES 업데이트 실패 시 예외 발생")
+	void write_failure_throwsException() {
+
+		// given
+		BidPriceDto data = new BidPriceDto(1L, 10L, 100000L);
+		Chunk<BidPriceDto> chunk = new Chunk<>(List.of(data));
+		when(elasticsearchOperations.update(any(UpdateQuery.class), any(IndexCoordinates.class)))
+			.thenThrow(new RuntimeException("ES connection failed"));
+
+		// when & then
+		assertThatThrownBy(() -> writer.write(chunk))
+			.isInstanceOf(RuntimeException.class);
+	}
+
+	@Test
+	@DisplayName("빈 Chunk 처리")
+	void write_emptyChunk_noException() throws Exception {
+
+		// given
+		Chunk<BidPriceDto> chunk = new Chunk<>();
+
+		// when & then
+		assertThatCode(() -> writer.write(chunk)).doesNotThrowAnyException();
+		verify(elasticsearchOperations, never()).update(any(), any());
 	}
 
 }
