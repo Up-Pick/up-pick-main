@@ -1,4 +1,4 @@
-package org.oneog.uppick.auction.common.config;
+package org.oneog.uppick.common.config;
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -57,9 +57,9 @@ public class RedisConfig {
 		// 캐시별 맞춤 설정
 		Map<String, RedisCacheConfiguration> cacheConfigurations = new HashMap<>();
 
-		// 카테고리 캐시: TTL 1시간 (카테고리는 거의 변경되지 않음)
-		cacheConfigurations.put("categories",
-			defaultConfig.entryTtl(Duration.ofHours(1)));
+		// 핫 키워드 캐시: TTL 1주일 (주간 배치로만 업데이트)
+		cacheConfigurations.put("hotKeywords",
+			defaultConfig.entryTtl(Duration.ofDays(7)));
 
 		return RedisCacheManager.builder(connectionFactory)
 			.cacheDefaults(defaultConfig)
