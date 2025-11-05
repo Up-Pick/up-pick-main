@@ -1,5 +1,6 @@
 package org.oneog.uppick.batch.domain.productviewcount.writer;
 
+import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -57,6 +58,21 @@ class ViewCountItemWriterTest {
 		// then
 		verify(jdbcTemplate, times(1)).update(anyString(), anyLong(), anyLong());
 		verify(stringRedisTemplate, times(1)).delete("product:view:10");
+	}
+
+	@Test
+	@DisplayName("DB 업데이트 실패 시 예외 발생")
+	void write_failure_throwsException() {
+
+		// given
+		ViewCountDto data = new ViewCountDto(10L, 5L);
+		Chunk<ViewCountDto> chunk = new Chunk<>(List.of(data));
+		when(jdbcTemplate.update(anyString(), anyLong(), anyLong())).thenThrow(new RuntimeException("DB failed"));
+
+		// when & then
+		assertThatThrownBy(() -> writer.write(chunk))
+			.isInstanceOf(RuntimeException.class);
+		verify(stringRedisTemplate, never()).delete(anyString());
 	}
 
 }
