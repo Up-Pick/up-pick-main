@@ -26,4 +26,23 @@ class BidPriceItemProcessorTest {
 		assertThat(result).isSameAs(input);
 	}
 
+	@Test
+	@DisplayName("null 필드가 있으면 null 반환")
+	void process_nullFields_returnsNull() throws Exception {
+
+		// given & when & then
+		assertThat(processor.process(new BidPriceDto(null, 10L, 100000L))).isNull();
+		assertThat(processor.process(new BidPriceDto(1L, null, 100000L))).isNull();
+		assertThat(processor.process(new BidPriceDto(1L, 10L, null))).isNull();
+	}
+
+	@Test
+	@DisplayName("0 이하 입찰가는 null 반환")
+	void process_invalidBidPrice_returnsNull() throws Exception {
+
+		// given & when & then
+		assertThat(processor.process(new BidPriceDto(1L, 10L, 0L))).isNull();
+		assertThat(processor.process(new BidPriceDto(1L, 10L, -1000L))).isNull();
+	}
+
 }
