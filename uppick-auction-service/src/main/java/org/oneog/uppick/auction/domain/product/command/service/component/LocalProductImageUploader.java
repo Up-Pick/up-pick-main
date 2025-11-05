@@ -1,12 +1,14 @@
-package org.oneog.uppick.auction.domain.product.common;
+package org.oneog.uppick.auction.domain.product.command.service.component;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 @Profile("!dev & !prod")
 @Service
-public class LocalS3FileStorageService implements S3FileManager {
+@Qualifier("localProductImageUploader")
+public class LocalProductImageUploader implements ProductImageUploader {
 
 	@Override
 	public String store(MultipartFile file) {

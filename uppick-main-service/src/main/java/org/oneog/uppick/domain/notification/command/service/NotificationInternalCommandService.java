@@ -26,32 +26,32 @@ public class NotificationInternalCommandService {
 	@Transactional
 	public void sendNotification(SendNotificationRequest request) {
 
-		log.info("NotificationInternalCommandService - 알림 데이터 저장 시도 ⏳");
+		log.debug("NotificationInternalCommandService - 알림 데이터 저장 시도 ⏳");
 
 		notificationJpaRepository.save(notificationMapper.toEntity(request));
 
-		log.info("NotificationInternalCommandService - 알림 데이터 저장 성공 ✅");
+		log.debug("NotificationInternalCommandService - 알림 데이터 저장 성공 ✅");
 	}
 
 	@Transactional
 	public void sendNotification(BidPlacedEvent event) {
 
-		log.info("NotificationInternalCommandService - 알림 시도 ⏳");
+		log.debug("NotificationInternalCommandService - 알림 시도 ⏳");
 
 		// 판매자 알림
-		log.info("-- 판매자 알림 생성");
+		log.debug("-- 판매자 알림 생성");
 		Notification notification = notificationMapper.toSellerNotification(event);
 		notificationJpaRepository.save(notification);
 
 		// 다른 입찰자에게 알림
-		log.info("-- 입찰자 알림 생성");
+		log.debug("-- 입찰자 알림 생성");
 		List<Long> bidderIds = auctionClient.getBiddingMemberIds(event.getAuctionId(), event.getBidderId());
 		bidderIds.forEach(bidderId -> {
 			Notification bidderNotification = notificationMapper.toBidderNotification(event, bidderId);
 			notificationJpaRepository.save(bidderNotification);
 		});
 
-		log.info("NotificationInternalCommandService - 알림 성공 ✅");
+		log.debug("NotificationInternalCommandService - 알림 성공 ✅");
 	}
 
 }

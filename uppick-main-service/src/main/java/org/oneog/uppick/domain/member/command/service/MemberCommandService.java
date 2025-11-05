@@ -23,14 +23,14 @@ public class MemberCommandService {
 	@Transactional
 	public CreditChargeResponse chargeCredit(CreditChargeRequest creditChargeRequest, AuthMember authMember) {
 
-		log.info("MemberCommandService - 크레딧 충전 시도 ⏳");
+		log.debug("MemberCommandService - 크레딧 충전 시도 ⏳");
 
 		Member member = findMemberByIdOrElseThrow(authMember.getMemberId());
 		member.addCredit(creditChargeRequest.getAmount());
 
 		CreditChargeResponse response = new CreditChargeResponse(member.getCredit());
 
-		log.info("MemberCommandService - 크레딧 충전 성공 ✅");
+		log.debug("MemberCommandService - 크레딧 충전 성공 ✅");
 
 		return response;
 	}

@@ -22,12 +22,12 @@ public class MemberQueryService {
 
 	public CreditGetResponse getCredit(AuthMember authMember) {
 
-		log.info("MemberQueryService - 크레딧 조회 시도 ⏳");
+		log.debug("MemberQueryService - 크레딧 조회 시도 ⏳");
 
 		Member member = findMemberByIdOrElseThrow(authMember.getMemberId());
 		CreditGetResponse response = new CreditGetResponse(member.getCredit());
 
-		log.info("MemberQueryService - 크레딧 조회 성공 ✅");
+		log.debug("MemberQueryService - 크레딧 조회 성공 ✅");
 
 		return response;
 	}

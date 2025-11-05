@@ -9,8 +9,8 @@ import org.oneog.uppick.auction.domain.auction.command.event.AuctionEventType;
 import org.oneog.uppick.auction.domain.auction.command.event.BidPlacedEvent;
 import org.oneog.uppick.auction.domain.auction.command.model.dto.request.AuctionBidRequest;
 import org.oneog.uppick.auction.domain.auction.command.model.dto.request.BiddingResultDto;
+import org.oneog.uppick.auction.domain.auction.command.service.component.BiddingProcessor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class AuctionCommandService {
 
 	private static final String BIDDING_LOCK_KEY_PREFIX = "auction:bidding:";
@@ -33,7 +32,6 @@ public class AuctionCommandService {
 	private final AuctionEventProducer auctionEventProducer;
 
 	// 특정 상품에 입찰 시도를 한다
-	@Transactional(readOnly = false)
 	public void bid(@Valid AuctionBidRequest request, long auctionId, long memberId) {
 
 		String lockKey = BIDDING_LOCK_KEY_PREFIX + auctionId;

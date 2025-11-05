@@ -30,7 +30,7 @@ public class RedisConfig {
 	@Bean
 	public RedisConnectionFactory redisConnectionFactory() {
 
-		log.info("Redis Connection Factory 초기화 - host: {}, port: {}", host, port);
+		log.debug("Redis Connection Factory 초기화 - host: {}, port: {}", host, port);
 
 		RedisStandaloneConfiguration redisConfig = new RedisStandaloneConfiguration();
 		redisConfig.setHostName(host);
@@ -42,7 +42,7 @@ public class RedisConfig {
 	@Bean
 	public StringRedisTemplate stringRedisTemplate() {
 
-		log.info("StringRedisTemplate 초기화");
+		log.debug("StringRedisTemplate 초기화");
 
 		StringRedisTemplate template = new StringRedisTemplate();
 		template.setConnectionFactory(redisConnectionFactory());

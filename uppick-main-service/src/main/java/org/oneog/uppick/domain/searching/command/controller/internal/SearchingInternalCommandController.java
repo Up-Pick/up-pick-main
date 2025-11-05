@@ -1,6 +1,6 @@
-package org.oneog.uppick.domain.searching.command.controller;
+package org.oneog.uppick.domain.searching.command.controller.internal;
 
-import org.oneog.uppick.domain.searching.command.dto.SaveSearchHistoriesRequest;
+import org.oneog.uppick.domain.searching.command.model.dto.SaveSearchHistoriesRequest;
 import org.oneog.uppick.domain.searching.command.service.SearchingCommandService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

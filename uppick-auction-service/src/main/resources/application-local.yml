@@ -70,9 +70,9 @@ management:
   metrics:
     tags:
       application: ${spring.application.name}
-      distribution:
-        percentiles-histogram:
-          http.server.requests: true   # 요청시간 분포 (P95, P99 계산용)
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true   # 요청시간 분포 (P95, P99 계산용)
   prometheus:
     metrics:
       export:
@@ -81,8 +81,8 @@ management:
 # 로깅 설정
 logging:
   level:
-    org.oneog.uppick.auction.common.config.datasource: INFO
-    com.zaxxer.hikari: INFO
+    root: DEBUG
+
 server:
   port: 8080
 jwt:

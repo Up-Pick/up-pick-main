@@ -26,46 +26,46 @@ public class MemberInternalQueryService {
 
 	public String getMemberNicknameByMemberId(Long memberId) {
 
-		log.info("MemberInternalQueryService - 닉네임 조회 시도 ⏳");
+		log.debug("MemberInternalQueryService - 닉네임 조회 시도 ⏳");
 
 		Member member = findMemberByIdOrElseThrow(memberId);
 		String nickname = member.getNickname();
 
-		log.info("MemberInternalQueryService - 닉네임 조회 성공 ✅");
+		log.debug("MemberInternalQueryService - 닉네임 조회 성공 ✅");
 
 		return nickname;
 	}
 
 	public List<SoldProductSellAtResponse> findSellAtByProductIds(List<Long> productIds) {
 
-		log.info("MemberInternalQueryService - sellAt 조회 시도 ⏳");
+		log.debug("MemberInternalQueryService - sellAt 조회 시도 ⏳");
 
 		List<SoldProductSellAtResponse> responses = memberQueryRepository.findSellAtByProductIds(productIds);
 
-		log.info("MemberInternalQueryService - sellAt 조회 성공 ✅");
+		log.debug("MemberInternalQueryService - sellAt 조회 성공 ✅");
 
 		return responses;
 	}
 
 	public List<PurchasedProductBuyAtResponse> findBuyAtByProductIds(List<Long> productIds) {
 
-		log.info("MemberInternalQueryService - buyAt 조회 시도 ⏳");
+		log.debug("MemberInternalQueryService - buyAt 조회 시도 ⏳");
 
 		List<PurchasedProductBuyAtResponse> responses = memberQueryRepository.findBuyAtByProductIds(productIds);
 
-		log.info("MemberInternalQueryService - buyAt 조회 성공 ✅");
+		log.debug("MemberInternalQueryService - buyAt 조회 성공 ✅");
 
 		return responses;
 	}
 
 	public long getMemberCreditByMemberId(long memberId) {
 
-		log.info("MemberInternalQueryService - 크레딧 조회 시도 ⏳");
+		log.debug("MemberInternalQueryService - 크레딧 조회 시도 ⏳");
 
 		Member member = findMemberByIdOrElseThrow(memberId);
 		long credit = member.getCredit();
 
-		log.info("MemberInternalQueryService - 크레딧 조회 성공 ✅");
+		log.debug("MemberInternalQueryService - 크레딧 조회 성공 ✅");
 
 		return credit;
 	}

@@ -21,7 +21,7 @@ public class RankingBatchScheduler {
 	@Scheduled(cron = "0 * * * * *") // 매일 자정 업데이트
 	public void runRankingUpdateBatch() {
 
-		log.info("핫 키워드 랭킹 배치 Job 실행 시작");
+		log.debug("핫 키워드 랭킹 배치 Job 실행 시작");
 
 		try {
 			// JobParameters에 현재 시간을 넣어 매번 다른 Job Instance 생성
@@ -31,7 +31,7 @@ public class RankingBatchScheduler {
 
 			jobLauncher.run(rankingUpdateJob, jobParameters);
 
-			log.info("핫 키워드 랭킹 배치 Job 실행 완료");
+			log.debug("핫 키워드 랭킹 배치 Job 실행 완료");
 		} catch (Exception e) {
 			log.error("핫 키워드 랭킹 배치 Job 실행 실패: {}", e.getMessage(), e);
 		}

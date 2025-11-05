@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class DefaultAuctionInnerService implements AuctionInnerService {
+public class DefaultAuctionInnerCommandService implements AuctionInnerCommandService {
 
 	private final AuctionRepository auctionRepository;
 	private final RabbitTemplate rabbitTemplate;

@@ -21,7 +21,7 @@ public class ViewCountBatchScheduler {
 	@Scheduled(cron = "0 * * * * *") // 매분 실행 (0초마다)
 	public void runViewCountUpdateBatch() {
 
-		log.info("조회수 배치 Job 실행 시작");
+		log.debug("조회수 배치 Job 실행 시작");
 
 		try {
 			// JobParameters에 현재 시간을 넣어 매번 다른 Job Instance 생성
@@ -31,7 +31,7 @@ public class ViewCountBatchScheduler {
 
 			jobLauncher.run(viewCountUpdateJob, jobParameters);
 
-			log.info("조회수 배치 Job 실행 완료");
+			log.debug("조회수 배치 Job 실행 완료");
 		} catch (Exception e) {
 			log.error("조회수 배치 Job 실행 실패: {}", e.getMessage(), e);
 		}

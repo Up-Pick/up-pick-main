@@ -30,7 +30,7 @@ public class BidPriceItemWriter implements ItemWriter<BidPriceDto> {
 	@Override
 	public void write(Chunk<? extends BidPriceDto> chunk) throws Exception {
 
-		log.info("입찰가 배치 Write 시작 - 처리할 데이터: {}개", chunk.size());
+		log.debug("입찰가 배치 Write 시작 - 처리할 데이터: {}개", chunk.size());
 
 		for (BidPriceDto data : chunk) {
 			try {
@@ -51,7 +51,7 @@ public class BidPriceItemWriter implements ItemWriter<BidPriceDto> {
 			}
 		}
 
-		log.info("입찰가 배치 Write 완료 - 처리된 데이터: {}개", chunk.size());
+		log.debug("입찰가 배치 Write 완료 - 처리된 데이터: {}개", chunk.size());
 	}
 
 }

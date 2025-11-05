@@ -23,14 +23,14 @@ public class ChunkStepExecutionListener implements StepExecutionListener {
 	@Override
 	public void beforeStep(StepExecution stepExecution) {
 
-		log.info("{} 배치 Step 시작", batchName);
+		log.debug("{} 배치 Step 시작", batchName);
 		readerInitializer.run(); // Reader 초기화
 	}
 
 	@Override
 	public ExitStatus afterStep(StepExecution stepExecution) {
 
-		log.info("{} 배치 Step 완료 - 읽은 데이터: {}, 처리된 데이터: {}, 쓰여진 데이터: {}",
+		log.debug("{} 배치 Step 완료 - 읽은 데이터: {}, 처리된 데이터: {}, 쓰여진 데이터: {}",
 			batchName,
 			stepExecution.getReadCount(),
 			stepExecution.getFilterCount(),

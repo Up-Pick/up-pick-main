@@ -28,7 +28,7 @@ public class DataSourceConfig {
 	@ConfigurationProperties(prefix = "batch.datasource")
 	public DataSource batchDataSource() {
 
-		log.info("Batch DataSource 초기화");
+		log.debug("Batch DataSource 초기화");
 		return DataSourceBuilder.create().build();
 	}
 
@@ -36,7 +36,7 @@ public class DataSourceConfig {
 	@ConfigurationProperties(prefix = "auction.datasource")
 	public DataSource auctionDataSource() {
 
-		log.info("Auction DataSource 초기화");
+		log.debug("Auction DataSource 초기화");
 		return DataSourceBuilder.create().build();
 	}
 
