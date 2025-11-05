@@ -26,7 +26,7 @@ public class BidPriceBatchScheduler {
 	@Scheduled(cron = "0 * * * * *") // 매분 실행 (0초마다)
 	public void runBidPriceUpdateBatch() {
 
-		log.info("입찰가 배치 Job 실행 시작");
+		log.debug("입찰가 배치 Job 실행 시작");
 
 		try {
 			// JobParameters에 현재 시간을 넣어 매번 다른 Job Instance 생성
@@ -36,7 +36,7 @@ public class BidPriceBatchScheduler {
 
 			jobLauncher.run(bidPriceUpdateJob, jobParameters);
 
-			log.info("입찰가 배치 Job 실행 완료");
+			log.debug("입찰가 배치 Job 실행 완료");
 		} catch (Exception e) {
 			log.error("입찰가 배치 Job 실행 실패: {}", e.getMessage(), e);
 		}

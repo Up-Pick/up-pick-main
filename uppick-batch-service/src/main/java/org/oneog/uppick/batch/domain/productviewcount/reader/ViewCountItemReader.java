@@ -37,12 +37,12 @@ public class ViewCountItemReader implements ItemReader<ViewCountDto> {
 		Set<String> keys = stringRedisTemplate.keys(REDIS_KEY_PATTERN);
 
 		if (keys == null || keys.isEmpty()) {
-			log.info("처리할 조회수 데이터가 없습니다.");
+			log.debug("처리할 조회수 데이터가 없습니다.");
 			keyIterator = Set.<String>of().iterator();
 			return;
 		}
 
-		log.info("조회수 배치 처리 시작 - 총 {}개의 Redis 키 발견", keys.size());
+		log.debug("조회수 배치 처리 시작 - 총 {}개의 Redis 키 발견", keys.size());
 		keyIterator = keys.iterator();
 	}
 

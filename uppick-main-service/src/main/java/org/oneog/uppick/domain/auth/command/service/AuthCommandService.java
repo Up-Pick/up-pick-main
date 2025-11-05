@@ -28,7 +28,7 @@ public class AuthCommandService {
 	@Transactional
 	public void signup(SignupRequest signupRequest) {
 
-		log.info("AuthCommandService - 회원가입 시도 ⏳");
+		log.debug("AuthCommandService - 회원가입 시도 ⏳");
 
 		// 이메일 중복 체크
 		if (memberExternalService.existsByEmail(signupRequest.getEmail())) {
@@ -43,12 +43,12 @@ public class AuthCommandService {
 		String encodedPassword = passwordEncoder.encode(signupRequest.getPassword());
 		memberExternalService.createUser(signupRequest, encodedPassword);
 
-		log.info("AuthCommandService - 회원가입 성공 ✅");
+		log.debug("AuthCommandService - 회원가입 성공 ✅");
 	}
 
 	public LoginResponse login(LoginRequest loginRequest) {
 
-		log.info("AuthCommandService - 로그인 시도 ⏳");
+		log.debug("AuthCommandService - 로그인 시도 ⏳");
 
 		Member member = memberExternalService.findByEmail(loginRequest.getEmail());
 
@@ -60,7 +60,7 @@ public class AuthCommandService {
 		String token = jwtUtil.createToken(member.getId(), member.getNickname());
 		LoginResponse response = new LoginResponse(token);
 
-		log.info("AuthCommandService - 로그인 성공 ✅");
+		log.debug("AuthCommandService - 로그인 성공 ✅");
 
 		return response;
 	}

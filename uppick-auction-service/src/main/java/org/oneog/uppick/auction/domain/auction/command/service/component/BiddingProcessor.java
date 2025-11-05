@@ -1,4 +1,4 @@
-package org.oneog.uppick.auction.domain.auction.command.service;
+package org.oneog.uppick.auction.domain.auction.command.service.component;
 
 import org.oneog.uppick.auction.domain.auction.command.entity.Auction;
 import org.oneog.uppick.auction.domain.auction.command.entity.BiddingDetail;
@@ -69,7 +69,7 @@ public class BiddingProcessor {
 				// 본인 재입찰: 차액만 차감
 				long additionalAmount = biddingPrice - previousBidPrice;
 				memberInnerService.updateMemberCredit(memberId, -additionalAmount);
-				log.info("기존 입찰자({}) 재입찰: 추가 차감 {}", memberId, additionalAmount);
+				log.debug("기존 입찰자({}) 재입찰: 추가 차감 {}", memberId, additionalAmount);
 			} else {
 				// 새 입찰자: 전체 금액 차감
 				memberInnerService.updateMemberCredit(memberId, -biddingPrice);
@@ -77,7 +77,7 @@ public class BiddingProcessor {
 				// 이전 최고 입찰자 환불
 				if (previousBidderId != null && previousBidPrice != null) {
 					memberInnerService.updateMemberCredit(previousBidderId, previousBidPrice);
-					log.info("이전 최고 입찰자({}) 환불: {}", previousBidderId, previousBidPrice);
+					log.debug("이전 최고 입찰자({}) 환불: {}", previousBidderId, previousBidPrice);
 				}
 			}
 

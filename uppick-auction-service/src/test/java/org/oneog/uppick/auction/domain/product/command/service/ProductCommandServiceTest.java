@@ -10,14 +10,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.oneog.uppick.auction.domain.auction.command.service.AuctionInnerService;
+import org.oneog.uppick.auction.domain.auction.command.service.AuctionInnerCommandService;
 import org.oneog.uppick.auction.domain.category.query.model.dto.response.CategoryInfoResponse;
-import org.oneog.uppick.auction.domain.category.query.service.CategoryInnerService;
+import org.oneog.uppick.auction.domain.category.query.service.CategoryInnerQueryService;
 import org.oneog.uppick.auction.domain.product.command.entity.Product;
 import org.oneog.uppick.auction.domain.product.command.model.dto.request.ProductRegisterRequest;
 import org.oneog.uppick.auction.domain.product.command.repository.ProductDocumentRepository;
 import org.oneog.uppick.auction.domain.product.command.repository.ProductRepository;
-import org.oneog.uppick.auction.domain.product.common.S3FileManager;
+import org.oneog.uppick.auction.domain.product.command.service.component.ProductImageUploader;
 import org.oneog.uppick.auction.domain.product.common.document.ProductDocument;
 import org.oneog.uppick.auction.domain.product.common.mapper.ProductMapper;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -33,11 +33,11 @@ public class ProductCommandServiceTest {
 	@Mock
 	ProductRepository productRepository;
 	@Mock
-	S3FileManager s3FileManager;
+	ProductImageUploader s3FileManager;
 	@Mock
-	AuctionInnerService auctionInnerService;
+	AuctionInnerCommandService auctionInnerService;
 	@Mock
-	CategoryInnerService categoryInnerService;
+	CategoryInnerQueryService categoryInnerService;
 
 	ProductCommandService productCommandService;
 

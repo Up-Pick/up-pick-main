@@ -30,34 +30,34 @@ public class MemberInternalCommandService {
 	@Transactional
 	public void updateMemberCredit(long memberId, long amount) {
 
-		log.info("MemberInternalCommandService - 크레딧 업데이트 시도 ⏳");
+		log.debug("MemberInternalCommandService - 크레딧 업데이트 시도 ⏳");
 
 		Member member = findMemberByIdOrElseThrow(memberId);
 		member.calculateCredit(amount);
 
-		log.info("MemberInternalCommandService - 크레딧 업데이트 성공 ✅");
+		log.debug("MemberInternalCommandService - 크레딧 업데이트 성공 ✅");
 	}
 
 	@Transactional
 	public void registerPurchaseDetail(RegisterPurchaseDetailRequest request) {
 
-		log.info("MemberInternalCommandService - purchaseDetail 데이터 저장 시도 ⏳");
+		log.debug("MemberInternalCommandService - purchaseDetail 데이터 저장 시도 ⏳");
 
 		PurchaseDetail purchaseDetail = memberMapper.purchaseDetailToEntity(request);
 		purchaseDetailRepository.save(purchaseDetail);
 
-		log.info("MemberInternalCommandService - purchaseDetail 데이터 저장 성공 ✅");
+		log.debug("MemberInternalCommandService - purchaseDetail 데이터 저장 성공 ✅");
 	}
 
 	@Transactional
 	public void registerSellDetail(RegisterSellDetailRequest request) {
 
-		log.info("MemberInternalCommandService - sellDetail 데이터 저장 시도 ⏳");
+		log.debug("MemberInternalCommandService - sellDetail 데이터 저장 시도 ⏳");
 
 		SellDetail sellDetail = memberMapper.sellDetailToEntity(request);
 		sellDetailRepository.save(sellDetail);
 
-		log.info("MemberInternalCommandService - sellDetail 데이터 저장 성공 ✅");
+		log.debug("MemberInternalCommandService - sellDetail 데이터 저장 성공 ✅");
 	}
 
 	private Member findMemberByIdOrElseThrow(Long memberId) {

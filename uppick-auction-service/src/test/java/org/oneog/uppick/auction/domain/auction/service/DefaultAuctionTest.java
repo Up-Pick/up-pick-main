@@ -16,7 +16,7 @@ import org.oneog.uppick.auction.domain.auction.command.entity.Auction;
 import org.oneog.uppick.auction.domain.auction.command.entity.AuctionStatus;
 import org.oneog.uppick.auction.domain.auction.command.event.AuctionEndedEvent;
 import org.oneog.uppick.auction.domain.auction.command.repository.AuctionRepository;
-import org.oneog.uppick.auction.domain.auction.command.service.DefaultAuctionInnerService;
+import org.oneog.uppick.auction.domain.auction.command.service.DefaultAuctionInnerCommandService;
 import org.springframework.amqp.core.MessagePostProcessor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -31,7 +31,7 @@ public class DefaultAuctionTest {
 	RabbitTemplate rabbitTemplate;
 
 	@InjectMocks
-	DefaultAuctionInnerService defaultAuctionInnerService;
+	DefaultAuctionInnerCommandService defaultAuctionInnerService;
 
 	@Test
 	void registerAuction_호출시_save정상호출() {

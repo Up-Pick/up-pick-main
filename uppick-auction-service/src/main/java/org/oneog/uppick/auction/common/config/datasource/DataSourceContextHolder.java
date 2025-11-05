@@ -8,15 +8,19 @@ public class DataSourceContextHolder {
     private static final ThreadLocal<DataSourceType> CONTEXT = new ThreadLocal<>();
 
     public static void setDataSourceType(DataSourceType dataSourceType) {
-        log.info(">>> DataSource 전환: {}", dataSourceType);
+
+        log.debug(">>> DataSource 전환: {}", dataSourceType);
         CONTEXT.set(dataSourceType);
     }
 
     public static DataSourceType getDataSourceType() {
+
         return CONTEXT.get();
     }
 
     public static void clearDataSourceType() {
+
         CONTEXT.remove();
     }
+
 }

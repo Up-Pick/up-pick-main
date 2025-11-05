@@ -23,7 +23,7 @@ public class NotificationCommandService {
 	@Transactional
 	public GetUnreadNotificationsResponse getUnreadNotifications(long memberId) {
 
-		log.info("NotificationCommandService - 읽지 않은 알림 조회 시도 ⏳");
+		log.debug("NotificationCommandService - 읽지 않은 알림 조회 시도 ⏳");
 
 		// 읽음 처리
 		List<Notification> unreadNotifications = notificationJpaRepository.findAllByMemberIdAndIsReadFalse(memberId);
@@ -31,7 +31,7 @@ public class NotificationCommandService {
 
 		GetUnreadNotificationsResponse response = notificationMapper.toResponse(unreadNotifications);
 
-		log.info("NotificationCommandService - 읽지 않은 알림 조회 성공 ✅");
+		log.debug("NotificationCommandService - 읽지 않은 알림 조회 성공 ✅");
 
 		return response;
 	}

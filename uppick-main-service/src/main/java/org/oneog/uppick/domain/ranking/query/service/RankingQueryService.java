@@ -24,12 +24,12 @@ public class RankingQueryService {
 	@Cacheable(value = "hotKeywords", key = "'top10'")
 	public List<HotKeywordResponse> getHotKeywords() {
 
-		log.info("RankingQueryService - 핫 키워드 TOP10 조회 시도 ⏳");
+		log.debug("RankingQueryService - 핫 키워드 TOP10 조회 시도 ⏳");
 
 		List<HotKeyword> hotKeywords = hotKeywordRepository.findAllByOrderByRankNoAsc();
 		List<HotKeywordResponse> responses = toHotKeywordResponseList(hotKeywords);
 
-		log.info("RankingQueryService - 핫 키워드 TOP10 조회 성공 ✅");
+		log.debug("RankingQueryService - 핫 키워드 TOP10 조회 성공 ✅");
 
 		return responses;
 	}

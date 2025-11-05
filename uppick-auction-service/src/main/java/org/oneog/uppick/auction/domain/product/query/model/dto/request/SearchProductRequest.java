@@ -2,7 +2,7 @@ package org.oneog.uppick.auction.domain.product.query.model.dto.request;
 
 import java.time.LocalDate;
 
-import org.oneog.uppick.auction.domain.product.common.enums.ProductSearchSortType;
+import org.oneog.uppick.auction.domain.product.query.controller.enums.ProductSearchSortType;
 import org.oneog.uppick.common.constants.FormatConstants;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
