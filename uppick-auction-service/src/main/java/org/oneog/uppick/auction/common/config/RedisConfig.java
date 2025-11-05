@@ -43,36 +43,51 @@ public class RedisConfig {
 		objectMapper.registerModule(new JavaTimeModule());
 		objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
-		// 타입 정보 활성화 (역직렬화를 위해)
-		objectMapper.activateDefaultTyping(
-			objectMapper.getPolymorphicTypeValidator(),
+		// GenericJackson2JsonRedisSerializer - List/Collection 타입용
+		GenericJackson2JsonRedisSerializer genericSerializer = new GenericJackson2JsonRedisSerializer(objectMapper);
+
+		// Jackson2JsonRedisSerializer - 단일 객체용 (Projection 등)
+		ObjectMapper objectMapperForSingle = new ObjectMapper();
+		objectMapperForSingle.registerModule(new JavaTimeModule());
+		objectMapperForSingle.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+		objectMapperForSingle.activateDefaultTyping(
+			objectMapperForSingle.getPolymorphicTypeValidator(),
 			ObjectMapper.DefaultTyping.NON_FINAL,
-			JsonTypeInfo.As.WRAPPER_OBJECT
+			JsonTypeInfo.As.PROPERTY
 		);
+		Jackson2JsonRedisSerializer<Object> singleObjectSerializer = new Jackson2JsonRedisSerializer<>(
+			objectMapperForSingle, Object.class);
 
-		Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(objectMapper, Object.class);
-
-		// 기본 캐시 설정: TTL 10분
+		// 기본 캐시 설정: TTL 10분 (단일 객체용)
 		RedisCacheConfiguration defaultConfig = RedisCacheConfiguration.defaultCacheConfig()
 			.entryTtl(Duration.ofMinutes(10))
 			.disableCachingNullValues()
 			.serializeKeysWith(
 				RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
 			.serializeValuesWith(
-				RedisSerializationContext.SerializationPair.fromSerializer(serializer));
+				RedisSerializationContext.SerializationPair.fromSerializer(singleObjectSerializer));
+
+		// 컬렉션용 캐시 설정
+		RedisCacheConfiguration collectionConfig = RedisCacheConfiguration.defaultCacheConfig()
+			.entryTtl(Duration.ofMinutes(10))
+			.disableCachingNullValues()
+			.serializeKeysWith(
+				RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
+			.serializeValuesWith(
+				RedisSerializationContext.SerializationPair.fromSerializer(genericSerializer));
 
 		// 캐시별 맞춤 설정
 		Map<String, RedisCacheConfiguration> cacheConfigurations = new HashMap<>();
 
-		// 카테고리 캐시: TTL 1시간 (카테고리는 거의 변경되지 않음)
+		// 카테고리 캐시: TTL 1시간, GenericSerializer 사용 (List 타입)
 		cacheConfigurations.put("categories",
-			defaultConfig.entryTtl(Duration.ofHours(1)));
+			collectionConfig.entryTtl(Duration.ofHours(1)));
 
-		// 상품 상세 정보 캐시: TTL 5분
+		// 상품 상세 정보 캐시: TTL 5분, Jackson2JsonRedisSerializer 사용 (단일 객체)
 		cacheConfigurations.put("productDetail",
 			defaultConfig.entryTtl(Duration.ofMinutes(5)));
 
-		// 상품 간단 정보 캐시: TTL 5분
+		// 상품 간단 정보 캐시: TTL 5분, Jackson2JsonRedisSerializer 사용 (단일 객체)
 		cacheConfigurations.put("productSimpleInfo",
 			defaultConfig.entryTtl(Duration.ofMinutes(5)));
 
