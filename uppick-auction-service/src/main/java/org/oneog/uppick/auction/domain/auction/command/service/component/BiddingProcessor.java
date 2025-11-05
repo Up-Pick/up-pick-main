@@ -90,7 +90,7 @@ public class BiddingProcessor {
 				biddingPrice);
 			biddingDetailRepository.save(biddingDetail);
 
-			return new BiddingResultDto(auction.getRegisterId(), biddingPrice);
+			return new BiddingResultDto(auction.getProductId(), auction.getRegisterId(), biddingPrice);
 
 		} catch (Exception e) {
 			log.error("입찰 처리 중 예외 발생", e);
