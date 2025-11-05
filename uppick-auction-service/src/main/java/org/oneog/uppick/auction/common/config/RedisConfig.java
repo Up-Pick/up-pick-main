@@ -20,7 +20,6 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 @Configuration
@@ -47,7 +46,7 @@ public class RedisConfig {
 		// 타입 정보 활성화 (역직렬화를 위해)
 		objectMapper.activateDefaultTyping(
 			objectMapper.getPolymorphicTypeValidator(),
-			ObjectMapper.DefaultTyping.EVERYTHING,
+			ObjectMapper.DefaultTyping.NON_FINAL,
 			JsonTypeInfo.As.WRAPPER_OBJECT
 		);
 
