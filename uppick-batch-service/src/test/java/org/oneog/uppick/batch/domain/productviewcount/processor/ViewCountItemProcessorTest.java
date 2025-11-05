@@ -26,4 +26,15 @@ class ViewCountItemProcessorTest {
 		assertThat(result).isSameAs(input);
 	}
 
+	@Test
+	@DisplayName("null 또는 0 이하 필드는 null 반환")
+	void process_invalidFields_returnsNull() throws Exception {
+
+		// given & when & then
+		assertThat(processor.process(new ViewCountDto(null, 5L))).isNull();
+		assertThat(processor.process(new ViewCountDto(10L, null))).isNull();
+		assertThat(processor.process(new ViewCountDto(0L, 5L))).isNull();
+		assertThat(processor.process(new ViewCountDto(10L, 0L))).isNull();
+	}
+
 }
