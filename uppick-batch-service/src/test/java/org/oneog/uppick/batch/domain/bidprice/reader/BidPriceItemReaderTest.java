@@ -81,4 +81,35 @@ class BidPriceItemReaderTest {
 		assertThat(result).isNull();
 	}
 
+	@Test
+	@DisplayName("잘못된 데이터 스킵하고 정상 데이터 반환")
+	void read_skipInvalidData() throws Exception {
+
+		// given
+		String key1 = "auction:1:current-bid-price";
+		String key2 = "auction:2:current-bid-price";
+		when(stringRedisTemplate.keys("auction:*:current-bid-price")).thenReturn(Set.of(key1, key2));
+		when(stringRedisTemplate.opsForValue()).thenReturn(valueOperations);
+		when(valueOperations.get(anyString())).thenAnswer(invocation -> {
+			String key = invocation.getArgument(0);
+			if (key.equals(key1))
+				return "invalid";
+			if (key.equals(key2))
+				return "100000";
+			return null;
+		});
+		when(jdbcTemplate.queryForObject(anyString(), eq(Long.class), anyLong())).thenAnswer(invocation -> {
+			Long auctionId = invocation.getArgument(2);
+			return auctionId * 10;  // productId = auctionId * 10
+		});
+
+		// when
+		reader.init();
+		BidPriceDto result = reader.read();
+
+		// then
+		assertThat(result).isNotNull();
+		assertThat(result.getAuctionId()).isEqualTo(2L);
+	}
+
 }
