@@ -1,4 +1,4 @@
-package org.oneog.uppick.domain.searching.command.dto;
+package org.oneog.uppick.domain.searching.command.model.dto;
 
 import java.util.List;
 
