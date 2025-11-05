@@ -66,4 +66,19 @@ class BidPriceItemReaderTest {
 		assertThat(result.getBidPrice()).isEqualTo(100000L);
 	}
 
+	@Test
+	@DisplayName("Redis에 데이터가 없을 때 null 반환")
+	void read_emptyRedis_returnsNull() throws Exception {
+
+		// given
+		when(stringRedisTemplate.keys("auction:*:current-bid-price")).thenReturn(Set.of());
+
+		// when
+		reader.init();
+		BidPriceDto result = reader.read();
+
+		// then
+		assertThat(result).isNull();
+	}
+
 }
