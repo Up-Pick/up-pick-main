@@ -58,4 +58,21 @@ class RankingUpdateTaskletTest {
 			.hasMessageContaining("API call failed");
 	}
 
+	@Test
+	@DisplayName("여러 번 실행 가능")
+	void execute_multipleTimes_success() throws Exception {
+
+		// given
+		doNothing().when(rankClient).updateHotKeywords();
+
+		// when
+		RepeatStatus result1 = tasklet.execute(contribution, chunkContext);
+		RepeatStatus result2 = tasklet.execute(contribution, chunkContext);
+
+		// then
+		assertThat(result1).isEqualTo(RepeatStatus.FINISHED);
+		assertThat(result2).isEqualTo(RepeatStatus.FINISHED);
+		verify(rankClient, times(2)).updateHotKeywords();
+	}
+
 }
