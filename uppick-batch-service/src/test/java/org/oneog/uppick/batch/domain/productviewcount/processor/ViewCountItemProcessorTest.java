@@ -12,8 +12,8 @@ class ViewCountItemProcessorTest {
 	private final ViewCountItemProcessor processor = new ViewCountItemProcessor();
 
 	@Test
-	@DisplayName("정상 데이터 검증 성공")
-	void process_validData_success() throws Exception {
+	@DisplayName("process - 정상 데이터 - 동일 객체 반환")
+	void process_정상데이터_동일객체반환() throws Exception {
 
 		// given
 		ViewCountDto input = new ViewCountDto(10L, 5L);
@@ -27,8 +27,8 @@ class ViewCountItemProcessorTest {
 	}
 
 	@Test
-	@DisplayName("null 또는 0 이하 필드는 null 반환")
-	void process_invalidFields_returnsNull() throws Exception {
+	@DisplayName("process - null 또는 0 이하 필드 - null 반환")
+	void process_null또는0이하필드_null반환() throws Exception {
 
 		// given & when & then
 		assertThat(processor.process(new ViewCountDto(null, 5L))).isNull();

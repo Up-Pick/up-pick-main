@@ -29,8 +29,8 @@ class ViewCountItemReaderTest {
 	private ViewCountItemReader reader;
 
 	@Test
-	@DisplayName("정상 데이터 읽기 성공")
-	void read_success() throws Exception {
+	@DisplayName("read - 정상 데이터 - ViewCountDto 반환")
+	void read_정상데이터_ViewCountDto반환() throws Exception {
 
 		// given
 		String key = "product:view:10";
@@ -49,8 +49,8 @@ class ViewCountItemReaderTest {
 	}
 
 	@Test
-	@DisplayName("Redis에 데이터가 없을 때 null 반환")
-	void read_emptyRedis_returnsNull() throws Exception {
+	@DisplayName("read - Redis 데이터 없음 - null 반환")
+	void read_Redis데이터없음_null반환() throws Exception {
 
 		// given
 		when(stringRedisTemplate.keys("product:view:*")).thenReturn(Set.of());
@@ -64,8 +64,8 @@ class ViewCountItemReaderTest {
 	}
 
 	@Test
-	@DisplayName("잘못된 데이터 스킵하고 정상 데이터 반환")
-	void read_skipInvalidData() throws Exception {
+	@DisplayName("read - 잘못된 형식 데이터 - 스킵하고 정상 데이터 반환")
+	void read_잘못된형식데이터_스킵하고정상데이터반환() throws Exception {
 
 		// given
 		String key1 = "product:view:10";

@@ -12,8 +12,8 @@ class BidPriceItemProcessorTest {
 	private final BidPriceItemProcessor processor = new BidPriceItemProcessor();
 
 	@Test
-	@DisplayName("정상 데이터 검증 성공")
-	void process_validData_success() throws Exception {
+	@DisplayName("process - 정상 데이터 - 동일 객체 반환")
+	void process_정상데이터_동일객체반환() throws Exception {
 
 		// given
 		BidPriceDto input = new BidPriceDto(1L, 10L, 100000L);
@@ -27,8 +27,8 @@ class BidPriceItemProcessorTest {
 	}
 
 	@Test
-	@DisplayName("null 필드가 있으면 null 반환")
-	void process_nullFields_returnsNull() throws Exception {
+	@DisplayName("process - null 필드 - null 반환")
+	void process_null필드_null반환() throws Exception {
 
 		// given & when & then
 		assertThat(processor.process(new BidPriceDto(null, 10L, 100000L))).isNull();
@@ -37,8 +37,8 @@ class BidPriceItemProcessorTest {
 	}
 
 	@Test
-	@DisplayName("0 이하 입찰가는 null 반환")
-	void process_invalidBidPrice_returnsNull() throws Exception {
+	@DisplayName("process - 0 이하 입찰가 - null 반환")
+	void process_0이하입찰가_null반환() throws Exception {
 
 		// given & when & then
 		assertThat(processor.process(new BidPriceDto(1L, 10L, 0L))).isNull();

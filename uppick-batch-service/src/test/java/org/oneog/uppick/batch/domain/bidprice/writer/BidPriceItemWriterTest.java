@@ -29,8 +29,8 @@ class BidPriceItemWriterTest {
 	private BidPriceItemWriter writer;
 
 	@Test
-	@DisplayName("ES 업데이트 성공")
-	void write_success() throws Exception {
+	@DisplayName("write - 정상 데이터 - ES 업데이트 성공")
+	void write_정상데이터_ES업데이트성공() throws Exception {
 
 		// given
 		BidPriceDto data = new BidPriceDto(1L, 10L, 100000L);
@@ -46,8 +46,8 @@ class BidPriceItemWriterTest {
 	}
 
 	@Test
-	@DisplayName("ES 업데이트 실패 시 예외 발생")
-	void write_failure_throwsException() {
+	@DisplayName("write - ES 연결 실패 - 예외 발생")
+	void write_ES연결실패_예외발생() {
 
 		// given
 		BidPriceDto data = new BidPriceDto(1L, 10L, 100000L);
@@ -61,8 +61,8 @@ class BidPriceItemWriterTest {
 	}
 
 	@Test
-	@DisplayName("빈 Chunk 처리")
-	void write_emptyChunk_noException() throws Exception {
+	@DisplayName("write - 빈 Chunk - 예외 없이 처리")
+	void write_빈Chunk_예외없이처리() throws Exception {
 
 		// given
 		Chunk<BidPriceDto> chunk = new Chunk<>();

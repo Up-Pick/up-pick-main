@@ -31,8 +31,8 @@ class RankingUpdateTaskletTest {
 	private RankingUpdateTasklet tasklet;
 
 	@Test
-	@DisplayName("랭킹 업데이트 성공")
-	void execute_success() throws Exception {
+	@DisplayName("execute - 정상 API 호출 - FINISHED 반환")
+	void execute_정상API호출_FINISHED반환() throws Exception {
 
 		// given
 		doNothing().when(rankClient).updateHotKeywords();
@@ -46,8 +46,8 @@ class RankingUpdateTaskletTest {
 	}
 
 	@Test
-	@DisplayName("API 호출 실패 시 예외 발생")
-	void execute_failure_throwsException() {
+	@DisplayName("execute - API 호출 실패 - 예외 발생")
+	void execute_API호출실패_예외발생() {
 
 		// given
 		doThrow(new RuntimeException("API call failed")).when(rankClient).updateHotKeywords();
@@ -59,9 +59,9 @@ class RankingUpdateTaskletTest {
 	}
 
 	@Test
-	@DisplayName("여러 번 실행 가능")
-	void execute_multipleTimes_success() throws Exception {
-
+	@DisplayName("execute - 여러 번 실행 - 모두 성공")
+	void execute_여러번실행_모두성공() throws Exception {
+		
 		// given
 		doNothing().when(rankClient).updateHotKeywords();
 
