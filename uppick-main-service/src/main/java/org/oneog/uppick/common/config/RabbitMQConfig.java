@@ -9,7 +9,6 @@ import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
-import org.springframework.amqp.support.converter.DefaultJackson2JavaTypeMapper;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
@@ -30,7 +29,7 @@ public class RabbitMQConfig {
     public static final String NOTIFICATION_DLQ_QUEUE = "auction.notification.dlq.queue";
     public static final String NOTIFICATION_DLQ_ROUTING_KEY = "auction.notification.dlq.routing.key";
 
-    public RabbitMQConfig() {
+    static {
 
         EVENT_TYPE_MAPPINGS.put("auction.BidPlacedEvent", BidPlacedEvent.class);
     }
@@ -78,10 +77,13 @@ public class RabbitMQConfig {
     public MessageConverter jsonMessageConverter(ObjectMapper objectMapper) {
 
         var converter = new Jackson2JsonMessageConverter(objectMapper);
-        var typeMapper = new DefaultJackson2JavaTypeMapper();
-        typeMapper.setIdClassMapping(EVENT_TYPE_MAPPINGS);
-        typeMapper.setTypePrecedence(DefaultJackson2JavaTypeMapper.TypePrecedence.TYPE_ID);
-        converter.setJavaTypeMapper(typeMapper);
+
+        // 커스텀 ClassMapper 사용 - 양방향 매핑 지원
+        BidirectionalClassMapper classMapper = new BidirectionalClassMapper();
+        classMapper.setTrustedPackages("*");
+        classMapper.setIdClassMapping(EVENT_TYPE_MAPPINGS);
+
+        converter.setClassMapper(classMapper);
         return converter;
     }
 
