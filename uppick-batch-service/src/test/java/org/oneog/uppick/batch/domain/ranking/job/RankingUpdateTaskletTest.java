@@ -45,4 +45,17 @@ class RankingUpdateTaskletTest {
 		verify(rankClient, times(1)).updateHotKeywords();
 	}
 
+	@Test
+	@DisplayName("API 호출 실패 시 예외 발생")
+	void execute_failure_throwsException() {
+
+		// given
+		doThrow(new RuntimeException("API call failed")).when(rankClient).updateHotKeywords();
+
+		// when & then
+		assertThatThrownBy(() -> tasklet.execute(contribution, chunkContext))
+			.isInstanceOf(RuntimeException.class)
+			.hasMessageContaining("API call failed");
+	}
+
 }
