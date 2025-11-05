@@ -43,8 +43,8 @@ class ViewCountItemWriterTest {
 	}
 
 	@Test
-	@DisplayName("DB 업데이트 및 Redis 삭제 성공")
-	void write_success() throws Exception {
+	@DisplayName("write - 정상 데이터 - DB 업데이트 및 Redis 삭제 성공")
+	void write_정상데이터_DB업데이트및Redis삭제성공() throws Exception {
 
 		// given
 		ViewCountDto data = new ViewCountDto(10L, 5L);
@@ -61,8 +61,8 @@ class ViewCountItemWriterTest {
 	}
 
 	@Test
-	@DisplayName("DB 업데이트 실패 시 예외 발생")
-	void write_failure_throwsException() {
+	@DisplayName("write - DB 업데이트 실패 - 예외 발생")
+	void write_DB업데이트실패_예외발생() {
 
 		// given
 		ViewCountDto data = new ViewCountDto(10L, 5L);
@@ -76,8 +76,8 @@ class ViewCountItemWriterTest {
 	}
 
 	@Test
-	@DisplayName("빈 Chunk 처리")
-	void write_emptyChunk_noException() throws Exception {
+	@DisplayName("write - 빈 Chunk - 예외 없이 처리")
+	void write_빈Chunk_예외없이처리() throws Exception {
 
 		// given
 		Chunk<ViewCountDto> chunk = new Chunk<>();

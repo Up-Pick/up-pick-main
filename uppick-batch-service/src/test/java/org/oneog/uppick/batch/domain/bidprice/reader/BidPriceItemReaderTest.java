@@ -45,8 +45,8 @@ class BidPriceItemReaderTest {
 	}
 
 	@Test
-	@DisplayName("정상 데이터 읽기 성공")
-	void read_success() throws Exception {
+	@DisplayName("read - 정상 데이터 - BidPriceDto 반환")
+	void read_정상데이터_BidPriceDto반환() throws Exception {
 
 		// given
 		String key = "auction:1:current-bid-price";
@@ -67,8 +67,8 @@ class BidPriceItemReaderTest {
 	}
 
 	@Test
-	@DisplayName("Redis에 데이터가 없을 때 null 반환")
-	void read_emptyRedis_returnsNull() throws Exception {
+	@DisplayName("read - Redis 데이터 없음 - null 반환")
+	void read_Redis데이터없음_null반환() throws Exception {
 
 		// given
 		when(stringRedisTemplate.keys("auction:*:current-bid-price")).thenReturn(Set.of());
@@ -82,8 +82,8 @@ class BidPriceItemReaderTest {
 	}
 
 	@Test
-	@DisplayName("잘못된 데이터 스킵하고 정상 데이터 반환")
-	void read_skipInvalidData() throws Exception {
+	@DisplayName("read - 잘못된 형식 데이터 - 스킵하고 정상 데이터 반환")
+	void read_잘못된형식데이터_스킵하고정상데이터반환() throws Exception {
 
 		// given
 		String key1 = "auction:1:current-bid-price";
@@ -100,7 +100,7 @@ class BidPriceItemReaderTest {
 		});
 		when(jdbcTemplate.queryForObject(anyString(), eq(Long.class), anyLong())).thenAnswer(invocation -> {
 			Long auctionId = invocation.getArgument(2);
-			return auctionId * 10;  // productId = auctionId * 10
+			return auctionId * 10;
 		});
 
 		// when
