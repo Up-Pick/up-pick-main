@@ -5,6 +5,7 @@ import java.util.List;
 import org.oneog.uppick.domain.ranking.command.entity.HotKeyword;
 import org.oneog.uppick.domain.ranking.command.repository.HotKeywordRepository;
 import org.oneog.uppick.domain.ranking.query.model.dto.response.HotKeywordResponse;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,7 @@ public class RankingQueryService {
 	private final HotKeywordRepository hotKeywordRepository;
 
 	//핫 키워드 TOP10 조회
+	@Cacheable(value = "hotKeywords", key = "'top10'")
 	public List<HotKeywordResponse> getHotKeywords() {
 
 		log.info("RankingQueryService - 핫 키워드 TOP10 조회 시도 ⏳");
