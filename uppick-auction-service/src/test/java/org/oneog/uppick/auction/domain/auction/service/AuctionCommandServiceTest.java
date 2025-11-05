@@ -44,7 +44,7 @@ public class AuctionCommandServiceTest {
 		AuctionBidRequest request = mock(AuctionBidRequest.class);
 		long auctionId = 1L;
 		long memberId = 2L;
-		BiddingResultDto result = new BiddingResultDto(3L, 1000L);
+		BiddingResultDto result = new BiddingResultDto(3L, 3L, 1000L);
 
 		given(lockManager.executeWithLock(anyString(), any(Supplier.class))).willReturn(result);
 
