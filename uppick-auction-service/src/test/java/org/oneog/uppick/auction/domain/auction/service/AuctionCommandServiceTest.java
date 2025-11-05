@@ -19,6 +19,7 @@ import org.oneog.uppick.auction.domain.auction.command.model.dto.request.Bidding
 import org.oneog.uppick.auction.domain.auction.command.service.AuctionCommandService;
 import org.oneog.uppick.auction.domain.auction.command.service.component.BiddingProcessor;
 import org.oneog.uppick.auction.domain.auction.common.exception.AuctionErrorCode;
+import org.oneog.uppick.auction.domain.product.command.service.ProductCacheEvictService;
 import org.oneog.uppick.common.exception.BusinessException;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,6 +34,9 @@ public class AuctionCommandServiceTest {
 
 	@Mock
 	private AuctionEventProducer auctionEventProducer;
+
+	@Mock
+	private ProductCacheEvictService productCacheEvictService;
 
 	@InjectMocks
 	private AuctionCommandService auctionCommandService;
@@ -53,6 +57,7 @@ public class AuctionCommandServiceTest {
 
 		// Then
 		then(lockManager).should().executeWithLock(eq("auction:bidding:1"), any(Supplier.class));
+		then(productCacheEvictService).should().evictProductCache(3L);
 		then(auctionEventProducer).should().produce(eq(AuctionEventType.BID_PLACED), any(BidPlacedEvent.class));
 	}
 
