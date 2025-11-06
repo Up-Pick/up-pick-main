@@ -19,18 +19,22 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 @EnableMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class SecurityConfig {
+
     private final SimpleAuthenticationFilter simpleAuthenticationFilter;
     private final InternalAuthenticationFilter internalAuthenticationFilter;
 
     @Bean
     @Order(1)
     public SecurityFilterChain externalFilterChain(HttpSecurity http) throws Exception {
+
         http
             .securityMatcher("/api/**")
             .csrf(csrf -> csrf.disable())
+            .cors(cors -> cors.disable())
             .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authz -> authz
-                .anyRequest().permitAll())
+                .anyRequest()
+                .permitAll())
             .addFilterBefore(simpleAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -39,12 +43,15 @@ public class SecurityConfig {
     @Bean
     @Order(2)
     public SecurityFilterChain internalFilterChain(HttpSecurity http) throws Exception {
+
         http
             .securityMatcher("/internal/**")
             .csrf(csrf -> csrf.disable())
+            .cors(cors -> cors.disable())
             .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authz -> authz
-                .anyRequest().authenticated())
+                .anyRequest()
+                .authenticated())
             .addFilterBefore(internalAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -54,12 +61,16 @@ public class SecurityConfig {
     @Bean
     @Order(3)
     public SecurityFilterChain actuatorFilterChain(HttpSecurity http) throws Exception {
+
         http
             .securityMatcher("/actuator/**")
             .csrf(csrf -> csrf.disable())
+            .cors(cors -> cors.disable())
             .authorizeHttpRequests(authz -> authz
-                .anyRequest().permitAll());
+                .anyRequest()
+                .permitAll());
 
         return http.build();
     }
+
 }
