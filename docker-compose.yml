@@ -32,7 +32,16 @@ services:
       - "3308:3306"
     volumes:
       - auction_mysql_data:/var/lib/mysql
-    command: --default-authentication-plugin=mysql_native_password --innodb-buffer-pool-size=128M --max-connections=50
+    command:
+      - --default-authentication-plugin=mysql_native_password
+      - --innodb-buffer-pool-size=128M
+      - --max-connections=50
+      - --server-id=1
+      - --log-bin=mysql-bin
+      - --binlog-format=ROW
+      - --max-binlog-size=100M
+      - --expire-logs-days=7
+      - --sync-binlog=1
     deploy:
       resources:
         limits:
@@ -42,6 +51,55 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
+
+  auction-mysql-slave:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: uppick_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3310:3306"
+    volumes:
+      - auction_mysql_slave_data:/var/lib/mysql
+      - ./mysql/init-replication-docker.sh:/docker-entrypoint-initdb.d/init-replication.sh
+    command:
+      - --default-authentication-plugin=mysql_native_password
+      - --innodb-buffer-pool-size=128M
+      - --max-connections=50
+      - --server-id=2
+      - --relay-log=mysql-relay-bin
+      - --log-bin=mysql-bin
+      - --binlog-format=ROW
+      - --read-only=1
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    depends_on:
+      auction-mysql:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  auction-mysql-exporter:
+    image: prom/mysqld-exporter:latest
+    command:
+      - "--mysqld.username=user:password"
+      - "--mysqld.address=auction-mysql:3306"
+    ports:
+      - "9104:9104"
+    depends_on:
+      auction-mysql:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 128M
 
   batch-mysql:
     image: mysql:8.0
@@ -65,7 +123,25 @@ services:
       timeout: 5s
       retries: 3
 
-  # 추후 Lock과 Cache용 Redis를 분리해야함
+  # Main 서비스용 Redis (랭킹 캐시 등)
+  main-redis:
+    image: redis:8.2.2
+    ports:
+      - "6379:6379"
+    volumes:
+      - main_redis_data:/data
+    command: redis-server --maxmemory 256mb --save ""
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # Auction 서비스용 Redis (분산 락, 캐시 등)
   auction-redis:
     image: redis:8.2.2
     ports:
@@ -127,7 +203,8 @@ services:
       dockerfile: uppick-auction-service/Dockerfile
     environment:
       SPRING_PROFILES_ACTIVE: local
-      DB_URL: jdbc:mysql://auction-mysql:3306/uppick_db
+      DB_MASTER_URL: jdbc:mysql://auction-mysql:3306/uppick_db
+      DB_SLAVE_URL: jdbc:mysql://auction-mysql-slave:3306/uppick_db
       DB_USER: user
       DB_PASS: password
       REDIS_HOST: auction-redis
@@ -150,6 +227,8 @@ services:
         condition: service_healthy
       auction-mysql:
         condition: service_healthy
+      auction-mysql-slave:
+        condition: service_healthy
       auction-redis:
         condition: service_healthy
       uppick-rabbitmq:
@@ -164,6 +243,8 @@ services:
       DB_URL: jdbc:mysql://main-mysql:3306/uppick_db
       DB_USER: user
       DB_PASS: password
+      REDIS_HOST: main-redis
+      REDIS_PORT: 6379
       # RabbitMQ 접속 정보 (필요시 사용)
       RABBITMQ_HOST: uppick-rabbitmq
       RABBITMQ_PORT: 5672
@@ -179,6 +260,8 @@ services:
           memory: 768M
     depends_on:
       main-mysql:
+        condition: service_healthy
+      main-redis:
         condition: service_healthy
       uppick-rabbitmq:
         condition: service_healthy
@@ -293,9 +376,10 @@ services:
     image: docker.elastic.co/kibana/kibana:8.15.3
     container_name: kibana
     depends_on:
-      - auction-elasticsearch
+      auction-elasticsearch:
+        condition: service_healthy
     environment:
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTICSEARCH_HOSTS=http://auction-elasticsearch:9200
       - NODE_OPTIONS="--max-old-space-size=512"
     ports:
       - 5602:5601
@@ -314,7 +398,9 @@ services:
 volumes:
   main_mysql_data:
   auction_mysql_data:
+  auction_mysql_slave_data:
   batch_mysql_data:
+  main_redis_data:
   auction_redis_data:
   uppick_rabbitmq_data:
   grafana_data:

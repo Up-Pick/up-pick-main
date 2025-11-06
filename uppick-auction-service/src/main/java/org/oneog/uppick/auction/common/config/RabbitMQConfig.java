@@ -3,14 +3,14 @@ package org.oneog.uppick.auction.common.config;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.oneog.uppick.auction.domain.auction.event.AuctionEndedEvent;
+import org.oneog.uppick.auction.domain.auction.command.event.AuctionEndedEvent;
+import org.oneog.uppick.auction.domain.auction.command.event.BidPlacedEvent;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.CustomExchange;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
-import org.springframework.amqp.support.converter.DefaultJackson2JavaTypeMapper;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
@@ -21,21 +21,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Configuration
 public class RabbitMQConfig {
 
-    private static final Map<String, Class<?>> EVENT_TYPE_MAPPINGS = new HashMap<>();
-
     public static final String AUCTION_EXCHANGE_NAME = "auction.exchange";
-
     public static final String AUCTION_ENDED_EXCHANGE_NAME = "auction.ended.exchange";
     public static final String AUCTION_ENDED_QUEUE = "auction.ended.queue";
     public static final String AUCTION_ENDED_ROUTING_KEY = "auction.ended.#";
-
     public static final String AUCTION_DLX_EXCHANGE_NAME = "auction.dlx.exchange";
     public static final String AUCTION_DLQ_QUEUE = "auction.dlq.queue";
     public static final String AUCTION_DLQ_ROUTING_KEY = "auction.dlq.routing.key";
+    private static final Map<String, Class<?>> EVENT_TYPE_MAPPINGS = new HashMap<>();
 
-    public RabbitMQConfig() {
+    static {
 
-        EVENT_TYPE_MAPPINGS.put("auction.BidPlacedEvent", AuctionEndedEvent.class);
+        EVENT_TYPE_MAPPINGS.put("auction.BidPlacedEvent", BidPlacedEvent.class);
         EVENT_TYPE_MAPPINGS.put("auction.AuctionEndedEvent", AuctionEndedEvent.class);
     }
 
@@ -94,10 +91,13 @@ public class RabbitMQConfig {
     public MessageConverter jsonMessageConverter(ObjectMapper objectMapper) {
 
         var converter = new Jackson2JsonMessageConverter(objectMapper);
-        var typeMapper = new DefaultJackson2JavaTypeMapper();
-        typeMapper.setIdClassMapping(EVENT_TYPE_MAPPINGS);
-        typeMapper.setTypePrecedence(DefaultJackson2JavaTypeMapper.TypePrecedence.TYPE_ID);
-        converter.setJavaTypeMapper(typeMapper);
+
+        // 커스텀 ClassMapper 사용 - 양방향 매핑 지원
+        BidirectionalClassMapper classMapper = new BidirectionalClassMapper();
+        classMapper.setTrustedPackages("*");
+        classMapper.setIdClassMapping(EVENT_TYPE_MAPPINGS);
+
+        converter.setClassMapper(classMapper);
         return converter;
     }
 

@@ -33,7 +33,7 @@ public class BatchConfig extends DefaultBatchConfiguration {
 	public BatchConfig(@Qualifier("batchDataSource") DataSource batchDataSource) {
 
 		this.batchDataSource = batchDataSource;
-		log.info("BatchConfig 초기화 ");
+		log.debug("BatchConfig 초기화 ");
 	}
 
 	/**
@@ -42,7 +42,7 @@ public class BatchConfig extends DefaultBatchConfiguration {
 	@Override
 	protected DataSource getDataSource() {
 
-		log.info("Batch DataSource 설정");
+		log.debug("Batch DataSource 설정");
 		return batchDataSource;
 	}
 
@@ -53,7 +53,7 @@ public class BatchConfig extends DefaultBatchConfiguration {
 	@Override
 	protected PlatformTransactionManager getTransactionManager() {
 
-		log.info("Batch TransactionManager 설정 (DefaultBatchConfiguration용)");
+		log.debug("Batch TransactionManager 설정 (DefaultBatchConfiguration용)");
 		return new JdbcTransactionManager(batchDataSource);
 	}
 
@@ -64,7 +64,7 @@ public class BatchConfig extends DefaultBatchConfiguration {
 	@Bean(name = "batchTransactionManager")
 	public PlatformTransactionManager batchTransactionManager() {
 
-		log.info("Batch TransactionManager Bean 생성");
+		log.debug("Batch TransactionManager Bean 생성");
 		return getTransactionManager(); // 동일한 TransactionManager 반환
 	}
 
@@ -78,7 +78,7 @@ public class BatchConfig extends DefaultBatchConfiguration {
 		BatchProperties properties
 	) {
 
-		log.info("Batch 스키마 초기화 설정: {}", properties.getJdbc().getInitializeSchema());
+		log.debug("Batch 스키마 초기화 설정: {}", properties.getJdbc().getInitializeSchema());
 		return new BatchDataSourceScriptDatabaseInitializer(dataSource, properties.getJdbc());
 	}
 

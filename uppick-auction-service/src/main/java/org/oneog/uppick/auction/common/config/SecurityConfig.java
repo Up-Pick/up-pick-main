@@ -30,6 +30,7 @@ public class SecurityConfig {
 		http
 			.securityMatcher("/api/**")
 			.csrf(csrf -> csrf.disable())
+			.cors(cors -> cors.disable())
 			.sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.authorizeHttpRequests(authz -> authz
 				.anyRequest()
@@ -46,6 +47,7 @@ public class SecurityConfig {
 		http
 			.securityMatcher("/internal/**")
 			.csrf(csrf -> csrf.disable())
+			.cors(cors -> cors.disable())
 			.sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.authorizeHttpRequests(authz -> authz
 				.anyRequest()
@@ -63,6 +65,7 @@ public class SecurityConfig {
 		http
 			.securityMatcher("/actuator/**")
 			.csrf(csrf -> csrf.disable())
+			.cors(cors -> cors.disable())
 			.authorizeHttpRequests(authz -> authz
 				.anyRequest()
 				.permitAll());

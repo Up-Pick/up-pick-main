@@ -20,7 +20,7 @@ WORKDIR /app
 RUN ./gradlew :uppick-main-service:build -x test
 
 # Runtime stage
-FROM openjdk:21-jdk-slim
+FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 COPY --from=build /app/uppick-main-service/build/libs/*.jar app.jar
 EXPOSE 8080

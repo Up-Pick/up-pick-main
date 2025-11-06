@@ -51,12 +51,12 @@ public class BidPriceItemReader implements ItemReader<BidPriceDto> {
 		Set<String> keys = stringRedisTemplate.keys(REDIS_KEY_PATTERN);
 
 		if (keys == null || keys.isEmpty()) {
-			log.info("처리할 입찰가 데이터가 없습니다.");
+			log.debug("처리할 입찰가 데이터가 없습니다.");
 			keyIterator = Set.<String>of().iterator();
 			return;
 		}
 
-		log.info("입찰가 배치 처리 시작 - 총 {}개의 Redis 키 발견", keys.size());
+		log.debug("입찰가 배치 처리 시작 - 총 {}개의 Redis 키 발견", keys.size());
 		keyIterator = keys.iterator();
 	}
 

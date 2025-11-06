@@ -40,7 +40,7 @@ public class ViewCountItemWriter implements ItemWriter<ViewCountDto> {
 	@Override
 	public void write(Chunk<? extends ViewCountDto> chunk) throws Exception {
 
-		log.info("조회수 배치 Write 시작 - 처리할 데이터: {}개", chunk.size());
+		log.debug("조회수 배치 Write 시작 - 처리할 데이터: {}개", chunk.size());
 
 		for (ViewCountDto data : chunk) {
 			try {
@@ -70,7 +70,7 @@ public class ViewCountItemWriter implements ItemWriter<ViewCountDto> {
 			}
 		}
 
-		log.info("조회수 배치 Write 완료 - 처리된 데이터: {}개", chunk.size());
+		log.debug("조회수 배치 Write 완료 - 처리된 데이터: {}개", chunk.size());
 	}
 
 }

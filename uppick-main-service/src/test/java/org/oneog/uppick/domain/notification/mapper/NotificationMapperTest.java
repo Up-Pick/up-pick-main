@@ -12,9 +12,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.oneog.uppick.domain.notification.dto.response.GetUnreadNotificationsResponse;
-import org.oneog.uppick.domain.notification.entity.Notification;
-import org.oneog.uppick.domain.notification.entity.NotificationType;
+import org.oneog.uppick.domain.notification.command.entity.Notification;
+import org.oneog.uppick.domain.notification.command.entity.NotificationType;
+import org.oneog.uppick.domain.notification.query.model.dto.response.GetUnreadNotificationsResponse;
+import org.oneog.uppick.domain.notification.common.mapper.NotificationMapper;
 
 @ExtendWith(MockitoExtension.class)
 public class NotificationMapperTest {

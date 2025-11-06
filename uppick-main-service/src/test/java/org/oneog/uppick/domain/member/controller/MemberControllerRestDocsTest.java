@@ -10,10 +10,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.oneog.uppick.domain.member.dto.request.CreditChargeRequest;
-import org.oneog.uppick.domain.member.dto.response.CreditChargeResponse;
-import org.oneog.uppick.domain.member.dto.response.CreditGetResponse;
-import org.oneog.uppick.domain.member.service.MemberService;
+import org.oneog.uppick.domain.member.command.controller.MemberCommandController;
+import org.oneog.uppick.domain.member.command.model.dto.request.CreditChargeRequest;
+import org.oneog.uppick.domain.member.command.model.dto.response.CreditChargeResponse;
+import org.oneog.uppick.domain.member.command.service.MemberCommandService;
+import org.oneog.uppick.domain.member.query.controller.MemberQueryController;
+import org.oneog.uppick.domain.member.query.model.dto.response.CreditGetResponse;
+import org.oneog.uppick.domain.member.query.service.MemberQueryService;
 import org.oneog.uppick.support.auth.WithMockAuthMember;
 import org.oneog.uppick.support.restdocs.RestDocsBase;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,14 +27,17 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@WebMvcTest(MemberController.class)
+@WebMvcTest({MemberCommandController.class, MemberQueryController.class})
 class MemberControllerRestDocsTest extends RestDocsBase {
 
 	@Autowired
 	private ObjectMapper objectMapper;
 
 	@MockitoBean
-	private MemberService memberInternalService;
+	private MemberCommandService memberCommandService;
+
+	@MockitoBean
+	private MemberQueryService memberQueryService;
 
 	@Test
 	@DisplayName("크레딧 충전 API Rest Docs 문서화")
@@ -41,7 +47,7 @@ class MemberControllerRestDocsTest extends RestDocsBase {
 		CreditChargeRequest request = new CreditChargeRequest(10000L);
 		CreditChargeResponse response = new CreditChargeResponse(20000L); // 10000 충전 후 잔액 20000
 
-		given(memberInternalService.chargeCredit(any(CreditChargeRequest.class), any()))
+		given(memberCommandService.chargeCredit(any(CreditChargeRequest.class), any()))
 			.willReturn(response);
 
 		// when & then
@@ -74,7 +80,7 @@ class MemberControllerRestDocsTest extends RestDocsBase {
 		// given
 		CreditGetResponse response = new CreditGetResponse(20000L); // 예시: 현재 잔액 20000
 
-		given(memberInternalService.getCredit(any()))
+		given(memberQueryService.getCredit(any()))
 			.willReturn(response);
 
 		// when & then

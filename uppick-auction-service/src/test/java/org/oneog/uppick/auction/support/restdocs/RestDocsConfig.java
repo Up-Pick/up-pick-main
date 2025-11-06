@@ -1,6 +1,6 @@
 package org.oneog.uppick.auction.support.restdocs;
 
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 
 import org.springframework.boot.test.autoconfigure.restdocs.RestDocsMockMvcConfigurationCustomizer;
 import org.springframework.boot.test.context.TestConfiguration;
