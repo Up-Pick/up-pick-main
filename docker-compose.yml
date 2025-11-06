@@ -376,7 +376,8 @@ services:
     image: docker.elastic.co/kibana/kibana:8.15.3
     container_name: kibana
     depends_on:
-      - auction-elasticsearch
+      auction-elasticsearch:
+        condition: service_healthy
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - NODE_OPTIONS="--max-old-space-size=512"
