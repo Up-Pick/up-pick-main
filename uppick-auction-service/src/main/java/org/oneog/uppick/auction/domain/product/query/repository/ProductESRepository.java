@@ -7,6 +7,7 @@ import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
@@ -47,12 +48,14 @@ public class ProductESRepository {
 
         return Query.of(q -> q
             .bool(b -> {
-                // 상품 이름 : match 조회
-                b.must(m -> m.match(mq -> mq
-                    .field("name")
-                    .query(searchProductRequest.getKeyword())
-                    .fuzziness("AUTO"))
-                );
+                if (StringUtils.hasText(searchProductRequest.getKeyword())) {
+                    // 상품 이름 : match 조회
+                    b.must(m -> m.match(mq -> mq
+                        .field("name")
+                        .query(searchProductRequest.getKeyword())
+                        .fuzziness("AUTO"))
+                    );
+                }
 
                 // 기본 값 1L 또는 지정된 category_id 조회
                 b.filter(f -> f.term(t -> t
