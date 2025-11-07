@@ -1,35 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-  <!-- 서비스 이름을 Spring Context에서 자동 주입 -->
-  <springProperty scope="context" name="SERVICE_NAME" source="spring.application.name" defaultValue="main-service"/>
+    <!-- 서비스 이름을 Spring Context에서 자동 주입 -->
+    <springProperty scope="context" name="SERVICE_NAME" source="spring.application.name" defaultValue="main-service"/>
 
-  <!-- Fluent Bit 수집용 JSON 로그 파일 -->
-  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>/logs/${SERVICE_NAME}.log</file>
-    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <fileNamePattern>/logs/${SERVICE_NAME}.%d{yyyy-MM-dd}.log</fileNamePattern>
-      <maxHistory>7</maxHistory>
-    </rollingPolicy>
-    <encoder charset="UTF-8">
-      <pattern>
-        {
-          "timestamp":"%date{ISO8601}",
-          "level":"%level",
-          "thread":"%thread",
-          "logger":"%logger",
-          "service":"${SERVICE_NAME}",
-          "message":"%replace(%msg){'\n','\\\\n'}",
-          "exception":"%ex{full}"
-        }%n
-      </pattern>
-    </encoder>
-  </appender>
+    <!-- Fluent Bit 수집용 JSON 로그 파일 -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>/logs/${SERVICE_NAME}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>/logs/${SERVICE_NAME}.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>14</maxHistory>
+        </rollingPolicy>
+        <encoder charset="UTF-8">
+            <pattern>
+                {
+                "timestamp":"%date{ISO8601}",
+                "level":"%level",
+                "thread":"%thread",
+                "logger":"%logger",
+                "service":"${SERVICE_NAME}",
+                "message":"%replace(%msg){'\n','\\\\n'}",
+                "exception":"%ex{full}"
+                }%n
+            </pattern>
+        </encoder>
+    </appender>
 
-  <!-- 로그 레벨 및 Appender 연결 -->
-  <root level="INFO">
-    <appender-ref ref="FILE" />
-  </root>
+    <!-- 로그 레벨 및 Appender 연결 -->
+    <root level="INFO">
+        <appender-ref ref="FILE"/>
+    </root>
 
-  <!-- 패키지별 세부 로깅 -->
-  <logger name="org.oneog" level="INFO"/>
+    <!-- 패키지별 세부 로깅 -->
+    <logger name="org.oneog" level="INFO"/>
 </configuration>
