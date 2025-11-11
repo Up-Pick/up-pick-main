@@ -53,10 +53,8 @@ dependencies {
     // Prometheus
     implementation 'io.micrometer:micrometer-registry-prometheus'
 
-    // OpenSearch
-    implementation 'org.opensearch.client:spring-data-opensearch-starter:2.0.3'
-    implementation 'org.opensearch.client:opensearch-java:3.3.0'
-    implementation 'software.amazon.awssdk:apache-client'
+    // Elastic Search
+    implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
 
     // RabbitMQ (Spring AMQP)
     implementation 'org.springframework.boot:spring-boot-starter-amqp'
@@ -64,9 +62,6 @@ dependencies {
     // flyway
     implementation 'org.flywaydb:flyway-core'
     implementation 'org.flywaydb:flyway-mysql'
-
-    // AWS Secret Manager Spring Boot Starter
-    implementation 'io.awspring.cloud:spring-cloud-aws-starter-secrets-manager'
 }
 
 // REST Docs 스니펫 디렉토리 설정
