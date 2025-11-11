@@ -1,0 +1,66 @@
+plugins {
+    id 'java'
+}
+
+group = 'org.oneog.uppick'
+version = '1.0.0'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'com.amazonaws:aws-lambda-java-core:1.2.3'
+    implementation 'com.amazonaws:aws-lambda-java-events:3.11.3'
+
+    // HTTP Client
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+
+    // JSON
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.3'
+
+    // Redis
+    implementation 'redis.clients:jedis:5.1.0'
+
+    // JDBC (MySQL)
+    implementation 'com.mysql:mysql-connector-j:8.3.0'
+    implementation 'com.zaxxer:HikariCP:5.1.0'
+
+    // Lombok
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+}
+
+task buildRankingLambdaZip(type: Zip) {
+    dependsOn compileJava, processResources
+    from compileJava
+    from processResources
+    into('lib') {
+        from configurations.runtimeClasspath
+    }
+    archiveFileName = 'ranking-update-lambda.zip'
+    destinationDirectory = file("${buildDir}/distributions")
+}
+
+task buildViewCountLambdaZip(type: Zip) {
+    dependsOn compileJava, processResources
+    from compileJava
+    from processResources
+    into('lib') {
+        from configurations.runtimeClasspath
+    }
+    archiveFileName = 'view-count-update-lambda.zip'
+    destinationDirectory = file("${buildDir}/distributions")
+}
+
+task buildAllLambdas {
+    dependsOn buildRankingLambdaZip, buildViewCountLambdaZip
+}
+
+assemble.dependsOn buildAllLambdas
