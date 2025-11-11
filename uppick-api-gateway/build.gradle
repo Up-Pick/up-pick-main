@@ -25,9 +25,6 @@ dependencies {
     implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
     runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
     runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
-
-    // AWS Secret Manager Spring Boot Starter
-    implementation 'io.awspring.cloud:spring-cloud-aws-starter-secrets-manager'
 }
 
 tasks.named('test') {

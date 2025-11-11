@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DefaultProductInnerCommandService implements ProductInnerCommandService {
 
-	private final ElasticsearchOperations elasticsearchOperations;
+	ElasticsearchOperations elasticsearchOperations;
 
 	@Override
 	public void updateProductDocumentStatus(Long productId) {

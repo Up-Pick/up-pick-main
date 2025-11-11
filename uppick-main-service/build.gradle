@@ -57,9 +57,6 @@ dependencies {
     // flyway
     implementation 'org.flywaydb:flyway-core'
     implementation 'org.flywaydb:flyway-mysql'
-
-    // AWS Secret Manager Spring Boot Starter
-    implementation 'io.awspring.cloud:spring-cloud-aws-starter-secrets-manager'
 }
 
 // REST Docs 스니펫 디렉토리 설정
