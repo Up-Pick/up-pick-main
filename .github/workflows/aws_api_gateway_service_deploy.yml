@@ -45,7 +45,7 @@ jobs:
         id: get-task-def
         run: |
           aws ecs describe-task-definition \
-            --task-definition $ECS_SERVICE \
+            --task-definition uppick-prod-api-gateway \
             --query "taskDefinition" \
             --output json \
           | jq 'del(
@@ -57,7 +57,7 @@ jobs:
               .registeredAt,
               .registeredBy,
               .enableFaultInjection
-            )' > $ECS_TASK_DEFINITION
+            )' > ${{ env.ECS_TASK_DEFINITION }}
 
       - name: Build, tag, and push uppick-api-gateway image to Amazon ECR
         id: build-image
