@@ -47,7 +47,17 @@ jobs:
           aws ecs describe-task-definition \
             --task-definition $ECS_SERVICE \
             --query "taskDefinition" \
-            --output json > $ECS_TASK_DEFINITION
+            --output json \
+          | jq 'del(
+              .taskDefinitionArn,
+              .revision,
+              .status,
+              .requiresAttributes,
+              .compatibilities,
+              .registeredAt,
+              .registeredBy,
+              .enableFaultInjection
+            )' > $ECS_TASK_DEFINITION
 
       - name: Build, tag, and push uppick-api-gateway image to Amazon ECR
         id: build-image
