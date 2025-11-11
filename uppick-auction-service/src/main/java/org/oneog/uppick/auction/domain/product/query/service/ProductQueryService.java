@@ -9,7 +9,6 @@ import org.oneog.uppick.auction.domain.auction.command.repository.AuctionRedisRe
 import org.oneog.uppick.auction.domain.member.service.MemberInnerService;
 import org.oneog.uppick.auction.domain.product.command.service.component.ProductViewCountIncreaseProcessor;
 import org.oneog.uppick.auction.domain.product.common.document.ProductDocument;
-import org.oneog.uppick.auction.domain.product.common.exception.ProductErrorCode;
 import org.oneog.uppick.auction.domain.product.common.mapper.ProductMapper;
 import org.oneog.uppick.auction.domain.product.query.model.dto.projection.ProductDetailProjection;
 import org.oneog.uppick.auction.domain.product.query.model.dto.projection.ProductSimpleInfoProjection;
@@ -25,11 +24,10 @@ import org.oneog.uppick.auction.domain.product.query.model.dto.response.ProductS
 import org.oneog.uppick.auction.domain.product.query.model.dto.response.PurchasedProductInfoResponse;
 import org.oneog.uppick.auction.domain.product.query.model.dto.response.SearchProductInfoResponse;
 import org.oneog.uppick.auction.domain.product.query.model.dto.response.SoldProductInfoResponse;
-import org.oneog.uppick.auction.domain.product.query.repository.ProductESRepository;
+import org.oneog.uppick.auction.domain.product.query.repository.ProductOSRepository;
 import org.oneog.uppick.auction.domain.product.query.repository.ProductQueryRepository;
 import org.oneog.uppick.auction.domain.searching.service.SearchingInnerService;
 import org.oneog.uppick.common.dto.AuthMember;
-import org.oneog.uppick.common.exception.BusinessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -52,7 +50,7 @@ public class ProductQueryService {
 	private final ProductViewCountIncreaseProcessor viewCountIncreaseProcessor;
 	private final MemberInnerService memberInnerService;
 	private final AuctionRedisRepository auctionRedisRepository;
-	private final ProductESRepository productESRepository;
+	private final ProductOSRepository productOSRepository;
 	private final SearchingInnerService searchingInnerService;
 	private final ProductCacheService productCacheService;
 
@@ -169,7 +167,7 @@ public class ProductQueryService {
 		}
 
 		// Repository에서 검색 수행
-		SearchHits<ProductDocument> searchHits = productESRepository.searchProducts(searchProductRequest);
+		SearchHits<ProductDocument> searchHits = productOSRepository.searchProducts(searchProductRequest);
 
 		// Document -> SearchResponse 매핑
 		List<SearchProductInfoResponse> responseList = searchHits.getSearchHits().stream().map(searchHit -> {
