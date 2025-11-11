@@ -78,10 +78,9 @@ management:
       export:
         enabled: true
 
-# 로깅 설정
-# logging:
-#   level:
-#     root: INFO
+logging:
+  level:
+    root: WARN
 
 server:
   port: 8080
@@ -89,9 +88,8 @@ jwt:
   secret:
     key: "VXBwaWNrUHJvamVjdFNlY3JldEtleUZvclRlc3RpbmdQdXJwb3NlczEyMzQ1Njc4OTA="
 
-gateway:
-  url: ${GATEWAY_URL}
-
 internal:
   api:
     secret: "jdklsfjksdfjksldfjklsdjfklsdfjsklfjskljafklwejflkjw"
+  main-service:
+    url: ${MAIN_SERVICE_URL}
