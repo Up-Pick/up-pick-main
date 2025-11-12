@@ -9,7 +9,7 @@ on:
 env:
   AWS_REGION: us-east-1
   ECR_REPOSITORY: uppick/prod
-  ECS_SERVICE: uppick-prod-api-gateway
+  ECS_SERVICE: uppick-prod-api-gateway-service-lliuwbe9
   ECS_CLUSTER: uppick-prod-cluster
   ECS_TASK_DEFINITION: .aws/uppick-prod-api-gateway.json
   CONTAINER_NAME: springboot

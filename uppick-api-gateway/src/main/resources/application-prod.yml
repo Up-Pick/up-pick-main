@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: api-gateway
+  config:
+    import: "aws-secretsmanager:uppick/prod"
+  main:
+    web-application-type: reactive
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: uppick-auction-service
+              uri: ${auction-service.url}
+              predicates:
+                - Path=/auction/**
+              filters:
+                - StripPrefix=1
+            - id: uppick-main-service
+              uri: ${main-service.url}
+              predicates:
+                - Path=/main/**
+              filters:
+                - StripPrefix=1
+jwt:
+  secret:
+    key: ${jwt.secret}
+server:
+  http2:
+    enabled: true

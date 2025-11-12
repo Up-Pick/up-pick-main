@@ -1,0 +1,69 @@
+spring:
+  application:
+    name: main-service
+  config:
+    import: "aws-secretsmanager:uppick/prod"
+  datasource:
+    url: ${main.db.url}
+    username: ${main.db.user}
+    password: ${main.db.pass}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: validate
+  threads:
+    virtual:
+      enabled: true
+  data:
+    redis:
+      host: ${redis.host}
+      port: ${redis.port}
+  rabbitmq:
+    host: ${rabbitmq.host}
+    port: ${rabbitmq.port}
+    username: ${rabbitmq.user}
+    password: ${rabbitmq.pass}
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 1
+    locations:
+      - classpath:db/migration
+      - classpath:db/seed
+server:
+  port: 8080
+# Actuator 및 모니터링 설정
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+  # Prometheus 메트릭 설정: 보안을 위해 health와 prometheus만 노출
+  metrics:
+    tags:
+      application: ${spring.application.name}
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+logging:
+  level:
+    org.oneog.uppick: warn
+
+jwt:
+  secret:
+    key: ${jwt.secret}
+
+internal:
+  api:
+    secret: ${internal.secret}
+  auction-service:
+    url: ${auction-service.url}

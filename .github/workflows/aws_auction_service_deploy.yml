@@ -9,7 +9,7 @@ on:
 env:
   AWS_REGION: us-east-1
   ECR_REPOSITORY: uppick/prod
-  ECS_SERVICE: uppick-prod-auction-service
+  ECS_SERVICE: uppick-prod-auction-service-service-yn11foya
   ECS_CLUSTER: uppick-prod-cluster
   ECS_TASK_DEFINITION: .aws/uppick-prod-auction-service.json
   CONTAINER_NAME: springboot

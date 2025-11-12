@@ -9,7 +9,7 @@ on:
 env:
   AWS_REGION: us-east-1
   ECR_REPOSITORY: uppick/prod
-  ECS_SERVICE: uppick-prod-main-service
+  ECS_SERVICE: uppick-prod-main-service-service-read4p28
   ECS_CLUSTER: uppick-prod-cluster
   ECS_TASK_DEFINITION: .aws/uppick-prod-main-service.json
   CONTAINER_NAME: springboot
@@ -82,6 +82,13 @@ jobs:
           task-definition: ${{ env.ECS_TASK_DEFINITION }}
           container-name: ${{ env.CONTAINER_NAME }}
           image: ${{ steps.build-image.outputs.image }}
+
+      # << 추가할 디버깅 스텝 >>
+      - name: Show final task definition
+        run: |
+          echo "--- Generated Task Definition ---"
+          cat ${{ steps.task-def.outputs.task-definition }}
+          echo "---------------------------------"
 
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1

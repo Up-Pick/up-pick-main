@@ -1,0 +1,102 @@
+spring:
+  application:
+    name: auction-service
+  config:
+    import: "aws-secretsmanager:uppick/prod"
+  datasource:
+    master:
+      hikari:
+        jdbc-url: ${auction.db.master.url}
+        username: ${auction.db.master.user}
+        password: ${auction.db.master.pass}
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        maximum-pool-size: 20
+        minimum-idle: 10
+        connection-timeout: 30000   # 30초
+        max-lifetime: 1800000       # 30분
+        leak-detection-threshold: 60000  # 누수 감지
+    slave:
+      hikari:
+        jdbc-url: ${auction.db.slave.url}
+        username: ${auction.db.slave.user}
+        password: ${auction.db.slave.pass}
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        maximum-pool-size: 20
+        minimum-idle: 10
+        connection-timeout: 30000   # 30초
+        max-lifetime: 1800000       # 30분
+        leak-detection-threshold: 60000  # 누수 감지
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: validate
+  threads:
+    virtual:
+      enabled: true
+  cloud:
+    aws:
+      region:
+        static: us-east-1
+      s3:
+        enabled: true
+        bucket: ${s3.bucket}
+  data:
+    redis:
+      host: ${redis.host}
+      port: ${redis.port}  
+  rabbitmq:
+    host: ${rabbitmq.host}
+    port: ${rabbitmq.port}
+    username: ${rabbitmq.user}
+    password: ${rabbitmq.pass}
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 1
+    url: ${auction.db.master.url}
+    user: ${auction.db.master.user}
+    password: ${auction.db.master.pass}
+    locations:
+      - classpath:db/migration
+      - classpath:db/seed
+# Actuator 및 모니터링 설정
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+      # Prometheus 메트릭 설정: 보안을 위해 health와 prometheus 노출
+  metrics:
+    tags:
+      application: ${spring.application.name}
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true   # 요청시간 분포 (P95, P99 계산용)
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+logging:
+  level:
+    org.oneog.uppick: warn
+
+server:
+  port: 8080
+
+jwt:
+  secret:
+    key: ${jwt.secret}
+
+internal:
+  api:
+    secret: ${internal.secret}
+  main-service:
+    url: ${main-service.url}
+
+opensearch:
+  uris: ${opensearch.uris}
+  region: ${opensearch.region}  
