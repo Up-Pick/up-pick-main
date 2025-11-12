@@ -352,7 +352,8 @@ public class BidPriceUpdateHandler implements RequestHandler<Object, Map<String,
 			openSearchClient.update(u -> u
 				.index(INDEX_NAME)
 				.id(productId.toString())
-				.doc(doc),
+				.doc(doc)
+				.docAsUpsert(true),
 				Object.class
 			);
 
