@@ -352,12 +352,17 @@ public class BidPriceUpdateHandler implements RequestHandler<Object, Map<String,
 			openSearchClient.update(u -> u
 				.index(INDEX_NAME)
 				.id(productId.toString())
-				.doc(doc)
-				.docAsUpsert(true),
+				.doc(doc),
 				Object.class
 			);
 
 		} catch (OpenSearchException e) {
+			// 문서가 없는 경우 (인덱싱 안됨, 삭제됨 등) - 경고 로그만 남기고 무시
+			if (e.getMessage() != null && e.getMessage().contains("document_missing_exception")) {
+				logger.log(" OpenSearch 문서 없음 (인덱싱 안됨) - productId: " + productId + ", 입찰가 업데이트 스킵");
+				return;
+			}
+
 			logger.log(" OpenSearch 업데이트 실패 - productId: " + productId + ", bidPrice: " + bidPrice
 				+ ", error: " + e.getMessage());
 			throw e;
