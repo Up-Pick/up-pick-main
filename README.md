@@ -138,10 +138,6 @@
 
 📄 [API Documentation](http://uppick-api-docs.s3-website-us-east-1.amazonaws.com)
 
-### 📊 서비스 플로우
-
-![Service Flow](docs/images/service-flow.png)
-
 ---
 
 ## 🛠️ 기술 스택
