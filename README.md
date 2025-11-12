@@ -187,7 +187,7 @@
 ## 💡 기술적 의사결정
 
 <details>
-<summary><b>1. 부하 테스트 도구: k6 선택</b></summary>
+<summary><b>1️⃣ 부하 테스트 도구: k6 선택</b></summary>
 
 ### 문제 인식
 
@@ -210,7 +210,7 @@
 </details>
 
 <details>
-<summary><b>2. MSA 아키텍처 도입</b></summary>
+<summary><b>2️⃣ MSA 아키텍처 도입</b></summary>
 
 ### 최종 결정
 
@@ -234,7 +234,7 @@
 </details>
 
 <details>
-<summary><b>3. 서비스 간 통신: OpenFeign 선택</b></summary>
+<summary><b>3️⃣ 서비스 간 통신: OpenFeign 선택</b></summary>
 
 ### 문제 인식
 
@@ -254,7 +254,7 @@ Spring 기반 통합성과 생산성을 고려해 OpenFeign을 채택
 </details>
 
 <details>
-<summary><b>4. Redis 도입</b></summary>
+<summary><b>4️⃣ Redis 도입</b></summary>
 
 ### 문제 인식
 
@@ -277,7 +277,7 @@ Spring 기반 통합성과 생산성을 고려해 OpenFeign을 채택
 </details>
 
 <details>
-<summary><b>5. Elasticsearch 도입</b></summary>
+<summary><b>5️⃣ Elasticsearch 도입</b></summary>
 
 ### 문제 인식
 
@@ -300,7 +300,7 @@ Spring 기반 통합성과 생산성을 고려해 OpenFeign을 채택
 </details>
 
 <details>
-<summary><b>6. RabbitMQ 비동기 이벤트 도입</b></summary>
+<summary><b>6️⃣ RabbitMQ 비동기 이벤트 도입</b></summary>
 
 ### 문제 인식
 
@@ -322,7 +322,7 @@ Spring 기반 통합성과 생산성을 고려해 OpenFeign을 채택
 </details>
 
 <details>
-<summary><b>7. Spring Batch → AWS Lambda 전환</b></summary>
+<summary><b>7️⃣ Spring Batch → AWS Lambda 전환</b></summary>
 
 ### 문제 인식
 
@@ -345,7 +345,7 @@ Spring 기반 통합성과 생산성을 고려해 OpenFeign을 채택
 </details>
 
 <details>
-<summary><b>8. Blue-Green 배포 도입</b></summary>
+<summary><b>8️⃣ Blue-Green 배포 도입</b></summary>
 
 ### 문제 인식
 
@@ -372,7 +372,7 @@ Zero-Downtime 배포, 완벽한 환경 검증, 즉각적인 복구 능력 제공
 ## 🚨 트러블 슈팅
 
 <details>
-<summary><b>1. Spring Rest Docs 경로 오류 해결 (Windows 환경)</b></summary>
+<summary><b>1️⃣ Spring Rest Docs 경로 오류 해결 (Windows 환경)</b></summary>
 
 ### 문제 상황
 
@@ -402,7 +402,7 @@ cd /mnt/c/Users/YourName/project
 </details>
 
 <details>
-<summary><b>2. Docker OpenJDK 이미지 지원 종료 해결</b></summary>
+<summary><b>2️⃣ Docker OpenJDK 이미지 지원 종료 해결</b></summary>
 
 ### 문제 상황
 
@@ -434,7 +434,7 @@ FROM eclipse-temurin:21-jdk
 </details>
 
 <details>
-<summary><b>3. RabbitMQ 무한 로그 출력 오류 해결</b></summary>
+<summary><b>3️⃣ RabbitMQ 무한 로그 출력 오류 해결</b></summary>
 
 ### 문제 상황
 
@@ -479,7 +479,7 @@ getMessage());
 </details>
 
 <details>
-<summary><b>4. 트랜잭션 전파로 인한 락 무효화 오류 해결</b></summary>
+<summary><b>4️⃣ 트랜잭션 전파로 인한 락 무효화 오류 해결</b></summary>
 
 ### 문제 상황
 
@@ -507,7 +507,7 @@ public BiddingResultDto process(AuctionBidRequest request, long auctionId, long 
 </details>
 
 <details>
-<summary><b>5. Redis 캐시 역직렬화 문제 해결</b></summary>
+<summary><b>5️⃣ Redis 캐시 역직렬화 문제 해결</b></summary>
 
 ### 문제 상황
 
@@ -542,7 +542,7 @@ GenericJackson2JsonRedisSerializer genericSerializer = ...
 </details>
 
 <details>
-<summary><b>6. Master/Slave 환경의 중첩 트랜잭션 readOnly 라우팅 문제</b></summary>
+<summary><b>6️⃣ Master/Slave 환경의 중첩 트랜잭션 readOnly 라우팅 문제</b></summary>
 
 ### 문제 상황
 
@@ -570,7 +570,7 @@ dataSourceType =actualReadOnly ?DataSourceType.SLAVE :DataSourceType.MASTER;
 </details>
 
 <details>
-<summary><b>7. Spring Batch DataSource 인식 문제 해결</b></summary>
+<summary><b>7️⃣ Spring Batch DataSource 인식 문제 해결</b></summary>
 
 ### 문제 상황
 
@@ -605,7 +605,7 @@ public class BatchConfig extends DefaultBatchConfiguration {
 </details>
 
 <details>
-<summary><b>8. Ranking Lambda 마이그레이션 문제 해결</b></summary>
+<summary><b>8️⃣ Ranking Lambda 마이그레이션 문제 해결</b></summary>
 
 ### 문제 상황
 
@@ -657,7 +657,6 @@ DB 직접 접근이 가장 단순하고 안정적
 
 </details>
 
----
 
 <details>
 <summary><b>2️⃣ 메시지 큐 도입 전후 비교</b></summary>
@@ -671,8 +670,6 @@ DB 직접 접근이 가장 단순하고 안정적
 ![Message Queue Performance](docs/images/mq-performance.png)
 
 </details>
-
----
 
 <details>
 <summary><b>3️⃣ 조회수 증가 로직: 낙관적 락 vs Redis</b></summary>
@@ -690,7 +687,6 @@ DB 직접 접근이 가장 단순하고 안정적
 
 </details>
 
----
 
 <details>
 <summary><b>4️⃣ 복합 키 인덱스 적용 전후 비교</b></summary>
@@ -706,7 +702,6 @@ DB 직접 접근이 가장 단순하고 안정적
 
 </details>
 
----
 
 <details>
 <summary><b>5️⃣ MySQL 기본 테이블 vs MySQL Full-Text Search vs Elasticsearch</b></summary>
@@ -721,7 +716,6 @@ DB 직접 접근이 가장 단순하고 안정적
 
 </details>
 
----
 
 <details>
 <summary><b>6️⃣ 버추얼 스레드 적용 전후 성능 비교</b></summary>
@@ -738,8 +732,6 @@ DB 직접 접근이 가장 단순하고 안정적
 
 </details>
 
----
-
 <details>
 <summary><b>7️⃣ Replica 적용 전후 비교</b></summary>
 
@@ -753,8 +745,6 @@ DB 직접 접근이 가장 단순하고 안정적
 ![Replica Performance](docs/images/replica-performance.png)
 
 </details>
-
----
 
 <details>
 <summary><b>8️⃣ 배치 성능 테스트</b></summary>
@@ -790,7 +780,6 @@ DB 직접 접근이 가장 단순하고 안정적
 
 </details>
 
----
 
 <details>
 <summary><b>9️⃣ Redis를 사용한 입찰 부하 분산</b></summary>
@@ -805,7 +794,6 @@ DB 직접 접근이 가장 단순하고 안정적
 
 </details>
 
----
 
 <details>
 <summary><b>🔟 Batch 청크 최적화 성능 개선</b></summary>
