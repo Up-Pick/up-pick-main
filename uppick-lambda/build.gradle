@@ -19,18 +19,21 @@ dependencies {
     implementation 'com.amazonaws:aws-lambda-java-core:1.2.3'
     implementation 'com.amazonaws:aws-lambda-java-events:3.11.3'
 
-    // HTTP Client
-    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
-
-    // JSON
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.3'
-
     // Redis
     implementation 'redis.clients:jedis:5.1.0'
 
     // JDBC (MySQL)
     implementation 'com.mysql:mysql-connector-j:8.3.0'
     implementation 'com.zaxxer:HikariCP:5.1.0'
+
+    // OpenSearch
+    // 역할:
+    //  - Lambda 실행 역할의 자격 증명을 자동으로 가져옴
+    //  - 모든 HTTP 요청에 AWS Signature v4 서명 추가
+    //  - IAM 정책 기반으로 OpenSearch 접근 권한 확인
+    implementation 'org.opensearch.client:opensearch-java:2.6.0'
+    implementation 'software.amazon.awssdk:apache-client:2.20.0'
+    implementation 'software.amazon.awssdk:auth:2.20.0'
 
     // Lombok
     compileOnly 'org.projectlombok:lombok:1.18.30'
@@ -59,8 +62,19 @@ task buildViewCountLambdaZip(type: Zip) {
     destinationDirectory = file("${buildDir}/distributions")
 }
 
+task buildBidPriceLambdaZip(type: Zip) {
+    dependsOn compileJava, processResources
+    from compileJava
+    from processResources
+    into('lib') {
+        from configurations.runtimeClasspath
+    }
+    archiveFileName = 'bid-price-update-lambda.zip'
+    destinationDirectory = file("${buildDir}/distributions")
+}
+
 task buildAllLambdas {
-    dependsOn buildRankingLambdaZip, buildViewCountLambdaZip
+    dependsOn buildRankingLambdaZip, buildViewCountLambdaZip, buildBidPriceLambdaZip
 }
 
 assemble.dependsOn buildAllLambdas
