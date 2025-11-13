@@ -30,7 +30,7 @@ import software.amazon.awssdk.regions.Region;
  * 입찰가 업데이트 Lambda Handler
  * EventBridge 스케줄러에 의해 매 1분마다 실행됨
  *
- * Redis의 auction:*:current-bid-price 키를 읽어서 OpenSearch에 업데이트 후 Redis 키 삭제
+ * Redis의 auction:*:current-bid-price 키를 읽어서 OpenSearch에 동기화
  */
 public class BidPriceUpdateHandler implements RequestHandler<Object, Map<String, Object>> {
 
@@ -47,10 +47,6 @@ public class BidPriceUpdateHandler implements RequestHandler<Object, Map<String,
 	private static JedisPool jedisPool;
 	private static HikariDataSource dataSource;
 	private static OpenSearchClient openSearchClient;
-
-	public BidPriceUpdateHandler() {
-		// Lazy initialization - 환경 변수가 설정된 후에 초기화됨
-	}
 
 	// 환경 변수 읽기 (System.getenv 또는 System.getProperty 지원)
 	private static String getEnvOrProperty(String key) {
@@ -106,27 +102,7 @@ public class BidPriceUpdateHandler implements RequestHandler<Object, Map<String,
 	}
 
 	/**
-	 * 리소스 정리 (Lambda 종료 시)
-	 */
-	public static void cleanup() {
-
-		if (jedisPool != null && !jedisPool.isClosed()) {
-			jedisPool.close();
-		}
-		if (dataSource != null && !dataSource.isClosed()) {
-			dataSource.close();
-		}
-		if (openSearchClient != null && openSearchClient._transport() != null) {
-			try {
-				openSearchClient._transport().close();
-			} catch (Exception e) {
-				// Ignore cleanup errors
-			}
-		}
-	}
-
-	/**
-	 * Redis, DB, OpenSearch 연결 초기화 (싱글톤)
+	 * Redis, DB, OpenSearch 연결 초기화 (싱글톤, Lazy)
 	 */
 	private synchronized void initializeResources() {
 
@@ -298,11 +274,23 @@ public class BidPriceUpdateHandler implements RequestHandler<Object, Map<String,
 				return false;
 			}
 
-			// OpenSearch 업데이트
-			updateOpenSearch(productId, bidPrice, logger);
+			// OpenSearch에서 현재 입찰가 조회 (중복 업데이트 방지)
+			Long currentBidPrice = getCurrentBidPriceFromOpenSearch(productId, logger);
 
-			logger.log(" auctionId " + auctionId + ", productId " + productId + "의 입찰가 " + bidPrice + "로 업데이트 완료");
-			return true;
+			// 입찰가가 변경된 경우에만 업데이트
+			// - currentBidPrice == null: 문서가 없거나 조회 실패 (첫 업데이트 또는 재시도)
+			// - !bidPrice.equals(currentBidPrice): 입찰가가 실제로 변경됨
+			if (currentBidPrice == null || !bidPrice.equals(currentBidPrice)) {
+				updateOpenSearch(productId, bidPrice, logger);
+				logger.log(" auctionId " + auctionId + ", productId " + productId + "의 입찰가 " +
+					(currentBidPrice != null ? currentBidPrice + " → " : "") + bidPrice + "로 업데이트 완료");
+				return true;
+			} else {
+				// 입찰가 변경 없음 - OpenSearch 업데이트 스킵 (불필요한 업데이트 방지)
+				logger.log(
+					" auctionId " + auctionId + ", productId " + productId + "의 입찰가 변경 없음 (" + bidPrice + ") - 스킵");
+				return false;
+			}
 
 		} catch (NumberFormatException e) {
 			logger.log(" 잘못된 형식의 데이터 - key: " + key + ", error: " + e.getMessage());
@@ -330,6 +318,46 @@ public class BidPriceUpdateHandler implements RequestHandler<Object, Map<String,
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * OpenSearch에서 현재 입찰가 조회
+	 *
+	 * Redis의 입찰가와 비교하여 변경 여부를 확인하기 위해 사용
+	 *
+	 * @param productId 상품 ID
+	 * @param logger Lambda 로거
+	 * @return OpenSearch에 저장된 현재 입찰가 (문서가 없거나 조회 실패 시 null)
+	 */
+	private Long getCurrentBidPriceFromOpenSearch(Long productId,
+		com.amazonaws.services.lambda.runtime.LambdaLogger logger) {
+
+		try {
+			// OpenSearch Get API로 product 문서 조회
+			var response = openSearchClient.get(g -> g
+					.index(INDEX_NAME)
+					.id(productId.toString()),
+				Map.class
+			);
+
+			// 문서가 존재하고 source가 있으면 current_bid_price 추출
+			if (response.found() && response.source() != null) {
+				Object bidPriceObj = response.source().get(FIELD_CURRENT_BID_PRICE);
+				if (bidPriceObj != null) {
+					// Integer 또는 Long 타입 처리
+					if (bidPriceObj instanceof Integer) {
+						return ((Integer)bidPriceObj).longValue();
+					} else if (bidPriceObj instanceof Long) {
+						return (Long)bidPriceObj;
+					}
+				}
+			}
+			return null;
+		} catch (Exception e) {
+			logger.log(" OpenSearch 조회 실패 - productId: " + productId + ", error: " + e.getMessage());
+			// 조회 실패 시 null 반환하여 업데이트가 진행되도록 함
+			return null;
+		}
 	}
 
 	/**

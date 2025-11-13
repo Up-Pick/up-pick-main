@@ -39,12 +39,8 @@ public class ViewCountUpdateHandler implements RequestHandler<Object, Map<String
 	private static JedisPool jedisPool;
 	private static HikariDataSource dataSource;
 
-	public ViewCountUpdateHandler() {
-		initializeResources();
-	}
-
 	/**
-	 * Redis와 DB 연결 초기화 (싱글톤)
+	 * Redis와 DB 연결 초기화 (싱글톤, Lazy)
 	 */
 	private synchronized void initializeResources() {
 		if (jedisPool == null) {
@@ -93,6 +89,9 @@ public class ViewCountUpdateHandler implements RequestHandler<Object, Map<String
 
 			// 환경 변수 검증
 			validateEnvironmentVariables();
+
+			// 리소스 초기화 (Lazy)
+			initializeResources();
 
 			// Redis에서 product:view:* 키 조회
 			Set<String> keys;
@@ -231,15 +230,4 @@ public class ViewCountUpdateHandler implements RequestHandler<Object, Map<String
 		}
 	}
 
-	/**
-	 * 리소스 정리 (Lambda 종료 시)
-	 */
-	public static void cleanup() {
-		if (jedisPool != null && !jedisPool.isClosed()) {
-			jedisPool.close();
-		}
-		if (dataSource != null && !dataSource.isClosed()) {
-			dataSource.close();
-		}
-	}
 }

@@ -27,25 +27,6 @@ import redis.clients.jedis.JedisPoolConfig;
  */
 public class RankingUpdateHandler implements RequestHandler<Object, Map<String, Object>> {
 
-	// 환경 변수 읽기 (System.getenv 또는 System.getProperty 지원)
-	private static String getEnvOrProperty(String key) {
-		String value = System.getenv(key);
-		if (value == null) {
-			value = System.getProperty(key);
-		}
-		return value;
-	}
-
-	// Main DB 연결 정보 (lazy evaluation을 위해 final 제거)
-	private static String DB_URL() { return getEnvOrProperty("DB_URL"); }
-	private static String DB_USERNAME() { return getEnvOrProperty("DB_USERNAME"); }
-	private static String DB_PASSWORD() { return getEnvOrProperty("DB_PASSWORD"); }
-
-	// Redis 연결 정보 (lazy evaluation을 위해 final 제거)
-	private static String REDIS_HOST() { return getEnvOrProperty("REDIS_HOST"); }
-	private static String REDIS_PORT() { return getEnvOrProperty("REDIS_PORT"); }
-	private static String REDIS_PASSWORD() { return getEnvOrProperty("REDIS_PASSWORD"); }
-
 	// SQL 쿼리
 	private static final String DELETE_ALL_SQL = "DELETE FROM hot_keyword";
 	private static final String INSERT_SQL = "INSERT INTO hot_keyword (keyword, rank_no) VALUES (?, ?)";
@@ -56,32 +37,55 @@ public class RankingUpdateHandler implements RequestHandler<Object, Map<String, 
 			"GROUP BY keyword " +
 			"ORDER BY count DESC " +
 			"LIMIT 10";
-
 	// Redis 캐시 키
 	private static final String CACHE_KEY = "hotKeywords::top10";
-
 	private static HikariDataSource dataSource;
 	private static JedisPool jedisPool;
 
-	public RankingUpdateHandler() {
-		// Lazy initialization - 환경 변수가 설정된 후에 초기화됨
+	// 환경 변수 읽기 (System.getenv 또는 System.getProperty 지원)
+	private static String getEnvOrProperty(String key) {
+
+		String value = System.getenv(key);
+		if (value == null) {
+			value = System.getProperty(key);
+		}
+		return value;
+	}
+
+	// Main DB 연결 정보 (lazy evaluation을 위해 final 제거)
+	private static String DB_URL() {
+
+		return getEnvOrProperty("DB_URL");
+	}
+
+	private static String DB_USERNAME() {
+
+		return getEnvOrProperty("DB_USERNAME");
+	}
+
+	private static String DB_PASSWORD() {
+
+		return getEnvOrProperty("DB_PASSWORD");
+	}
+
+	// Redis 연결 정보 (lazy evaluation을 위해 final 제거)
+	private static String REDIS_HOST() {
+
+		return getEnvOrProperty("REDIS_HOST");
+	}
+
+	private static String REDIS_PORT() {
+
+		return getEnvOrProperty("REDIS_PORT");
+	}
+
+	private static String REDIS_PASSWORD() {
+
+		return getEnvOrProperty("REDIS_PASSWORD");
 	}
 
 	/**
-	 * 리소스 정리 (Lambda 종료 시)
-	 */
-	public static void cleanup() {
-
-		if (dataSource != null && !dataSource.isClosed()) {
-			dataSource.close();
-		}
-		if (jedisPool != null && !jedisPool.isClosed()) {
-			jedisPool.close();
-		}
-	}
-
-	/**
-	 * DB와 Redis 연결 초기화 (싱글톤)
+	 * DB와 Redis 연결 초기화 (싱글톤, Lazy)
 	 */
 	private synchronized void initializeResources() {
 
