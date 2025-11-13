@@ -11,7 +11,6 @@ import java.util.Set;
 
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.OpenSearchException;
-import org.opensearch.client.opensearch.core.UpdateRequest;
 import org.opensearch.client.transport.aws.AwsSdk2Transport;
 import org.opensearch.client.transport.aws.AwsSdk2TransportOptions;
 
@@ -302,11 +301,6 @@ public class BidPriceUpdateHandler implements RequestHandler<Object, Map<String,
 			// OpenSearch 업데이트
 			updateOpenSearch(productId, bidPrice, logger);
 
-			// Redis 키 삭제
-			try (Jedis jedis = jedisPool.getResource()) {
-				jedis.del(key);
-			}
-
 			logger.log(" auctionId " + auctionId + ", productId " + productId + "의 입찰가 " + bidPrice + "로 업데이트 완료");
 			return true;
 
@@ -350,9 +344,9 @@ public class BidPriceUpdateHandler implements RequestHandler<Object, Map<String,
 			doc.put(FIELD_CURRENT_BID_PRICE, bidPrice);
 
 			openSearchClient.update(u -> u
-				.index(INDEX_NAME)
-				.id(productId.toString())
-				.doc(doc),
+					.index(INDEX_NAME)
+					.id(productId.toString())
+					.doc(doc),
 				Object.class
 			);
 
