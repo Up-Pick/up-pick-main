@@ -1,0 +1,1 @@
+docker buildx build --platform linux/arm64 -f monitoring/adot/Dockerfile -t adot-collector:prod monitoring/adot

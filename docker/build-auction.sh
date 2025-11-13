@@ -1,0 +1,1 @@
+docker buildx build --platform linux/arm64 -f uppick-auction-service/Dockerfile -t uppick-auction-service:prod .
