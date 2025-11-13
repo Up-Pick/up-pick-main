@@ -1,0 +1,1 @@
+docker buildx build --platform linux/arm64 -f uppick-main-service/Dockerfile -t uppick-main-service:prod .

@@ -1,5 +1,5 @@
 # Build stage
-FROM gradle:8.5-jdk21 AS build
+FROM --platform=$BUILDPLATFORM gradle:8.5-jdk21 AS build
 WORKDIR /app
 
 # Copy Gradle wrapper and build files
@@ -17,7 +17,7 @@ COPY uppick-auction-service ./uppick-auction-service
 
 # Build the application
 WORKDIR /app
-RUN ./gradlew :uppick-auction-service:build -x test
+RUN ./gradlew :uppick-auction-service:build -x test --no-daemon
 
 # Runtime stage
 FROM eclipse-temurin:21-jre-alpine
