@@ -9,6 +9,7 @@ public class AuctionRedisConstant {
 
 	public static final String CURRENT_BID_PRICE_KEY = "auction:%d:current-bid-price";
 	public static final String LAST_BIDDER_ID_KEY = "auction:%d:last-bidder-id";
+	public static final String OPENSEARCH_SYNC_FLAG_KEY = "opensearch:sync:%d";
 
 	public final DefaultRedisScript<Void> biddingScript;
 
@@ -29,6 +30,11 @@ public class AuctionRedisConstant {
 	public String getLastBidderIdKey(long auctionId) {
 
 		return String.format(LAST_BIDDER_ID_KEY, auctionId);
+	}
+
+	public String getOpenSearchSyncFlagKey(long auctionId) {
+
+		return String.format(OPENSEARCH_SYNC_FLAG_KEY, auctionId);
 	}
 
 }

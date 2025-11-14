@@ -30,14 +30,13 @@ import software.amazon.awssdk.regions.Region;
  * 입찰가 업데이트 Lambda Handler
  * EventBridge 스케줄러에 의해 매 1분마다 실행됨
  *
- * Redis의 auction:*:current-bid-price 키를 읽어서 OpenSearch에 업데이트 후 Redis 키 삭제
+ * Redis의 opensearch:sync:* 동기화 플래그를 읽어서 OpenSearch에 업데이트 후 플래그 삭제
  */
 public class BidPriceUpdateHandler implements RequestHandler<Object, Map<String, Object>> {
 
-	// Redis 키 패턴
-	private static final String REDIS_KEY_PATTERN = "auction:*:current-bid-price";
-	private static final String REDIS_KEY_PREFIX = "auction:";
-	private static final String REDIS_KEY_SUFFIX = ":current-bid-price";
+	// Redis 동기화 플래그 패턴
+	private static final String REDIS_SYNC_PATTERN = "opensearch:sync:*";
+	private static final String REDIS_SYNC_PREFIX = "opensearch:sync:";
 	// SQL 쿼리
 	private static final String FIND_PRODUCT_ID_SQL = "SELECT product_id FROM auction WHERE id = ?";
 	// OpenSearch 인덱스 정보
@@ -47,10 +46,6 @@ public class BidPriceUpdateHandler implements RequestHandler<Object, Map<String,
 	private static JedisPool jedisPool;
 	private static HikariDataSource dataSource;
 	private static OpenSearchClient openSearchClient;
-
-	public BidPriceUpdateHandler() {
-		// Lazy initialization - 환경 변수가 설정된 후에 초기화됨
-	}
 
 	// 환경 변수 읽기 (System.getenv 또는 System.getProperty 지원)
 	private static String getEnvOrProperty(String key) {
@@ -106,27 +101,7 @@ public class BidPriceUpdateHandler implements RequestHandler<Object, Map<String,
 	}
 
 	/**
-	 * 리소스 정리 (Lambda 종료 시)
-	 */
-	public static void cleanup() {
-
-		if (jedisPool != null && !jedisPool.isClosed()) {
-			jedisPool.close();
-		}
-		if (dataSource != null && !dataSource.isClosed()) {
-			dataSource.close();
-		}
-		if (openSearchClient != null && openSearchClient._transport() != null) {
-			try {
-				openSearchClient._transport().close();
-			} catch (Exception e) {
-				// Ignore cleanup errors
-			}
-		}
-	}
-
-	/**
-	 * Redis, DB, OpenSearch 연결 초기화 (싱글톤)
+	 * Redis, DB, OpenSearch 연결 초기화 (싱글톤, Lazy)
 	 */
 	private synchronized void initializeResources() {
 
@@ -203,10 +178,10 @@ public class BidPriceUpdateHandler implements RequestHandler<Object, Map<String,
 			// 리소스 초기화 (Lazy)
 			initializeResources();
 
-			// Redis에서 auction:*:current-bid-price 키 조회
+			// Redis에서 opensearch:sync:* 동기화 플래그 조회
 			Set<String> keys;
 			try (Jedis jedis = jedisPool.getResource()) {
-				keys = jedis.keys(REDIS_KEY_PATTERN);
+				keys = jedis.keys(REDIS_SYNC_PATTERN);
 			}
 
 			if (keys == null || keys.isEmpty()) {
@@ -259,27 +234,27 @@ public class BidPriceUpdateHandler implements RequestHandler<Object, Map<String,
 	}
 
 	/**
-	 * 단일 입찰가 데이터 처리
+	 * 단일 입찰가 데이터 처리 (동기화 플래그 기반)
 	 *
-	 * @param key Redis 키 (auction:{auctionId}:current-bid-price)
+	 * @param syncKey Redis 동기화 플래그 키 (opensearch:sync:{auctionId})
 	 * @param logger Lambda 로거
 	 * @return 처리 성공 여부
 	 */
-	private boolean processBidPrice(String key, com.amazonaws.services.lambda.runtime.LambdaLogger logger) {
+	private boolean processBidPrice(String syncKey, com.amazonaws.services.lambda.runtime.LambdaLogger logger) {
 
 		try {
-			// auctionId 추출 (auction:123:current-bid-price -> 123)
-			String auctionIdStr = key.replace(REDIS_KEY_PREFIX, "").replace(REDIS_KEY_SUFFIX, "");
+			// auctionId 추출 (opensearch:sync:123 -> 123)
+			String auctionIdStr = syncKey.replace(REDIS_SYNC_PREFIX, "");
 			Long auctionId = Long.parseLong(auctionIdStr);
 
-			// Redis에서 입찰가 조회
+			// Redis에서 입찰가 조회 (동기화 플래그 값)
 			String bidPriceStr;
 			try (Jedis jedis = jedisPool.getResource()) {
-				bidPriceStr = jedis.get(key);
+				bidPriceStr = jedis.get(syncKey);
 			}
 
 			if (bidPriceStr == null || bidPriceStr.isEmpty()) {
-				logger.log(" 키 " + key + "에 대한 값이 없습니다. 스킵합니다.");
+				logger.log("동기화 플래그 " + syncKey + "에 대한 값이 없습니다. 스킵합니다.");
 				return false;
 			}
 
@@ -294,21 +269,31 @@ public class BidPriceUpdateHandler implements RequestHandler<Object, Map<String,
 			Long productId = findProductId(auctionId);
 
 			if (productId == null) {
-				logger.log(" auctionId " + auctionId + "에 해당하는 상품이 DB에 존재하지 않습니다.");
+				logger.log("auctionId " + auctionId + "에 해당하는 상품이 DB에 존재하지 않습니다.");
+				// 동기화 플래그 삭제 (존재하지 않는 경매는 재처리 불필요)
+				try (Jedis jedis = jedisPool.getResource()) {
+					jedis.del(syncKey);
+				}
 				return false;
 			}
 
-			// OpenSearch 업데이트
+			// OpenSearch 업데이트 (동기화 플래그가 있으면 무조건 업데이트)
 			updateOpenSearch(productId, bidPrice, logger);
+			logger.log("auctionId " + auctionId + ", productId " + productId + "의 입찰가 " + bidPrice + "로 업데이트 완료");
 
-			logger.log(" auctionId " + auctionId + ", productId " + productId + "의 입찰가 " + bidPrice + "로 업데이트 완료");
+			// 동기화 완료 후 플래그 삭제
+			try (Jedis jedis = jedisPool.getResource()) {
+				jedis.del(syncKey);
+				logger.log("동기화 플래그 삭제 완료: " + syncKey);
+			}
+
 			return true;
 
 		} catch (NumberFormatException e) {
-			logger.log(" 잘못된 형식의 데이터 - key: " + key + ", error: " + e.getMessage());
+			logger.log("잘못된 형식의 데이터 - key: " + syncKey + ", error: " + e.getMessage());
 			return false;
 		} catch (Exception e) {
-			logger.log("처리 오류 - key: " + key + ", error: " + e.getMessage());
+			logger.log("처리 오류 - key: " + syncKey + ", error: " + e.getMessage());
 			return false;
 		}
 	}

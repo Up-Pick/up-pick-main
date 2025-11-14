@@ -90,6 +90,10 @@ public class AuctionEndProcessor {
 			auctionRepository.save(auction);
 			log.debug("[Auction:{}] 유찰 상태로 변경 완료", auctionId);
 
+			// Redis 키 정리 (입찰가, 입찰자)
+			auctionRedisRepository.deleteAuctionKeys(auctionId);
+			log.debug("[Auction:{}] Redis 키 정리 완료", auctionId);
+
 		} catch (Exception e) {
 			log.error("[Auction:{}] 유찰 처리 중 오류 발생: {}", auctionId, e.getMessage());
 			throw e;
@@ -126,6 +130,10 @@ public class AuctionEndProcessor {
 
 		// 경매 상태 업데이트 (Elasticsearch 반영)
 		productInnerService.updateProductDocumentStatus(auctionId);
+
+		// Redis 키 정리 (입찰가, 입찰자)
+		auctionRedisRepository.deleteAuctionKeys(auctionId);
+		log.debug("[Auction:{}] Redis 키 정리 완료", auctionId);
 	}
 
 	/**
