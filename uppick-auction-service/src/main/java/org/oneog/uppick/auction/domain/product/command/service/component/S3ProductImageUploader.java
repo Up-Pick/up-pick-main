@@ -78,7 +78,8 @@ public class S3ProductImageUploader implements ProductImageUploader {
 				putObjectRequest,
 				RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
 
-			String fileUrl = String.format("https://%s/%s", cloudFrontDomain, s3Key);
+			String normalizedDomain = normalizeCloudFrontDomain(cloudFrontDomain);
+			String fileUrl = String.format("https://%s/%s", normalizedDomain, s3Key);
 
 			log.debug("S3 업로드 성공 (CloudFront URL): {}", fileUrl);
 
@@ -108,6 +109,24 @@ public class S3ProductImageUploader implements ProductImageUploader {
 		}
 
 		return filename.substring(filename.lastIndexOf(".") + 1);
+	}
+
+	private String normalizeCloudFrontDomain(String domain) {
+
+		if (domain == null || domain.isBlank()) {
+
+			throw new BusinessException(ProductErrorCode.FILE_UPLOAD_FAILED);
+		}
+
+		String normalized = domain.trim();
+
+		// https:// 또는 http:// 제거
+		normalized = normalized.replaceFirst("^https?://", "");
+
+		// 끝의 슬래시 제거
+		normalized = normalized.replaceFirst("/$", "");
+
+		return normalized;
 	}
 
 }
