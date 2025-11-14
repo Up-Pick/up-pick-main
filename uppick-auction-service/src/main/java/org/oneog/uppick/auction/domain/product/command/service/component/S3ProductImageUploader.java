@@ -35,8 +35,8 @@ public class S3ProductImageUploader implements ProductImageUploader {
 
 	@Value("${spring.cloud.aws.s3.bucket}")
 	private String bucketName;
-	@Value("${spring.cloud.aws.region.static}")
-	private String region;
+	@Value("${spring.cloud.aws.cloudfront.domain}")
+	private String cloudFrontDomain;
 
 	@Override
 	public String store(MultipartFile file) {
@@ -78,11 +78,9 @@ public class S3ProductImageUploader implements ProductImageUploader {
 				putObjectRequest,
 				RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
 
-			String fileUrl = String.format(
-				"https://%s.s3.%s.amazonaws.com/%s",
-				bucketName, region, s3Key);
+			String fileUrl = String.format("https://%s/%s", cloudFrontDomain, s3Key);
 
-			log.debug("S3 업로드 성공: {}", fileUrl);
+			log.debug("S3 업로드 성공 (CloudFront URL): {}", fileUrl);
 
 			return fileUrl;
 

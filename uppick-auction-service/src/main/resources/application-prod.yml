@@ -43,6 +43,8 @@ spring:
       s3:
         enabled: true
         bucket: ${s3.bucket}
+      cloudfront:
+        domain: ${cloudfront.domain}
   data:
     redis:
       host: ${redis.host}
