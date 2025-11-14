@@ -30,14 +30,13 @@ import software.amazon.awssdk.regions.Region;
  * 입찰가 업데이트 Lambda Handler
  * EventBridge 스케줄러에 의해 매 1분마다 실행됨
  *
- * Redis의 auction:*:current-bid-price 키를 읽어서 OpenSearch에 동기화
+ * Redis의 opensearch:sync:* 동기화 플래그를 읽어서 OpenSearch에 업데이트 후 플래그 삭제
  */
 public class BidPriceUpdateHandler implements RequestHandler<Object, Map<String, Object>> {
 
-	// Redis 키 패턴
-	private static final String REDIS_KEY_PATTERN = "auction:*:current-bid-price";
-	private static final String REDIS_KEY_PREFIX = "auction:";
-	private static final String REDIS_KEY_SUFFIX = ":current-bid-price";
+	// Redis 동기화 플래그 패턴
+	private static final String REDIS_SYNC_PATTERN = "opensearch:sync:*";
+	private static final String REDIS_SYNC_PREFIX = "opensearch:sync:";
 	// SQL 쿼리
 	private static final String FIND_PRODUCT_ID_SQL = "SELECT product_id FROM auction WHERE id = ?";
 	// OpenSearch 인덱스 정보
@@ -179,10 +178,10 @@ public class BidPriceUpdateHandler implements RequestHandler<Object, Map<String,
 			// 리소스 초기화 (Lazy)
 			initializeResources();
 
-			// Redis에서 auction:*:current-bid-price 키 조회
+			// Redis에서 opensearch:sync:* 동기화 플래그 조회
 			Set<String> keys;
 			try (Jedis jedis = jedisPool.getResource()) {
-				keys = jedis.keys(REDIS_KEY_PATTERN);
+				keys = jedis.keys(REDIS_SYNC_PATTERN);
 			}
 
 			if (keys == null || keys.isEmpty()) {
@@ -235,27 +234,27 @@ public class BidPriceUpdateHandler implements RequestHandler<Object, Map<String,
 	}
 
 	/**
-	 * 단일 입찰가 데이터 처리
+	 * 단일 입찰가 데이터 처리 (동기화 플래그 기반)
 	 *
-	 * @param key Redis 키 (auction:{auctionId}:current-bid-price)
+	 * @param syncKey Redis 동기화 플래그 키 (opensearch:sync:{auctionId})
 	 * @param logger Lambda 로거
 	 * @return 처리 성공 여부
 	 */
-	private boolean processBidPrice(String key, com.amazonaws.services.lambda.runtime.LambdaLogger logger) {
+	private boolean processBidPrice(String syncKey, com.amazonaws.services.lambda.runtime.LambdaLogger logger) {
 
 		try {
-			// auctionId 추출 (auction:123:current-bid-price -> 123)
-			String auctionIdStr = key.replace(REDIS_KEY_PREFIX, "").replace(REDIS_KEY_SUFFIX, "");
+			// auctionId 추출 (opensearch:sync:123 -> 123)
+			String auctionIdStr = syncKey.replace(REDIS_SYNC_PREFIX, "");
 			Long auctionId = Long.parseLong(auctionIdStr);
 
-			// Redis에서 입찰가 조회
+			// Redis에서 입찰가 조회 (동기화 플래그 값)
 			String bidPriceStr;
 			try (Jedis jedis = jedisPool.getResource()) {
-				bidPriceStr = jedis.get(key);
+				bidPriceStr = jedis.get(syncKey);
 			}
 
 			if (bidPriceStr == null || bidPriceStr.isEmpty()) {
-				logger.log(" 키 " + key + "에 대한 값이 없습니다. 스킵합니다.");
+				logger.log("동기화 플래그 " + syncKey + "에 대한 값이 없습니다. 스킵합니다.");
 				return false;
 			}
 
@@ -270,33 +269,31 @@ public class BidPriceUpdateHandler implements RequestHandler<Object, Map<String,
 			Long productId = findProductId(auctionId);
 
 			if (productId == null) {
-				logger.log(" auctionId " + auctionId + "에 해당하는 상품이 DB에 존재하지 않습니다.");
+				logger.log("auctionId " + auctionId + "에 해당하는 상품이 DB에 존재하지 않습니다.");
+				// 동기화 플래그 삭제 (존재하지 않는 경매는 재처리 불필요)
+				try (Jedis jedis = jedisPool.getResource()) {
+					jedis.del(syncKey);
+				}
 				return false;
 			}
 
-			// OpenSearch에서 현재 입찰가 조회 (중복 업데이트 방지)
-			Long currentBidPrice = getCurrentBidPriceFromOpenSearch(productId, logger);
+			// OpenSearch 업데이트 (동기화 플래그가 있으면 무조건 업데이트)
+			updateOpenSearch(productId, bidPrice, logger);
+			logger.log("auctionId " + auctionId + ", productId " + productId + "의 입찰가 " + bidPrice + "로 업데이트 완료");
 
-			// 입찰가가 변경된 경우에만 업데이트
-			// - currentBidPrice == null: 문서가 없거나 조회 실패 (첫 업데이트 또는 재시도)
-			// - !bidPrice.equals(currentBidPrice): 입찰가가 실제로 변경됨
-			if (currentBidPrice == null || !bidPrice.equals(currentBidPrice)) {
-				updateOpenSearch(productId, bidPrice, logger);
-				logger.log(" auctionId " + auctionId + ", productId " + productId + "의 입찰가 " +
-					(currentBidPrice != null ? currentBidPrice + " → " : "") + bidPrice + "로 업데이트 완료");
-				return true;
-			} else {
-				// 입찰가 변경 없음 - OpenSearch 업데이트 스킵 (불필요한 업데이트 방지)
-				logger.log(
-					" auctionId " + auctionId + ", productId " + productId + "의 입찰가 변경 없음 (" + bidPrice + ") - 스킵");
-				return false;
+			// 동기화 완료 후 플래그 삭제
+			try (Jedis jedis = jedisPool.getResource()) {
+				jedis.del(syncKey);
+				logger.log("동기화 플래그 삭제 완료: " + syncKey);
 			}
+
+			return true;
 
 		} catch (NumberFormatException e) {
-			logger.log(" 잘못된 형식의 데이터 - key: " + key + ", error: " + e.getMessage());
+			logger.log("잘못된 형식의 데이터 - key: " + syncKey + ", error: " + e.getMessage());
 			return false;
 		} catch (Exception e) {
-			logger.log("처리 오류 - key: " + key + ", error: " + e.getMessage());
+			logger.log("처리 오류 - key: " + syncKey + ", error: " + e.getMessage());
 			return false;
 		}
 	}
@@ -318,46 +315,6 @@ public class BidPriceUpdateHandler implements RequestHandler<Object, Map<String,
 			}
 		}
 		return null;
-	}
-
-	/**
-	 * OpenSearch에서 현재 입찰가 조회
-	 *
-	 * Redis의 입찰가와 비교하여 변경 여부를 확인하기 위해 사용
-	 *
-	 * @param productId 상품 ID
-	 * @param logger Lambda 로거
-	 * @return OpenSearch에 저장된 현재 입찰가 (문서가 없거나 조회 실패 시 null)
-	 */
-	private Long getCurrentBidPriceFromOpenSearch(Long productId,
-		com.amazonaws.services.lambda.runtime.LambdaLogger logger) {
-
-		try {
-			// OpenSearch Get API로 product 문서 조회
-			var response = openSearchClient.get(g -> g
-					.index(INDEX_NAME)
-					.id(productId.toString()),
-				Map.class
-			);
-
-			// 문서가 존재하고 source가 있으면 current_bid_price 추출
-			if (response.found() && response.source() != null) {
-				Object bidPriceObj = response.source().get(FIELD_CURRENT_BID_PRICE);
-				if (bidPriceObj != null) {
-					// Integer 또는 Long 타입 처리
-					if (bidPriceObj instanceof Integer) {
-						return ((Integer)bidPriceObj).longValue();
-					} else if (bidPriceObj instanceof Long) {
-						return (Long)bidPriceObj;
-					}
-				}
-			}
-			return null;
-		} catch (Exception e) {
-			logger.log(" OpenSearch 조회 실패 - productId: " + productId + ", error: " + e.getMessage());
-			// 조회 실패 시 null 반환하여 업데이트가 진행되도록 함
-			return null;
-		}
 	}
 
 	/**
