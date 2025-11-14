@@ -10,12 +10,12 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum AuctionErrorCode implements ErrorCode {
 
-	WRONG_BIDDING_PRICE(HttpStatus.BAD_REQUEST, "입찰가를 잘못 입력하셨습니다."), AUCTION_NOT_FOUND(HttpStatus.NOT_FOUND,
-		"해당 경매가 존재하지 않습니다."), CANNOT_BID_OWN_AUCTION(HttpStatus.BAD_REQUEST,
-			"본인의 판매 물품에는 입찰할 수 없습니다."), INSUFFICIENT_CREDIT(HttpStatus.BAD_REQUEST,
-				"보유한 크레딧보다 큰 금액을 입력할수 없습니다."), BID_FAILED_CAUSE_ACQUIRE_LOCK_FAILED(HttpStatus.INTERNAL_SERVER_ERROR,
-					"입찰 처리 중 문제가 발생했습니다. 다시 시도해주세요.");
-
+	WRONG_BIDDING_PRICE(HttpStatus.BAD_REQUEST, "입찰가를 잘못 입력하셨습니다."),
+	AUCTION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 경매가 존재하지 않습니다."),
+	CANNOT_BID_OWN_AUCTION(HttpStatus.BAD_REQUEST, "본인의 판매 물품에는 입찰할 수 없습니다."),
+	INSUFFICIENT_CREDIT(HttpStatus.BAD_REQUEST, "보유한 크레딧보다 큰 금액을 입력할수 없습니다."),
+	BID_FAILED_CAUSE_ACQUIRE_LOCK_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "입찰 처리 중 문제가 발생했습니다. 다시 시도해주세요."),
+	AUCTION_ALREADY_ENDED(HttpStatus.BAD_REQUEST, "이미 종료된 경매입니다.");
 	private final HttpStatus status;
 	private final String message;
 
