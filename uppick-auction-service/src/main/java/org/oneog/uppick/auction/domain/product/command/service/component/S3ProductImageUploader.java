@@ -35,8 +35,8 @@ public class S3ProductImageUploader implements ProductImageUploader {
 
 	@Value("${spring.cloud.aws.s3.bucket}")
 	private String bucketName;
-	@Value("${spring.cloud.aws.region.static}")
-	private String region;
+	@Value("${spring.cloud.aws.cloudfront.domain}")
+	private String cloudFrontDomain;
 
 	@Override
 	public String store(MultipartFile file) {
@@ -78,11 +78,10 @@ public class S3ProductImageUploader implements ProductImageUploader {
 				putObjectRequest,
 				RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
 
-			String fileUrl = String.format(
-				"https://%s.s3.%s.amazonaws.com/%s",
-				bucketName, region, s3Key);
+			String normalizedDomain = normalizeCloudFrontDomain(cloudFrontDomain);
+			String fileUrl = String.format("https://%s/%s", normalizedDomain, s3Key);
 
-			log.debug("S3 업로드 성공: {}", fileUrl);
+			log.debug("S3 업로드 성공 (CloudFront URL): {}", fileUrl);
 
 			return fileUrl;
 
@@ -110,6 +109,24 @@ public class S3ProductImageUploader implements ProductImageUploader {
 		}
 
 		return filename.substring(filename.lastIndexOf(".") + 1);
+	}
+
+	private String normalizeCloudFrontDomain(String domain) {
+
+		if (domain == null || domain.isBlank()) {
+
+			throw new BusinessException(ProductErrorCode.FILE_UPLOAD_FAILED);
+		}
+
+		String normalized = domain.trim();
+
+		// https:// 또는 http:// 제거
+		normalized = normalized.replaceFirst("^https?://", "");
+
+		// 끝의 슬래시 제거
+		normalized = normalized.replaceFirst("/$", "");
+
+		return normalized;
 	}
 
 }

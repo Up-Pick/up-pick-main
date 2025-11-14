@@ -1,6 +1,7 @@
 package org.oneog.uppick.auction.domain.auction.command.service.component;
 
 import org.oneog.uppick.auction.domain.auction.command.entity.Auction;
+import org.oneog.uppick.auction.domain.auction.command.entity.AuctionStatus;
 import org.oneog.uppick.auction.domain.auction.command.entity.BiddingDetail;
 import org.oneog.uppick.auction.domain.auction.command.model.dto.request.AuctionBidRequest;
 import org.oneog.uppick.auction.domain.auction.command.model.dto.request.BiddingResultDto;
@@ -40,6 +41,11 @@ public class BiddingProcessor {
 			// 판매자 본인 입찰 방지
 			if (auction.getRegisterId().equals(memberId)) {
 				throw new BusinessException(AuctionErrorCode.CANNOT_BID_OWN_AUCTION);
+			}
+
+			//마감된 상품에 입찰 방지
+			if (auction.getStatus() != AuctionStatus.IN_PROGRESS) {
+				throw new BusinessException(AuctionErrorCode.AUCTION_ALREADY_ENDED);
 			}
 
 			long biddingPrice = request.getBiddingPrice();
