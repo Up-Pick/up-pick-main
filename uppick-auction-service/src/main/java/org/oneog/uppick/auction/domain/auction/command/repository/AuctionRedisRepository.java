@@ -36,4 +36,26 @@ public class AuctionRedisRepository {
 			String.valueOf(bidPrice), String.valueOf(bidderId));
 	}
 
+	/**
+	 * OpenSearch 동기화 플래그 생성
+	 * Lambda가 이 플래그를 감지하여 OpenSearch에 입찰가 업데이트
+	 */
+	public void createOpenSearchSyncFlag(long auctionId, long bidPrice) {
+
+		String syncFlagKey = auctionRedisConstant.getOpenSearchSyncFlagKey(auctionId);
+		stringRedisTemplate.opsForValue().set(syncFlagKey, String.valueOf(bidPrice));
+	}
+
+	/**
+	 * 경매 종료 시 Redis 키 정리
+	 * - auction:{auctionId}:current-bid-price
+	 * - auction:{auctionId}:last-bidder-id
+	 */
+	public void deleteAuctionKeys(long auctionId) {
+
+		String currentBidPriceKey = auctionRedisConstant.getCurrentBidPriceKey(auctionId);
+		String lastBidderIdKey = auctionRedisConstant.getLastBidderIdKey(auctionId);
+		stringRedisTemplate.delete(Arrays.asList(currentBidPriceKey, lastBidderIdKey));
+	}
+
 }
