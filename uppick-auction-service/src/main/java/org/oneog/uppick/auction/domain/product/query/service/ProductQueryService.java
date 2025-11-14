@@ -1,5 +1,6 @@
 package org.oneog.uppick.auction.domain.product.query.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -9,6 +10,7 @@ import org.oneog.uppick.auction.domain.auction.command.repository.AuctionRedisRe
 import org.oneog.uppick.auction.domain.member.service.MemberInnerService;
 import org.oneog.uppick.auction.domain.product.command.service.component.ProductViewCountIncreaseProcessor;
 import org.oneog.uppick.auction.domain.product.common.document.ProductDocument;
+import org.oneog.uppick.auction.domain.product.common.exception.ProductErrorCode;
 import org.oneog.uppick.auction.domain.product.common.mapper.ProductMapper;
 import org.oneog.uppick.auction.domain.product.query.model.dto.projection.ProductDetailProjection;
 import org.oneog.uppick.auction.domain.product.query.model.dto.projection.ProductSimpleInfoProjection;
@@ -28,6 +30,7 @@ import org.oneog.uppick.auction.domain.product.query.repository.ProductOSReposit
 import org.oneog.uppick.auction.domain.product.query.repository.ProductQueryRepository;
 import org.oneog.uppick.auction.domain.searching.service.SearchingInnerService;
 import org.oneog.uppick.common.dto.AuthMember;
+import org.oneog.uppick.common.exception.BusinessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -77,6 +80,11 @@ public class ProductQueryService {
 
 		// 상품 기본 정보만 캐싱
 		ProductSimpleInfoProjection projection = productCacheService.getProductSimpleInfoProjectionCached(productId);
+
+		// 만약 마감 시간을 넘긴 경우 예외 처리
+		if (LocalDateTime.now().isAfter(projection.getEndAt())) {
+			throw new BusinessException(ProductErrorCode.NOT_ON_SALE_PRODUCT);
+		}
 
 		// 실시간 입찰가는 매번 조회
 		Long currentPrice = auctionRedisRepository.findCurrentBidPrice(projection.getAuctionId());

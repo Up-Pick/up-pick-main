@@ -72,6 +72,7 @@ public class ProductQueryRepository {
 						ProductSimpleInfoProjection.class,
 						product.name,
 						product.image,
+						auction.endAt,
 						auction.minPrice,
 						auction.id))
 				.from(product)
