@@ -22,6 +22,8 @@ spring:
         static: ${AWS_REGION}
       s3:
         bucket: ${S3_BUCKET_NAME}
+      cloudfront:
+        domain: ${CLOUDFRONT_DOMAIN}
   data:
     redis:
       host: ${REDIS_HOST}
