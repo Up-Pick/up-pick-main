@@ -34,9 +34,9 @@ public interface MemberClient {
 		@RequestBody UpdateMemberCreditRequest updateMemberCreditRequest);
 
 	@PostMapping("/internal/v1/members/purchase-detail")
-	void registerPurchaseDetail(@RequestParam RegisterPurchaseDetailRequest request);
+	void registerPurchaseDetail(@RequestBody RegisterPurchaseDetailRequest request);
 
 	@PostMapping("/internal/v1/members/sell-detail")
-	void registerSellDetail(@RequestParam RegisterSellDetailRequest request);
+	void registerSellDetail(@RequestBody RegisterSellDetailRequest request);
 
 }
