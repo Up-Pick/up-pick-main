@@ -82,7 +82,7 @@ public class ProductQueryService {
 		ProductSimpleInfoProjection projection = productCacheService.getProductSimpleInfoProjectionCached(productId);
 
 		// 만약 마감 시간을 넘긴 경우 예외 처리
-		if (projection.getEndAt().isAfter(LocalDateTime.now())) {
+		if (LocalDateTime.now().isAfter(projection.getEndAt())) {
 			throw new BusinessException(ProductErrorCode.NOT_ON_SALE_PRODUCT);
 		}
 
