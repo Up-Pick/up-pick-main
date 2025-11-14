@@ -16,6 +16,7 @@ import org.oneog.uppick.auction.domain.auction.command.event.AuctionEventType;
 import org.oneog.uppick.auction.domain.auction.command.event.BidPlacedEvent;
 import org.oneog.uppick.auction.domain.auction.command.model.dto.request.AuctionBidRequest;
 import org.oneog.uppick.auction.domain.auction.command.model.dto.request.BiddingResultDto;
+import org.oneog.uppick.auction.domain.auction.command.repository.AuctionRedisRepository;
 import org.oneog.uppick.auction.domain.auction.command.service.AuctionCommandService;
 import org.oneog.uppick.auction.domain.auction.command.service.component.BiddingProcessor;
 import org.oneog.uppick.auction.domain.auction.common.exception.AuctionErrorCode;
@@ -37,6 +38,9 @@ public class AuctionCommandServiceTest {
 
 	@Mock
 	private ProductCacheEvictService productCacheEvictService;
+
+	@Mock
+	private AuctionRedisRepository auctionRedisRepository;
 
 	@InjectMocks
 	private AuctionCommandService auctionCommandService;
