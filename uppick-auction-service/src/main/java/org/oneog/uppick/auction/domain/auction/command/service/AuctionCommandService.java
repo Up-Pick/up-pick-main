@@ -10,10 +10,11 @@ import org.oneog.uppick.auction.domain.auction.command.event.AuctionEventType;
 import org.oneog.uppick.auction.domain.auction.command.event.BidPlacedEvent;
 import org.oneog.uppick.auction.domain.auction.command.model.dto.request.AuctionBidRequest;
 import org.oneog.uppick.auction.domain.auction.command.model.dto.request.BiddingResultDto;
+import org.oneog.uppick.auction.domain.auction.command.repository.AuctionRedisRepository;
 import org.oneog.uppick.auction.domain.auction.command.service.component.BiddingProcessor;
 import org.oneog.uppick.auction.domain.auction.common.exception.AuctionErrorCode;
-import org.oneog.uppick.common.exception.BusinessException;
 import org.oneog.uppick.auction.domain.product.command.service.ProductCacheEvictService;
+import org.oneog.uppick.common.exception.BusinessException;
 import org.springframework.stereotype.Service;
 
 import jakarta.validation.Valid;
@@ -35,6 +36,7 @@ public class AuctionCommandService {
 
 	private final AuctionEventProducer auctionEventProducer;
 	private final ProductCacheEvictService productCacheEvictService;
+	private final AuctionRedisRepository auctionRedisRepository;
 
 	// 특정 상품에 입찰 시도를 한다
 	public void bid(@Valid AuctionBidRequest request, long auctionId, long memberId) {
@@ -59,6 +61,9 @@ public class AuctionCommandService {
 
 		// 입찰 성공 시 해당 상품의 조회 캐시 삭제
 		productCacheEvictService.evictProductCache(result.getProductId());
+
+		// OpenSearch 동기화 플래그 생성 (Lambda가 OpenSearch 업데이트)
+		auctionRedisRepository.createOpenSearchSyncFlag(auctionId, result.getBiddingPrice());
 
 		BidPlacedEvent bidPlacedEvent = BidPlacedEvent.builder()
 			.sellerId(result.getSellerId())
