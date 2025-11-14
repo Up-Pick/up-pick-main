@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
@@ -29,13 +28,13 @@ public class MemberInternalCommandController {
 	}
 
 	@PostMapping("/members/purchase-detail")
-	public void registerPurchaseDetail(@RequestParam RegisterPurchaseDetailRequest request) {
+	public void registerPurchaseDetail(@RequestBody RegisterPurchaseDetailRequest request) {
 
 		memberInternalCommandService.registerPurchaseDetail(request);
 	}
 
 	@PostMapping("/members/sell-detail")
-	public void registerSellDetail(@RequestParam RegisterSellDetailRequest request) {
+	public void registerSellDetail(@RequestBody RegisterSellDetailRequest request) {
 
 		memberInternalCommandService.registerSellDetail(request);
 
