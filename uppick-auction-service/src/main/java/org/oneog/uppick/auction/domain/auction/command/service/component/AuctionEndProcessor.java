@@ -3,6 +3,7 @@ package org.oneog.uppick.auction.domain.auction.command.service.component;
 import java.util.Optional;
 
 import org.oneog.uppick.auction.domain.auction.command.entity.Auction;
+import org.oneog.uppick.auction.domain.auction.command.entity.AuctionStatus;
 import org.oneog.uppick.auction.domain.auction.command.entity.BiddingDetail;
 import org.oneog.uppick.auction.domain.auction.command.repository.AuctionRedisRepository;
 import org.oneog.uppick.auction.domain.auction.command.repository.AuctionRepository;
@@ -45,6 +46,12 @@ public class AuctionEndProcessor {
 		// 종료 시간이 현재 시간 이전인 '진행 중' 경매 조회
 		Auction auction = auctionRepository.findById(auctionId)
 			.orElseThrow(() -> new BusinessException(AuctionErrorCode.AUCTION_NOT_FOUND));
+
+		// 이미 처리된 경매인지 확인 (멱등성 보장)
+		if (auction.getStatus() != AuctionStatus.IN_PROGRESS) {
+			log.debug("[Auction:{}] 이미 처리된 경매입니다. 현재 상태: {}", auctionId, auction.getStatus());
+			return;
+		}
 
 		// 구매 확정 처리
 		processAuctionResult(auction);
