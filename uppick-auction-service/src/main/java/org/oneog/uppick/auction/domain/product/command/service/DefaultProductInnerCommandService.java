@@ -18,7 +18,7 @@ public class DefaultProductInnerCommandService implements ProductInnerCommandSer
 
 		UpdateQuery updateQuery = UpdateQuery.builder(String.valueOf(productId))
 			.withDocument(Document.create()
-				.append("is_sold", false))
+				.append("is_sold", true))
 			.build();
 
 		elasticsearchOperations.update(updateQuery);
