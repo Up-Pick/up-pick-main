@@ -54,10 +54,90 @@ public class AuctionEndProcessor {
 		}
 
 		// 구매 확정 처리
-		processAuctionResult(auction);
+		AuctionResult result = processAuctionResult(auction);
+
+		// 경매 상태만 먼저 변경하고 커밋 (멱등성 보장)
+		if (result.isSuccess()) {
+			updateAuctionStatusAndCommit(auction, result);
+		}
 	}
 
-	private void processAuctionResult(Auction auction) {
+	/**
+	 * 경매 상태를 먼저 변경하고 커밋한 후, 후속 작업 처리
+	 * 이렇게 하면 후속 작업 실패 시에도 재시도 방지 가능
+	 */
+	@Transactional
+	protected void updateAuctionStatusAndCommit(Auction auction, AuctionResult result) {
+
+		Long auctionId = auction.getId();
+
+		if (result.isExpired()) {
+			// 유찰 처리
+			auction.markAsExpired();
+			auctionRepository.save(auction);
+			log.debug("[Auction:{}] 유찰 상태로 변경 완료", auctionId);
+
+			// Redis 키 정리
+			auctionRedisRepository.deleteAuctionKeys(auctionId);
+			log.debug("[Auction:{}] Redis 키 정리 완료", auctionId);
+
+		} else {
+			// 낙찰 처리 - 경매 상태만 먼저 커밋
+			auction.markAsSold();
+			auctionRepository.save(auction);
+			log.debug("[Auction:{}] 낙찰 상태로 변경 완료", auctionId);
+
+			// 트랜잭션 커밋 후 후속 작업 처리 (별도 트랜잭션)
+			processPostAuctionTasks(result);
+		}
+	}
+
+	/**
+	 * 경매 종료 후 후속 작업 처리 (별도 트랜잭션)
+	 * - 구매/판매 내역 등록
+	 * - 알림 전송
+	 * - Elasticsearch 업데이트
+	 * - Redis 정리
+	 */
+	@Transactional(propagation = org.springframework.transaction.annotation.Propagation.REQUIRES_NEW)
+	protected void processPostAuctionTasks(AuctionResult result) {
+
+		Long auctionId = result.getAuctionId();
+		Long buyerId = result.getBuyerId();
+		Long sellerId = result.getSellerId();
+		Long productId = result.getProductId();
+		Long finalPrice = result.getFinalPrice();
+
+		try {
+			// 구매 내역 등록
+			createPurchaseHistory(auctionId, buyerId, productId, finalPrice);
+
+			// 판매 내역 등록
+			createSellHistory(auctionId, sellerId, productId, finalPrice);
+
+			// 알림 발송
+			sendWinnerNotification(buyerId, productId, finalPrice);
+
+			// Elasticsearch 업데이트
+			productInnerService.updateProductDocumentStatus(productId);
+
+			// Redis 키 정리
+			auctionRedisRepository.deleteAuctionKeys(auctionId);
+			log.debug("[Auction:{}] Redis 키 정리 완료", auctionId);
+
+			log.debug("[Auction:{}] 후속 작업 완료", auctionId);
+
+		} catch (Exception e) {
+			log.error("[Auction:{}] 후속 작업 중 오류 발생 (경매 상태는 이미 커밋됨): {}", auctionId, e.getMessage(), e);
+			// 경매 상태는 이미 FINISHED로 커밋되었으므로 재시도 시 멱등성 보장됨
+			throw e;
+		}
+	}
+
+	/**
+	 * 경매 결과 판단 (낙찰 vs 유찰)
+	 */
+	private AuctionResult processAuctionResult(Auction auction) {
 
 		Long auctionId = auction.getId();
 		Long lastBidderId = auctionRedisRepository.findLastBidderId(auctionId);
@@ -65,9 +145,8 @@ public class AuctionEndProcessor {
 
 		if (lastBidderId == null || currentBidPrice == null) {
 			// 입찰자가 없을 경우: 유찰 처리
-			handleExpiredAuction(auction);
 			log.debug("[Auction:{}] 유찰 처리 (입찰자 없음)", auctionId);
-			return;
+			return AuctionResult.expired(auctionId);
 		}
 
 		// 최고가 입찰 내역 1건 조회 (가격 기준 내림차순)
@@ -76,72 +155,21 @@ public class AuctionEndProcessor {
 
 		if (topBid.isEmpty()) {
 			// 입찰자가 없을 경우: 유찰 처리
-			handleExpiredAuction(auction);
 			log.debug("[Auction:{}] 유찰 처리 (입찰자 없음)", auctionId);
-			return;
+			return AuctionResult.expired(auctionId);
 		}
 
 		// 낙찰자 존재 시
 		BiddingDetail winner = topBid.get();
-		handleAuctionCompletion(auction, winner);
-
+		return AuctionResult.success(
+			auctionId,
+			winner.getBidderId(),
+			auction.getRegisterId(),
+			auction.getProductId(),
+			winner.getBidPrice()
+		);
 	}
 
-	private void handleExpiredAuction(Auction auction) {
-
-		Long auctionId = auction.getId();
-
-		try {
-			auction.markAsExpired();
-			// 경매 상태변경
-			auctionRepository.save(auction);
-			log.debug("[Auction:{}] 유찰 상태로 변경 완료", auctionId);
-
-			// Redis 키 정리 (입찰가, 입찰자)
-			auctionRedisRepository.deleteAuctionKeys(auctionId);
-			log.debug("[Auction:{}] Redis 키 정리 완료", auctionId);
-
-		} catch (Exception e) {
-			log.error("[Auction:{}] 유찰 처리 중 오류 발생: {}", auctionId, e.getMessage());
-			throw e;
-		}
-	}
-
-	/**
-	 *  경매 낙찰 확정 처리
-	 * - 알림 발송
-	 * - 구매내역 등록
-	 * - 판매내역 등록
-	 * - 상품 판매시각 갱신
-	 * - 경매 상태 업데이트
-	 */
-	private void handleAuctionCompletion(Auction auction, BiddingDetail winner) {
-
-		Long buyerId = winner.getBidderId(); //상품을 구매한사람
-		Long productId = auction.getProductId();
-		Long finalPrice = winner.getBidPrice();
-		Long auctionId = auction.getId();
-		Long sellerId = auction.getRegisterId(); // 상품을 판매한사람
-
-		// 경매 상태 업데이트 먼저! (DB 반영) - 중복 처리 방지를 위해 가장 먼저 실행
-		updateAuctionStatus(auction);
-
-		//  구매 내역 등록
-		createPurchaseHistory(auctionId, buyerId, productId, finalPrice);
-
-		// 판매 내역 등록
-		createSellHistory(auctionId, sellerId, productId, finalPrice);
-
-		//  알림 발송
-		sendWinnerNotification(buyerId, productId, finalPrice);
-
-		// 경매 상태 업데이트 (Elasticsearch 반영)
-		productInnerService.updateProductDocumentStatus(productId);
-
-		// Redis 키 정리 (입찰가, 입찰자)
-		auctionRedisRepository.deleteAuctionKeys(auctionId);
-		log.debug("[Auction:{}] Redis 키 정리 완료", auctionId);
-	}
 
 	/**
 	 *  구매 내역 등록
@@ -183,13 +211,63 @@ public class AuctionEndProcessor {
 	}
 
 	/**
-	 *  경매 상태 변경 후 DB 반영
+	 * 경매 처리 결과를 담는 내부 클래스
 	 */
-	private void updateAuctionStatus(Auction auction) {
+	private static class AuctionResult {
+		private final Long auctionId;
+		private final Long buyerId;
+		private final Long sellerId;
+		private final Long productId;
+		private final Long finalPrice;
+		private final boolean success;
+		private final boolean expired;
 
-		auction.markAsSold();
-		auctionRepository.save(auction);
-		log.debug("경매 {} 상태 저장 완료", auction.getId());
+		private AuctionResult(Long auctionId, Long buyerId, Long sellerId, Long productId, Long finalPrice,
+			boolean success, boolean expired) {
+			this.auctionId = auctionId;
+			this.buyerId = buyerId;
+			this.sellerId = sellerId;
+			this.productId = productId;
+			this.finalPrice = finalPrice;
+			this.success = success;
+			this.expired = expired;
+		}
+
+		static AuctionResult success(Long auctionId, Long buyerId, Long sellerId, Long productId, Long finalPrice) {
+			return new AuctionResult(auctionId, buyerId, sellerId, productId, finalPrice, true, false);
+		}
+
+		static AuctionResult expired(Long auctionId) {
+			return new AuctionResult(auctionId, null, null, null, null, true, true);
+		}
+
+		boolean isSuccess() {
+			return success;
+		}
+
+		boolean isExpired() {
+			return expired;
+		}
+
+		Long getAuctionId() {
+			return auctionId;
+		}
+
+		Long getBuyerId() {
+			return buyerId;
+		}
+
+		Long getSellerId() {
+			return sellerId;
+		}
+
+		Long getProductId() {
+			return productId;
+		}
+
+		Long getFinalPrice() {
+			return finalPrice;
+		}
 	}
 
 }
