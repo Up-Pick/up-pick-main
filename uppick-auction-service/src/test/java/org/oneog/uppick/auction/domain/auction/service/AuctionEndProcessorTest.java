@@ -178,4 +178,64 @@ class AuctionEndProcessorTest {
 		then(notificationInnerService).should(never()).sendNotification(any());
 	}
 
+	@Test
+	void processAuctionCompletion_경매상태를알림발송전에변경_순서검증() {
+
+		// given
+		Long auctionId = 1L;
+		Long buyerId = 100L;
+		Long sellerId = 200L;
+		Long productId = 10L;
+		Long bidPrice = 3000L;
+		String productName = "아이폰 15";
+
+		Auction auction = Auction.builder()
+			.productId(productId)
+			.registerId(sellerId)
+			.status(AuctionStatus.IN_PROGRESS)
+			.endAt(LocalDateTime.now().minusMinutes(1))
+			.build();
+
+		ReflectionTestUtils.setField(auction, "id", auctionId);
+
+		BiddingDetail topBid = BiddingDetail.builder()
+			.auctionId(auctionId)
+			.memberId(buyerId)
+			.bidPrice(bidPrice)
+			.build();
+
+		given(auctionRepository.findById(auctionId))
+			.willReturn(Optional.of(auction));
+		given(auctionRedisRepository.findLastBidderId(auctionId))
+			.willReturn(buyerId);
+		given(auctionRedisRepository.findCurrentBidPrice(auctionId))
+			.willReturn(bidPrice);
+		given(biddingDetailRepository.findTopByAuctionIdAndBidderIdAndBidPrice(auctionId, buyerId, bidPrice))
+			.willReturn(Optional.of(topBid));
+		given(auctionQueryRepository.findProductNameByProductId(productId))
+			.willReturn(productName);
+
+		willDoNothing().given(memberInnerService).registerPurchaseDetail(any(RegisterPurchaseDetailRequest.class));
+		willDoNothing().given(memberInnerService).registerSellDetail(any(RegisterSellDetailRequest.class));
+		willDoNothing().given(notificationInnerService).sendNotification(any(SendNotificationRequest.class));
+		willDoNothing().given(productInnerService).updateProductDocumentStatus(anyLong());
+
+		// when
+		auctionSchedulerService.process(auctionId);
+
+		// then - 호출 순서 검증: 경매 상태 변경이 알림 발송보다 먼저 일어나야 함
+		var inOrder = inOrder(auctionRepository, memberInnerService, notificationInnerService);
+
+		// 1. 경매 상태가 먼저 FINISHED로 변경되어 저장
+		inOrder.verify(auctionRepository).save(argThat(a -> a.getStatus() == AuctionStatus.FINISHED));
+
+		// 2. 그 다음 구매/판매 내역 등록
+		inOrder.verify(memberInnerService).registerPurchaseDetail(any());
+		inOrder.verify(memberInnerService).registerSellDetail(any());
+
+		// 3. 마지막으로 알림 발송 (이미 경매 상태는 FINISHED)
+		inOrder.verify(notificationInnerService).sendNotification(any());
+
+	}
+
 }

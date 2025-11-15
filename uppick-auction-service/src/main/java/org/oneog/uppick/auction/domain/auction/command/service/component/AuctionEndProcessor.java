@@ -123,6 +123,9 @@ public class AuctionEndProcessor {
 		Long auctionId = auction.getId();
 		Long sellerId = auction.getRegisterId(); // 상품을 판매한사람
 
+		// 경매 상태 업데이트 먼저! (DB 반영) - 중복 처리 방지를 위해 가장 먼저 실행
+		updateAuctionStatus(auction);
+
 		//  구매 내역 등록
 		createPurchaseHistory(auctionId, buyerId, productId, finalPrice);
 
@@ -131,9 +134,6 @@ public class AuctionEndProcessor {
 
 		//  알림 발송
 		sendWinnerNotification(buyerId, productId, finalPrice);
-
-		// 경매 상태 업데이트 (DB 반영)
-		updateAuctionStatus(auction);
 
 		// 경매 상태 업데이트 (Elasticsearch 반영)
 		productInnerService.updateProductDocumentStatus(productId);
