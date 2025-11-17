@@ -1,9 +1,0 @@
-docker tag uppick-api-gateway:prod 010419877715.dkr.ecr.us-east-1.amazonaws.com/uppick/prod:api-gateway
-docker tag uppick-main-service:prod 010419877715.dkr.ecr.us-east-1.amazonaws.com/uppick/prod:main-service
-docker tag uppick-auction-service:prod 010419877715.dkr.ecr.us-east-1.amazonaws.com/uppick/prod:auction-service
-docker tag adot-collector:prod 010419877715.dkr.ecr.us-east-1.amazonaws.com/uppick/prod:adot-collector
-
-docker push 010419877715.dkr.ecr.us-east-1.amazonaws.com/uppick/prod:api-gateway
-docker push 010419877715.dkr.ecr.us-east-1.amazonaws.com/uppick/prod:main-service
-docker push 010419877715.dkr.ecr.us-east-1.amazonaws.com/uppick/prod:auction-service
-docker push 010419877715.dkr.ecr.us-east-1.amazonaws.com/uppick/prod:adot-collector
