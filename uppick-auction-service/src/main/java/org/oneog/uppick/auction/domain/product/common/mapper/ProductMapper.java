@@ -57,7 +57,7 @@ public class ProductMapper {
 			.description(productInfo.getDescription())
 			.image(productInfo.getImage())
 			.finalPrice(productInfo.getFinalPrice())
-			.soldAt(sellerInfo.getBuyAt())
+			.soldAt(sellerInfo.getSoldAt())
 			.build();
 	}
 

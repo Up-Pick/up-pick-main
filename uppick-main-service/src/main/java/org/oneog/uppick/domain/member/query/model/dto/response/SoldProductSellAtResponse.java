@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SoldProductSellAtResponse {
 
-	private Long id;
+	private Long productId;
 	private LocalDateTime soldAt;
 
 }

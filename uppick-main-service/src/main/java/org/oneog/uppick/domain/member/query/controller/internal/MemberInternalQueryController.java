@@ -4,6 +4,10 @@ import java.util.List;
 
 import org.oneog.uppick.domain.member.query.model.dto.response.PurchasedProductBuyAtResponse;
 import org.oneog.uppick.domain.member.query.model.dto.response.SoldProductSellAtResponse;
+import org.oneog.uppick.common.dto.GlobalPageResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.oneog.uppick.domain.member.query.service.MemberInternalQueryService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,6 +40,15 @@ public class MemberInternalQueryController {
 	List<PurchasedProductBuyAtResponse> getPurchasedProductsBuyAt(@RequestParam List<Long> productIds) {
 
 		return memberInternalQueryService.findBuyAtByProductIds(productIds);
+	}
+
+	@GetMapping("/members/{memberId}/sales/sell-at")
+	public GlobalPageResponse<SoldProductSellAtResponse> getSoldProductsSellAtByMember(
+		@PathVariable Long memberId, @PageableDefault(size = 20) Pageable pageable) {
+
+		Page<SoldProductSellAtResponse> page = memberInternalQueryService.findSellAtByMemberId(memberId, pageable);
+
+		return GlobalPageResponse.of(page);
 	}
 
 	@GetMapping("/members/{memberId}/credit")

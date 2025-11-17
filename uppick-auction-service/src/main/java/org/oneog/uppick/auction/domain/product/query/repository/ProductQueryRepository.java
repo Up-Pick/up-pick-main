@@ -104,17 +104,35 @@ public class ProductQueryRepository {
 			.fetch();
 
 		Long total = Optional.ofNullable(
-				queryFactory
-					.select(product.count())
-					.from(product)
-					.join(auction)
-					.on(auction.productId.eq(product.id))
-					.where(memberId != null ? auction.registerId.eq(memberId)
-						.and(auction.status.eq(AuctionStatus.FINISHED)) : null)
-					.fetchOne())
+			queryFactory
+				.select(product.count())
+				.from(product)
+				.join(auction)
+				.on(auction.productId.eq(product.id))
+				.where(memberId != null ? auction.registerId.eq(memberId)
+					.and(auction.status.eq(AuctionStatus.FINISHED)) : null)
+				.fetchOne())
 			.orElse(0L);
 
 		return new PageImpl<>(qResponseList, pageable, total);
+	}
+
+	public List<SoldProductInfoProjection> getProductSoldInfoByIds(List<Long> ids) {
+
+		return queryFactory
+			.select(
+				Projections.constructor(
+					SoldProductInfoProjection.class,
+					product.id,
+					product.name,
+					product.description,
+					product.image,
+					auction.currentPrice))
+			.from(product)
+			.join(auction)
+			.on(auction.productId.eq(product.id))
+			.where(product.id.in(ids))
+			.fetch();
 	}
 
 	public Page<PurchasedProductInfoProjection> getPurchasedProductInfoByMemberId(Long memberId,
@@ -140,14 +158,14 @@ public class ProductQueryRepository {
 			.fetch();
 
 		Long total = Optional.ofNullable(
-				queryFactory
-					.select(product.count())
-					.from(product)
-					.join(auction)
-					.on(auction.productId.eq(product.id))
-					.where(memberId != null ? auction.lastBidderId.eq(memberId)
-						.and(auction.status.eq(AuctionStatus.FINISHED)) : null)
-					.fetchOne())
+			queryFactory
+				.select(product.count())
+				.from(product)
+				.join(auction)
+				.on(auction.productId.eq(product.id))
+				.where(memberId != null ? auction.lastBidderId.eq(memberId)
+					.and(auction.status.eq(AuctionStatus.FINISHED)) : null)
+				.fetchOne())
 			.orElse(0L);
 
 		return new PageImpl<>(qResponseList, pageable, total);

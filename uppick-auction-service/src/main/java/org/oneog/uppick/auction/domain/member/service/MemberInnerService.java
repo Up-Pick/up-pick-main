@@ -6,6 +6,8 @@ import org.oneog.uppick.auction.domain.member.dto.request.RegisterPurchaseDetail
 import org.oneog.uppick.auction.domain.member.dto.request.RegisterSellDetailRequest;
 import org.oneog.uppick.auction.domain.product.query.model.dto.response.ProductBuyAtResponse;
 import org.oneog.uppick.auction.domain.product.query.model.dto.response.ProductSellAtResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface MemberInnerService {
 
@@ -16,6 +18,9 @@ public interface MemberInnerService {
 	List<ProductBuyAtResponse> getProductBuyAt(List<Long> productIds);
 
 	List<ProductSellAtResponse> getProductSellAt(List<Long> productIds);
+
+	Page<ProductSellAtResponse> getProductSellAtByMemberId(Long memberId,
+		Pageable pageable);
 
 	void registerPurchaseDetail(RegisterPurchaseDetailRequest request);
 

@@ -3,11 +3,16 @@ package org.oneog.uppick.auction.domain.member.service;
 import java.util.List;
 
 import org.oneog.uppick.auction.domain.member.client.MemberClient;
+import org.oneog.uppick.common.dto.GlobalPageResponse;
 import org.oneog.uppick.auction.domain.member.dto.request.RegisterPurchaseDetailRequest;
 import org.oneog.uppick.auction.domain.member.dto.request.RegisterSellDetailRequest;
 import org.oneog.uppick.auction.domain.member.dto.request.UpdateMemberCreditRequest;
 import org.oneog.uppick.auction.domain.product.query.model.dto.response.ProductBuyAtResponse;
 import org.oneog.uppick.auction.domain.product.query.model.dto.response.ProductSellAtResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -40,6 +45,20 @@ public class DefaultMemberInnerService implements MemberInnerService {
 	public List<ProductSellAtResponse> getProductSellAt(List<Long> productIds) {
 
 		return memberClient.getSoldProductsSellAt(productIds);
+	}
+
+	@Override
+	public Page<ProductSellAtResponse> getProductSellAtByMemberId(Long memberId,
+		Pageable pageable) {
+
+		GlobalPageResponse<ProductSellAtResponse> response = memberClient.getSoldProductsByMember(
+			memberId, pageable.getPageNumber(), pageable.getPageSize());
+
+		Page<ProductSellAtResponse> page = new PageImpl<>(
+			response.getContents(), PageRequest.of(response.getPage(), response.getSize()),
+			response.getTotalElements());
+
+		return page;
 	}
 
 	@Override

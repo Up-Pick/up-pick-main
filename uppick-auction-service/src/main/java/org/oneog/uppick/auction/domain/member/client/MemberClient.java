@@ -8,6 +8,7 @@ import org.oneog.uppick.auction.domain.member.dto.request.UpdateMemberCreditRequ
 import org.oneog.uppick.auction.domain.product.query.model.dto.response.ProductBuyAtResponse;
 import org.oneog.uppick.auction.domain.product.query.model.dto.response.ProductSellAtResponse;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.oneog.uppick.common.dto.GlobalPageResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +23,10 @@ public interface MemberClient {
 
 	@GetMapping("/internal/v1/sales/sell-at")
 	List<ProductSellAtResponse> getSoldProductsSellAt(@RequestParam List<Long> productIds);
+
+	@GetMapping("/internal/v1/members/{memberId}/sales/sell-at")
+	GlobalPageResponse<ProductSellAtResponse> getSoldProductsByMember(@PathVariable Long memberId,
+		@RequestParam Integer page, @RequestParam Integer size);
 
 	@GetMapping("/internal/v1/purchases/buy-at")
 	List<ProductBuyAtResponse> getPurchasedProductsBuyAt(@RequestParam List<Long> productIds);

@@ -1,6 +1,9 @@
 package org.oneog.uppick.domain.member.query.service;
 
 import java.util.List;
+import org.springframework.data.domain.Page;
+
+import org.springframework.data.domain.Pageable;
 
 import org.oneog.uppick.common.exception.BusinessException;
 import org.oneog.uppick.domain.member.command.entity.Member;
@@ -43,6 +46,17 @@ public class MemberInternalQueryService {
 		List<SoldProductSellAtResponse> responses = memberQueryRepository.findSellAtByProductIds(productIds);
 
 		log.debug("MemberInternalQueryService - sellAt 조회 성공 ✅");
+
+		return responses;
+	}
+
+	public Page<SoldProductSellAtResponse> findSellAtByMemberId(Long memberId, Pageable pageable) {
+
+		log.debug("MemberInternalQueryService - sellAt(member) 조회 시도 ⏳");
+
+		Page<SoldProductSellAtResponse> responses = memberQueryRepository.findSellAtByMemberId(memberId, pageable);
+
+		log.debug("MemberInternalQueryService - sellAt(member) 조회 성공 ✅");
 
 		return responses;
 	}

@@ -95,34 +95,30 @@ public class ProductQueryService {
 	@Transactional(readOnly = true)
 	public Page<SoldProductInfoResponse> getSoldProductInfosByMemberId(Long memberId, Pageable pageable) {
 
-		// Product Page 조회
-		Page<SoldProductInfoProjection> productPageInfo = productQueryRepository.getProductSoldInfoByMemberId(
-			memberId, pageable);
+		// Member service에서 판매기록(Pageable) 먼저 조회
+		Page<ProductSellAtResponse> sellAtPage = memberInnerService.getProductSellAtByMemberId(memberId, pageable);
 
-		// Product Ids만 추출한 List로 추출한 뒤, Member에 전달
-		List<Long> productIds = productPageInfo.getContent()
-			.stream()
-			.map(SoldProductInfoProjection::getId)
-			.toList();
+		// member service가 반환한 목록의 productId를 추출
+		List<Long> productIds = sellAtPage.getContent().stream().map(ProductSellAtResponse::getProductId).toList();
 
-		// List<ProductId> -> List<ProductSellerInfoResponse> (각각의 id 값마다 seller Info 포함된 객체, 판매 시간 내림차순으로 반환받음)
-		List<ProductSellAtResponse> sellAtInfos = memberInnerService.getProductSellAt(productIds);
+		// 일괄로 Product정보 조회
+		List<SoldProductInfoProjection> productInfos = productQueryRepository.getProductSoldInfoByIds(productIds);
 
 		// ProductList를 Map<ProductId, 객체> 형태로 변환
-		Map<Long, SoldProductInfoProjection> productInfoMap = productPageInfo.getContent()
-			.stream()
+		Map<Long, SoldProductInfoProjection> productInfoMap = productInfos.stream()
 			.collect(Collectors.toMap(SoldProductInfoProjection::getId, Function.identity()));
 
-		// 정렬되었던 List<ProductId> 기준으로 ProductInfo와 결합한 뒤 반환
-		List<SoldProductInfoResponse> contents = sellAtInfos
+		// Member에서 제공한 순서(판매 시간 Desc)를 유지하면서 Product 정보와 결합
+		List<SoldProductInfoResponse> contents = sellAtPage.getContent()
 			.stream()
 			.map(sellAtInfo -> {
-				SoldProductInfoProjection productInfo = productInfoMap.get(sellAtInfo.getId());
+				SoldProductInfoProjection productInfo = productInfoMap.get(sellAtInfo.getProductId());
 				return productMapper.combineSoldProductInfoWithSeller(productInfo, sellAtInfo);
 			})
+			.filter(java.util.Objects::nonNull)
 			.toList();
 
-		return new PageImpl<>(contents, productPageInfo.getPageable(), productPageInfo.getTotalElements());
+		return new PageImpl<>(contents, sellAtPage.getPageable(), sellAtPage.getTotalElements());
 	}
 
 	@Transactional(readOnly = true)
