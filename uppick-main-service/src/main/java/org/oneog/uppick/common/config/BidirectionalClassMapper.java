@@ -28,7 +28,6 @@ public class BidirectionalClassMapper extends DefaultClassMapper {
         } else {
             // 없으면 기본 동작 (풀 클래스명)
             super.fromClass(clazz, properties);
-
         }
     }
 
