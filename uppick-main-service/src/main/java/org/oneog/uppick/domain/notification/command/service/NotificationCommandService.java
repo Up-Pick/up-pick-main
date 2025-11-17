@@ -2,8 +2,8 @@ package org.oneog.uppick.domain.notification.command.service;
 
 import java.util.List;
 
-import org.oneog.uppick.domain.notification.query.model.dto.response.GetUnreadNotificationsResponse;
 import org.oneog.uppick.domain.notification.command.entity.Notification;
+import org.oneog.uppick.domain.notification.command.model.dto.response.GetUnreadNotificationsResponse;
 import org.oneog.uppick.domain.notification.common.mapper.NotificationMapper;
 import org.oneog.uppick.domain.notification.command.repository.NotificationJpaRepository;
 import org.springframework.stereotype.Service;
