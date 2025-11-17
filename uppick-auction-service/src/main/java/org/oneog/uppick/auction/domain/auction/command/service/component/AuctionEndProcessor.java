@@ -129,7 +129,7 @@ public class AuctionEndProcessor {
 		updateAuctionStatus(auction);
 
 		// 경매 상태 업데이트 (Elasticsearch 반영)
-		productInnerService.updateProductDocumentStatus(auctionId);
+		productInnerService.updateProductDocumentStatus(productId);
 
 		// Redis 키 정리 (입찰가, 입찰자)
 		auctionRedisRepository.deleteAuctionKeys(auctionId);
