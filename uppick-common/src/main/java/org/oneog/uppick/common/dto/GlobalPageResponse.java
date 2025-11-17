@@ -4,14 +4,15 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.extern.jackson.Jacksonized;
 
 @Getter
-@AllArgsConstructor
 @Builder
+@Jacksonized
 public class GlobalPageResponse<T> {
+
     private final int page;
     private final int size;
     private final int totalPages;
@@ -19,6 +20,7 @@ public class GlobalPageResponse<T> {
     private final List<T> contents;
 
     public static <T> GlobalPageResponse<T> of(Page<T> pageData) {
+
         return GlobalPageResponse.<T>builder()
             .page(pageData.getNumber())
             .size(pageData.getSize())
@@ -27,4 +29,5 @@ public class GlobalPageResponse<T> {
             .contents(pageData.getContent())
             .build();
     }
+
 }
