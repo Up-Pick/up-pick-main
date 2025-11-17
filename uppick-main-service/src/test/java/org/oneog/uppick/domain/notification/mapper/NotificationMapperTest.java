@@ -14,7 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.oneog.uppick.domain.notification.command.entity.Notification;
 import org.oneog.uppick.domain.notification.command.entity.NotificationType;
-import org.oneog.uppick.domain.notification.query.model.dto.response.GetUnreadNotificationsResponse;
+import org.oneog.uppick.domain.notification.command.model.dto.response.GetUnreadNotificationsResponse;
 import org.oneog.uppick.domain.notification.common.mapper.NotificationMapper;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,11 +30,13 @@ public class NotificationMapperTest {
 
     @BeforeEach
     void setUp() {
+
         notificationMapper = new NotificationMapper();
     }
 
     @Test
     void toResponse_빈리스트가주어지면_빈응답을반환한다() {
+
         // Given
         List<Notification> notifications = List.of();
 
@@ -47,6 +49,7 @@ public class NotificationMapperTest {
 
     @Test
     void toResponse_알림리스트가주어지면_응답을반환한다() {
+
         // Given
         LocalDateTime now = LocalDateTime.now();
         when(notification1.getType()).thenReturn(NotificationType.TRADE);
@@ -79,4 +82,5 @@ public class NotificationMapperTest {
         assertEquals("You have a new bid.", detail2.getMessage());
         assertEquals(now.minusHours(1), detail2.getNotifiedAt());
     }
+
 }

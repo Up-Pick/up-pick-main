@@ -12,7 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.oneog.uppick.domain.notification.command.entity.Notification;
-import org.oneog.uppick.domain.notification.query.model.dto.response.GetUnreadNotificationsResponse;
+import org.oneog.uppick.domain.notification.command.model.dto.response.GetUnreadNotificationsResponse;
 import org.oneog.uppick.domain.notification.command.repository.NotificationJpaRepository;
 import org.oneog.uppick.domain.notification.command.service.NotificationCommandService;
 import org.oneog.uppick.domain.notification.common.mapper.NotificationMapper;
@@ -37,6 +37,7 @@ public class NotificationInternalServiceTest {
 
 	@Test
 	void getUnreadNotifications_읽지않은알림존재_읽지않은알림반환및읽음표시() {
+
 		// given
 		long memberId = 1L;
 		List<Notification> unreadNotifications = List.of(notification1, notification2);
@@ -58,6 +59,7 @@ public class NotificationInternalServiceTest {
 
 	@Test
 	void getUnreadNotifications_읽지않은알림없음_빈리스트반환() {
+
 		// given
 		long memberId = 1L;
 		List<Notification> unreadNotifications = Collections.emptyList();
@@ -74,4 +76,5 @@ public class NotificationInternalServiceTest {
 		verify(notificationJpaRepository).findAllByMemberIdAndIsReadFalse(memberId);
 		verify(notificationMapper).toResponse(unreadNotifications);
 	}
+
 }

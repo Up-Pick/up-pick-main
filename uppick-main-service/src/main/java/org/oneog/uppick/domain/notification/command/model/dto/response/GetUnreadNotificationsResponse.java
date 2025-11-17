@@ -1,4 +1,4 @@
-package org.oneog.uppick.domain.notification.query.model.dto.response;
+package org.oneog.uppick.domain.notification.command.model.dto.response;
 
 import java.time.LocalDateTime;
 import java.util.List;

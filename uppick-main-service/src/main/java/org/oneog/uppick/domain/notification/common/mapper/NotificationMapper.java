@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.oneog.uppick.domain.auction.event.BidPlacedEvent;
 import org.oneog.uppick.domain.notification.command.model.dto.request.SendNotificationRequest;
-import org.oneog.uppick.domain.notification.query.model.dto.response.GetUnreadNotificationsResponse;
+import org.oneog.uppick.domain.notification.command.model.dto.response.GetUnreadNotificationsResponse;
 import org.oneog.uppick.domain.notification.command.entity.Notification;
 import org.oneog.uppick.domain.notification.command.entity.NotificationType;
 import org.springframework.stereotype.Component;
@@ -16,13 +16,12 @@ public class NotificationMapper {
 
 		List<GetUnreadNotificationsResponse.NotificationDetail> notificationDetails = notifications
 			.stream()
-			.map(notification ->
-				GetUnreadNotificationsResponse.NotificationDetail.builder()
-					.type(notification.getType())
-					.title(notification.getTitle())
-					.message(notification.getMessage())
-					.notifiedAt(notification.getNotifiedAt())
-					.build())
+			.map(notification -> GetUnreadNotificationsResponse.NotificationDetail.builder()
+				.type(notification.getType())
+				.title(notification.getTitle())
+				.message(notification.getMessage())
+				.notifiedAt(notification.getNotifiedAt())
+				.build())
 			.toList();
 
 		return new GetUnreadNotificationsResponse(notificationDetails);
