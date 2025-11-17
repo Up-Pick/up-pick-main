@@ -30,6 +30,7 @@ public class AuctionCommandController {
 
 		auctionCommandService.bid(request, auctionId, authMember.getMemberId());
 		return GlobalApiResponse.ok(null);
+
 	}
 
 }
