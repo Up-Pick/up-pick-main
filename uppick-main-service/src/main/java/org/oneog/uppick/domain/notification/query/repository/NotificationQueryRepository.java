@@ -21,6 +21,7 @@ public class NotificationQueryRepository {
 
         return Optional.ofNullable(jpaQueryFactory
             .select(notification.count())
+            .from(notification)
             .where(
                 notification.memberId.eq(memberId)
                     .and(notification.isRead.eq(false))
