@@ -72,6 +72,17 @@ public class MemberInternalQueryService {
 		return responses;
 	}
 
+	public Page<PurchasedProductBuyAtResponse> findBuyAtByMemberId(Long memberId, Pageable pageable) {
+
+		log.debug("MemberInternalQueryService - buyAt(member) 조회 시도 ⏳");
+
+		Page<PurchasedProductBuyAtResponse> responses = memberQueryRepository.findBuyAtByMemberId(memberId, pageable);
+
+		log.debug("MemberInternalQueryService - buyAt(member) 조회 성공 ✅");
+
+		return responses;
+	}
+
 	public long getMemberCreditByMemberId(long memberId) {
 
 		log.debug("MemberInternalQueryService - 크레딧 조회 시도 ⏳");

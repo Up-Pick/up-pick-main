@@ -31,6 +31,10 @@ public interface MemberClient {
 	@GetMapping("/internal/v1/purchases/buy-at")
 	List<ProductBuyAtResponse> getPurchasedProductsBuyAt(@RequestParam List<Long> productIds);
 
+	@GetMapping("/internal/v1/members/{memberId}/purchases/buy-at")
+	GlobalPageResponse<ProductBuyAtResponse> getPurchasedProductsBuyAtByMember(@PathVariable Long memberId,
+		@RequestParam Integer page, @RequestParam Integer size);
+
 	@GetMapping("/internal/v1/members/{memberId}/credit")
 	long getMemberCredit(@PathVariable long memberId);
 

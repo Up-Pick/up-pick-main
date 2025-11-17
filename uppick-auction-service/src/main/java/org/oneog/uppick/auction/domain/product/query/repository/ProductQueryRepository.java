@@ -135,6 +135,24 @@ public class ProductQueryRepository {
 			.fetch();
 	}
 
+	public List<PurchasedProductInfoProjection> getProductPurchasedInfoByIds(List<Long> ids) {
+
+		return queryFactory
+			.select(
+				Projections.constructor(
+					PurchasedProductInfoProjection.class,
+					product.id,
+					product.name,
+					product.image,
+					auction.currentPrice))
+			.from(product)
+			.join(auction)
+			.on(auction.productId.eq(product.id))
+			.where(product.id.in(ids))
+			.fetch();
+
+	}
+
 	public Page<PurchasedProductInfoProjection> getPurchasedProductInfoByMemberId(Long memberId,
 		Pageable pageable) {
 

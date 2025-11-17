@@ -42,6 +42,16 @@ public class MemberInternalQueryController {
 		return memberInternalQueryService.findBuyAtByProductIds(productIds);
 	}
 
+	@GetMapping("/members/{memberId}/purchases/buy-at")
+	public GlobalPageResponse<PurchasedProductBuyAtResponse> getPurchasedProductsBuyAtByMember(
+		@PathVariable Long memberId, @PageableDefault(size = 20) Pageable pageable) {
+
+		Page<PurchasedProductBuyAtResponse> page = memberInternalQueryService.findBuyAtByMemberId(memberId,
+			pageable);
+
+		return GlobalPageResponse.of(page);
+	}
+
 	@GetMapping("/members/{memberId}/sales/sell-at")
 	public GlobalPageResponse<SoldProductSellAtResponse> getSoldProductsSellAtByMember(
 		@PathVariable Long memberId, @PageableDefault(size = 20) Pageable pageable) {

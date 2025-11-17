@@ -11,6 +11,7 @@ import org.oneog.uppick.domain.member.query.model.dto.response.SoldProductSellAt
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
 import com.querydsl.core.types.Projections;
@@ -75,6 +76,31 @@ public class MemberQueryRepository {
 			.where(purchaseDetail.productId.in(productIds))
 			.orderBy(purchaseDetail.purchaseAt.desc())
 			.fetch();
+	}
+
+	public Page<PurchasedProductBuyAtResponse> findBuyAtByMemberId(Long memberId, Pageable pageable) {
+
+		List<PurchasedProductBuyAtResponse> qResponseList = jpaQueryFactory
+			.select(
+				Projections.constructor(
+					PurchasedProductBuyAtResponse.class,
+					purchaseDetail.productId,
+					purchaseDetail.purchaseAt))
+			.from(purchaseDetail)
+			.where(purchaseDetail.buyerId.eq(memberId))
+			.orderBy(purchaseDetail.purchaseAt.desc())
+			.offset(pageable.getOffset())
+			.limit(pageable.getPageSize())
+			.fetch();
+
+		Long total = Optional.ofNullable(
+			jpaQueryFactory
+				.select(purchaseDetail.count())
+				.from(purchaseDetail)
+				.where(purchaseDetail.buyerId.eq(memberId))
+				.fetchOne()).orElse(0L);
+
+		return new PageImpl<>(qResponseList, pageable, total);
 	}
 
 }

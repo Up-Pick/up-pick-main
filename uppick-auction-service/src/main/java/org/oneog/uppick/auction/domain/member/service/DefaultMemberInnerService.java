@@ -62,6 +62,19 @@ public class DefaultMemberInnerService implements MemberInnerService {
 	}
 
 	@Override
+	public Page<ProductBuyAtResponse> getProductBuyAtByMemberId(Long memberId, Pageable pageable) {
+
+		GlobalPageResponse<ProductBuyAtResponse> response = memberClient.getPurchasedProductsBuyAtByMember(
+			memberId, pageable.getPageNumber(), pageable.getPageSize());
+
+		Page<ProductBuyAtResponse> page = new PageImpl<>(
+			response.getContents(), PageRequest.of(response.getPage(), response.getSize()),
+			response.getTotalElements());
+
+		return page;
+	}
+
+	@Override
 	public void registerPurchaseDetail(RegisterPurchaseDetailRequest request) {
 
 		memberClient.registerPurchaseDetail(request);

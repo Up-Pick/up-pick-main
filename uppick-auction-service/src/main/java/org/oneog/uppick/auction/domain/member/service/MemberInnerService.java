@@ -22,6 +22,8 @@ public interface MemberInnerService {
 	Page<ProductSellAtResponse> getProductSellAtByMemberId(Long memberId,
 		Pageable pageable);
 
+	Page<ProductBuyAtResponse> getProductBuyAtByMemberId(Long memberId, Pageable pageable);
+
 	void registerPurchaseDetail(RegisterPurchaseDetailRequest request);
 
 	void registerSellDetail(RegisterSellDetailRequest request);

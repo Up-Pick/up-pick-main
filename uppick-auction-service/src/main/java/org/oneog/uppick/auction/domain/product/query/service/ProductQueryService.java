@@ -3,6 +3,7 @@ package org.oneog.uppick.auction.domain.product.query.service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -115,7 +116,7 @@ public class ProductQueryService {
 				SoldProductInfoProjection productInfo = productInfoMap.get(sellAtInfo.getProductId());
 				return productMapper.combineSoldProductInfoWithSeller(productInfo, sellAtInfo);
 			})
-			.filter(java.util.Objects::nonNull)
+			.filter(Objects::nonNull)
 			.toList();
 
 		return new PageImpl<>(contents, sellAtPage.getPageable(), sellAtPage.getTotalElements());
@@ -125,29 +126,34 @@ public class ProductQueryService {
 	public Page<PurchasedProductInfoResponse> getPurchasedProductInfoByMemberId(Long memberId,
 		Pageable pageable) {
 
-		Page<PurchasedProductInfoProjection> productPageInfo = productQueryRepository.getPurchasedProductInfoByMemberId(
-			memberId, pageable);
+		// 변경: Member service에서 구매 기록(Pageable)을 먼저 조회합니다.
+		Page<ProductBuyAtResponse> buyAtPage = memberInnerService.getProductBuyAtByMemberId(memberId,
+			pageable);
 
-		List<Long> productIds = productPageInfo.getContent()
-			.stream()
-			.map(PurchasedProductInfoProjection::getId)
-			.toList();
+		List<Long> productIds = buyAtPage.getContent().stream().map(ProductBuyAtResponse::getProductId).toList();
 
-		List<ProductBuyAtResponse> buyAtInfos = memberInnerService.getProductBuyAt(productIds);
+		// 일괄로 Product정보 조회
+		List<PurchasedProductInfoProjection> productInfos = productQueryRepository.getProductPurchasedInfoByIds(
+			productIds);
 
-		Map<Long, PurchasedProductInfoProjection> productInfoMap = productPageInfo.getContent()
-			.stream()
+		// Map<ProductId, 객체>
+		Map<Long, PurchasedProductInfoProjection> productInfoMap = productInfos.stream()
 			.collect(Collectors.toMap(PurchasedProductInfoProjection::getId, Function.identity()));
 
-		List<PurchasedProductInfoResponse> contents = buyAtInfos
+		// Member에서 제공한 순서(구매 시간 Desc)를 유지하면서 Product 정보와 결합
+		List<PurchasedProductInfoResponse> contents = buyAtPage.getContent()
 			.stream()
 			.map(buyAtInfo -> {
-				PurchasedProductInfoProjection productInfo = productInfoMap.get(buyAtInfo.getId());
+				PurchasedProductInfoProjection productInfo = productInfoMap.get(buyAtInfo.getProductId());
+				if (productInfo == null) {
+					return null;
+				}
 				return productMapper.combinePurchasedInfoWithBuyer(productInfo, buyAtInfo);
 			})
+			.filter(java.util.Objects::nonNull)
 			.toList();
 
-		return new PageImpl<>(contents, productPageInfo.getPageable(), productPageInfo.getTotalElements());
+		return new PageImpl<>(contents, buyAtPage.getPageable(), buyAtPage.getTotalElements());
 	}
 
 	@Transactional(readOnly = true)
