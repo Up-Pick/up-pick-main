@@ -1,0 +1,9 @@
+**/build.gradle
+**/settings.gradle
+uppick-api-gateway/src/**
+uppick-auction-service/src/**
+uppick-batch-service/src/**
+uppick-common/**
+uppick-lambda/**
+uppick-main-service/**
+mysql/**
