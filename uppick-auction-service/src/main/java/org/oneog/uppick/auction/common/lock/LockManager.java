@@ -13,8 +13,7 @@ import lombok.RequiredArgsConstructor;
 public class LockManager {
 
     private final RedissonClient redissonClient;
-    private static final int MAX_WAIT_SECONDS = 60;
-    private static final int MAX_OCCUPANCY_SECONDS = 10;
+    private static final int MAX_WAIT_SECONDS = 30;
 
     public <T> T executeWithLock(String lockKey, Supplier<T> criticalSection) {
 
@@ -23,8 +22,7 @@ public class LockManager {
 
             boolean isLocked = false;
             try {
-                isLocked = lock.tryLock(MAX_WAIT_SECONDS, MAX_OCCUPANCY_SECONDS,
-                    TimeUnit.SECONDS);
+                isLocked = lock.tryLock(MAX_WAIT_SECONDS, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 throw new LockAcquisitionException();
