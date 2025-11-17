@@ -126,7 +126,7 @@ public class AuctionEndProcessor {
 		sendWinnerNotification(buyerId, productId, finalPrice);
 
 		// 경매 상태 업데이트 (DB 반영)
-		updateAuctionStatus(auction);
+		updateAuctionStatus(auction, finalPrice, buyerId);
 
 		// 경매 상태 업데이트 (Elasticsearch 반영)
 		productInnerService.updateProductDocumentStatus(productId);
@@ -178,8 +178,9 @@ public class AuctionEndProcessor {
 	/**
 	 *  경매 상태 변경 후 DB 반영
 	 */
-	private void updateAuctionStatus(Auction auction) {
+	private void updateAuctionStatus(Auction auction, Long biddingPrice, Long lastBidderId) {
 
+		auction.updateCurrentPrice(biddingPrice, lastBidderId);
 		auction.markAsSold();
 		auctionRepository.save(auction);
 		log.debug("경매 {} 상태 저장 완료", auction.getId());
