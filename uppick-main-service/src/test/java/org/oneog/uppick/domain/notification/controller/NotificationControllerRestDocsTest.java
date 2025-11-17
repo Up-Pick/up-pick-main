@@ -13,7 +13,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.oneog.uppick.domain.notification.command.controller.NotificationCommandController;
 import org.oneog.uppick.domain.notification.command.entity.NotificationType;
-import org.oneog.uppick.domain.notification.query.model.dto.response.GetUnreadNotificationsResponse;
+import org.oneog.uppick.domain.notification.command.model.dto.response.GetUnreadNotificationsResponse;
 import org.oneog.uppick.domain.notification.command.service.NotificationCommandService;
 import org.oneog.uppick.support.auth.WithMockAuthMember;
 import org.oneog.uppick.support.restdocs.RestDocsBase;
@@ -30,6 +30,7 @@ public class NotificationControllerRestDocsTest extends RestDocsBase {
 	@Test
 	@WithMockAuthMember
 	void getUnreadNotifications() throws Exception {
+
 		// Given
 		List<GetUnreadNotificationsResponse.NotificationDetail> details = List.of(
 			GetUnreadNotificationsResponse.NotificationDetail.builder()
@@ -43,7 +44,7 @@ public class NotificationControllerRestDocsTest extends RestDocsBase {
 
 		// When & Then
 		mockMvc.perform(get("/api/v1/notifications/me")
-				.header("Authorization", "Bearer valid-token"))
+			.header("Authorization", "Bearer valid-token"))
 			.andExpect(status().isOk())
 			.andDo(document("notifications-get-unread-notifications",
 				requestHeaders(
@@ -57,4 +58,5 @@ public class NotificationControllerRestDocsTest extends RestDocsBase {
 					fieldWithPath("data.notifications[].notifiedAt").description("알림 생성 시간 (ISO 8601 형식)")
 						.type(JsonFieldType.STRING))));
 	}
+
 }
