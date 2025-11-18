@@ -34,6 +34,15 @@ public class ProductOSRepository {
         NativeQueryBuilder queryBuilder = NativeQuery.builder();
         queryBuilder.withQuery(buildBoolQuery(request));
         queryBuilder.withPageable(PageRequest.of(request.getPage(), request.getSize()));
+
+        queryBuilder.withSort(s -> s
+            .field(f -> f
+                .field("is_sold")
+                .order(SortOrder.Asc)
+                .missing(FieldValue.of("_last"))
+            )
+        );
+
         if (StringUtils.hasText(request.getSortBy().getSortType())) {
             addSort(queryBuilder, request.getSortBy().getSortType());
         }
