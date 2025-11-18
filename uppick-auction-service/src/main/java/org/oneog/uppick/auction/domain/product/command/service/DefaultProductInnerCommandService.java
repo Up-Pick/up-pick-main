@@ -15,7 +15,7 @@ public class DefaultProductInnerCommandService implements ProductInnerCommandSer
 	private final ElasticsearchOperations elasticsearchOperations;
 
 	@Override
-	public void updateProductDocumentStatus(Long productId) {
+	public void markProductAsSold(Long productId) {
 
 		UpdateQuery updateQuery = UpdateQuery.builder(String.valueOf(productId))
 			.withDocument(Document.create()

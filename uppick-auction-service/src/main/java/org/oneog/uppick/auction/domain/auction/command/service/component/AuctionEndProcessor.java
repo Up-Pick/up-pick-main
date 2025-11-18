@@ -85,10 +85,13 @@ public class AuctionEndProcessor {
 		Long auctionId = auction.getId();
 
 		try {
-			auction.markAsExpired();
 			// 경매 상태변경
+			auction.markAsExpired();
 			auctionRepository.save(auction);
 			log.debug("[Auction:{}] 유찰 상태로 변경 완료", auctionId);
+
+			// 상품 상태 변경 (Elasticsearch 반영)
+			productInnerService.markProductAsSold(auction.getProductId());
 
 			// Redis 키 정리 (입찰가, 입찰자)
 			auctionRedisRepository.deleteAuctionKeys(auctionId);
@@ -129,7 +132,7 @@ public class AuctionEndProcessor {
 		updateAuctionStatus(auction, finalPrice, buyerId);
 
 		// 경매 상태 업데이트 (Elasticsearch 반영)
-		productInnerService.updateProductDocumentStatus(productId);
+		productInnerService.markProductAsSold(productId);
 
 		// Redis 키 정리 (입찰가, 입찰자)
 		auctionRedisRepository.deleteAuctionKeys(auctionId);

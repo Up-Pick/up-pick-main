@@ -112,6 +112,7 @@ public class ProductOSRepository {
                 );
             }
         } catch (Exception e) {
+            // 무시함???
         }
     }
 

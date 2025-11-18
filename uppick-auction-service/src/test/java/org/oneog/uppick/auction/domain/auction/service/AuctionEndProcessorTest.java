@@ -98,7 +98,7 @@ class AuctionEndProcessorTest {
 		willDoNothing().given(memberInnerService).registerPurchaseDetail(any(RegisterPurchaseDetailRequest.class));
 		willDoNothing().given(memberInnerService).registerSellDetail(any(RegisterSellDetailRequest.class));
 		willDoNothing().given(notificationInnerService).sendNotification(any(SendNotificationRequest.class));
-		willDoNothing().given(productInnerService).updateProductDocumentStatus(anyLong());
+		willDoNothing().given(productInnerService).markProductAsSold(anyLong());
 
 		// when
 		auctionSchedulerService.process(auctionId);
