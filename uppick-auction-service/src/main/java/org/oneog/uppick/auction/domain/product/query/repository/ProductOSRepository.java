@@ -73,7 +73,7 @@ public class ProductOSRepository {
         );
 
         // 미판매 상품 필터 (filter)
-        if (!request.isOnlyNotSold()) {
+        if (request.isOnlyNotSold()) {
             boolQueryBuilder.filter(f -> f
                 .term(t -> t
                     .field("is_sold")
