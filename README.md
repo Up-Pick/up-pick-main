@@ -1116,8 +1116,8 @@ Lambda 실행 (1분 후)
 </a>
 </td>
 <td align="center" width="20%">
-<a href="https://github.com/soo59599">
-<img src="https://github.com/soo59599.png" width="120px" style="border-radius: 50%;" alt="박수현"/>
+<a href="https://github.com/sooh59599">
+<img src="https://github.com/sooh59599.png" width="120px" style="border-radius: 50%;" alt="박수현"/>
 <br/><b>🎯 박수현</b><br/>
 <sub>부팀장</sub>
 </a>
