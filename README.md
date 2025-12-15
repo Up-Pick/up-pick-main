@@ -7,7 +7,7 @@
 **흥정 없는 공정한 거래**
 
 [![Website](https://img.shields.io/badge/🌐_Website-up--pick.com-blue?style=for-the-badge)](https://up-pick.com)
-[![API Docs](https://img.shields.io/badge/📄_API_Docs-Available-green?style=for-the-badge)](https://up-pick.com/docs/index.html)
+[![API Docs](https://img.shields.io/badge/📄_API_Docs-Available-green?style=for-the-badge)](https://up-pick.github.io/up-pick-main/)
 
 </div>
 
@@ -159,7 +159,7 @@
 
 ### 🌐 API 명세서
 
-📄 [API 명세서 LINK](https://up-pick.com/docs/index.html)
+📄 [API 명세서 LINK](https://up-pick.github.io/up-pick-main/)
 
 ### 🏫 와이어프레임
 
